@@ -1,6 +1,6 @@
 module UnitCatalogueTests
 
-using Alicorn.Units
+using Alicorn
 using Alicorn.Utils
 using Alicorn.Exceptions
 using Test

@@ -1,6 +1,6 @@
 module UnitPrefixTests
 
-using Alicorn.Units
+using Alicorn
 using Alicorn.Utils
 using Test
 using Random
