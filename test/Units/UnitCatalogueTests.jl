@@ -7,34 +7,35 @@ using Test
 
 function run()
     @testset "UnitCatalogue" begin
-        @test canInstanciateUnitCatalogue()
-        @test canCallAllBasicPrefixes()
+        canInstanciateUnitCatalogue()
+        canCallAllBasicPrefixes()
 
-        @test canListKnownPrefixes()
+        canListKnownPrefixes()
         errorsOnUnknownUnitElement()
-        @test providesUnitPrefixTest()
-        @test propertynames()
+        testProvidesUnitPrefix()
+        testPropertynames()
 
-        @test prettyPrinting()
+        testPrettyPrinting()
 
-        @test remove!Test()
-        @test addUnitPrefix!Test()
-        addUnitPrefix!ErrorsOnDuplicates()
+        testRemove!()
+        testAdd!()
+        add!ErrorsOnDuplicates()
     end
 end
 
 function canInstanciateUnitCatalogue()
+    pass = false
     try
         ucat = UnitCatalogue()
         return true
     catch
-        return false
     end
+    @test pass
 end
 
 function canCallAllBasicPrefixes()
     basicPrefixes = _getBasicPrefixes()
-    return _canCallAllPrefixes(basicPrefixes)
+    @test _canCallAllPrefixes(basicPrefixes)
 end
 
 function _getBasicPrefixes()
@@ -85,7 +86,7 @@ function canListKnownPrefixes()
     ucat = UnitCatalogue()
     correctKnownPrefixes = _listBasicPrefixNames()
     returnedKnownPrefixes = listUnitPrefixes(ucat)
-    return returnedKnownPrefixes == correctKnownPrefixes
+    @test returnedKnownPrefixes == correctKnownPrefixes
 end
 
 function _listBasicPrefixNames()
@@ -106,10 +107,10 @@ function errorsOnUnknownUnitElement()
     @test_throws KeyError("prefixCatalogue") ucat.prefixCatalogue
 end
 
-function providesUnitPrefixTest()
+function testProvidesUnitPrefix()
     ucat = UnitCatalogue()
     examples = _getProvidesUnitPrefixExamples()
-    return _checkProvidesUnitPrefixExamplesImplemented(examples, ucat)
+    @test _checkProvidesUnitPrefixExamplesImplemented(examples, ucat)
 end
 
 function _getProvidesUnitPrefixExamples()
@@ -129,11 +130,11 @@ function _checkProvidesUnitPrefixExamplesImplemented(examples::Array{Tuple{Strin
     return correct
 end
 
-function propertynames()
+function testPropertynames()
     ucat = UnitCatalogue()
     correctPropertySymbols = _getCorrectPropertyNames(ucat)
     returnedPropertySymbols = Base.propertynames(ucat)
-    return (returnedPropertySymbols == correctPropertySymbols)
+    @test (returnedPropertySymbols == correctPropertySymbols)
 end
 
 function _getCorrectPropertyNames(ucat::UnitCatalogue)
@@ -146,11 +147,11 @@ function _getCorrectPropertyNames(ucat::UnitCatalogue)
     return correctPropertySymbols
 end
 
-function prettyPrinting()
+function testPrettyPrinting()
     ucat = UnitCatalogue()
     correctPrettyString = _getCorrectPrettyString(ucat)
     returnedPrettyString = _getGeneratedPrettyPrintingString(ucat)
-    return (returnedPrettyString == correctPrettyString)
+    @test (returnedPrettyString == correctPrettyString)
 end
 
 function _getCorrectPrettyString(ucat::UnitCatalogue)
@@ -166,23 +167,23 @@ function _getGeneratedPrettyPrintingString(ucat::UnitCatalogue)
     return generatedString
 end
 
-function remove!Test()
+function testRemove!()
     ucat = UnitCatalogue()
     remove!(ucat,"nano")
     remainingPrefixes = listUnitPrefixes(ucat)
     removalSuccessful = !(Utils.isElementOf("nano",remainingPrefixes))
-    return removalSuccessful
+    @test removalSuccessful
 end
 
-function addUnitPrefix!Test()
+function testAdd!()
     ucat = UnitCatalogue()
     unitPrefix = UnitPrefix(name="test",symbol="t",value=2e-2)
     add!(ucat,unitPrefix)
     additionSuccessful = ucat.test == unitPrefix
-    return additionSuccessful
+    @test additionSuccessful
 end
 
-function addUnitPrefix!ErrorsOnDuplicates()
+function add!ErrorsOnDuplicates()
     ucat = UnitCatalogue()
     unitPrefix = UnitPrefix(name="nano",symbol="t",value=2e-2)
     @test_throws Exceptions.DublicationError("catalogue already contains an element \"nano\"") add!(ucat,unitPrefix)

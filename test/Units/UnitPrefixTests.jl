@@ -7,27 +7,28 @@ using Random
 
 function run()
     @testset "UnitPrefix" begin
-        @test canInstantiateUnitPrefix()
-        @test unitPrefixFieldsCorrectlyInitialized()
-        unitPrefix_ErrorsForInfiniteValues()
-        unitPrefix_ErrorsForNonIdentifierNames()
-        @test equalPrefixesAreIdentical()
-        @test prettyPrinting()
+        canInstantiateUnitPrefix()
+        UnitPrefixFieldsCorrectlyInitialized()
+        UnitPrefixErrorsForInfiniteValues()
+        UnitPrefixErrorsForNonIdentifierNames()
+        testEqualPrefixesAreIdentical()
+        testPrettyPrinting()
     end
 end
 
 function canInstantiateUnitPrefix()
+    pass = false
     try
         UnitPrefix(name="nano", symbol="n", value=1e-9)
-        return true
+        pass = true
     catch
-        return false
     end
+    @test pass
 end
 
-function unitPrefixFieldsCorrectlyInitialized()
+function UnitPrefixFieldsCorrectlyInitialized()
     (prefix, randFields) = _generateRandomPrefix()
-    return _verifyPrefixHasCorrectFields(prefix, randFields)
+    @test _verifyPrefixHasCorrectFields(prefix, randFields)
 end
 
 function _generateRandomPrefix()
@@ -51,26 +52,26 @@ function _verifyPrefixHasCorrectFields(prefix::UnitPrefix, randFields::Tuple{Str
     return correct
 end
 
-function unitPrefix_ErrorsForInfiniteValues()
+function UnitPrefixErrorsForInfiniteValues()
     @test_throws DomainError(Inf,"argument must be finite") UnitPrefix(name="test", symbol="t", value=Inf)
     @test_throws DomainError(-Inf,"argument must be finite") UnitPrefix(name="test", symbol="t", value=-Inf)
     @test_throws DomainError(NaN,"argument must be finite") UnitPrefix(name="test", symbol="t", value=NaN)
 end
 
-function unitPrefix_ErrorsForNonIdentifierNames()
+function UnitPrefixErrorsForNonIdentifierNames()
     @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="test test", symbol="t", value=2)
     @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="test-test", symbol="t", value=2)
     @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="test?test", symbol="t", value=2)
     @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="}", symbol="t", value=2)
 end
 
-function equalPrefixesAreIdentical()
-    return UnitPrefix(name="nano",symbol="n",value=1e-9) === UnitPrefix(name="nano",symbol="n",value=1e-9)
+function testEqualPrefixesAreIdentical()
+    @test UnitPrefix(name="nano",symbol="n",value=1e-9) === UnitPrefix(name="nano",symbol="n",value=1e-9)
 end
 
-function prettyPrinting()
+function testPrettyPrinting()
     examples = _getExamplesForPrettyPrinting()
-    return _checkExamplesForPrettyPrintingImplemented(examples)
+    @test _checkExamplesForPrettyPrintingImplemented(examples)
 end
 
 function _getExamplesForPrettyPrinting()

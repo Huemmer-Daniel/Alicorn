@@ -5,18 +5,55 @@ using Alicorn.Utils
 
 function run()
     @testset "Utils" begin
-        @test getDecadeTest()
-        getDecadeErrorsOnInfiniteNumbers()
-        @test separatePrefactorAndDecadeTest()
+        separatePrefactorAndDecadeTest()
         separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
-        @test prettyPrintScientificNumberTest()
-        @test isElementOfTest()
+        getDecadeTest()
+        getDecadeErrorsOnInfiniteNumbers()
+        assertNumberIsFiniteTest()
+        prettyPrintScientificNumberTest()
+        isElementOfTest()
     end
 end
 
+function separatePrefactorAndDecadeTest()
+    examples = _getSeparatePrefactorAndDecadeExamples()
+    @test _checkSeparatePrefactorAndDecadeExamplesImplemented(examples)
+end
+
+function _getSeparatePrefactorAndDecadeExamples()
+    examples = [
+    (1.456e-9, (1.456,-9)),
+    (1e-10, (1.0,-10)),
+    (2e-9, (2.0,-9)),
+    (1.0, (1.0,0)),
+    (0.0, (0.0,0)),
+    (7.123e8, (7.123,8)),
+    (12.123e99, (1.2123,100))
+    ]
+    return examples
+end
+
+function _checkSeparatePrefactorAndDecadeExamplesImplemented(examples::Array{Tuple{Float64,Tuple{Float64,Int64}}})
+    correct = true
+    for (number, (correctPrefactor, correctDecade)) in examples
+        (returnedPrefactor, returnedDecade) = Utils.separatePrefactorAndDecade(number)
+        correct &= (returnedPrefactor≈correctPrefactor) && (returnedDecade==correctDecade)
+    end
+    return correct
+end
+
+function separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
+    @test_throws DomainError(Inf,"argument must be finite") Utils.separatePrefactorAndDecade(Inf)
+    @test_throws DomainError(-Inf,"argument must be finite") Utils.separatePrefactorAndDecade(-Inf)
+    @test_throws DomainError(Inf16,"argument must be finite") Utils.separatePrefactorAndDecade(Inf16)
+    @test_throws DomainError(NaN,"argument must be finite") Utils.separatePrefactorAndDecade(NaN)
+    @test_throws DomainError(NaN32,"argument must be finite") Utils.separatePrefactorAndDecade(NaN32)
+end
+
+
 function getDecadeTest()
     examples = _getDecadeExamples()
-    return _checkGetDecadeExamplesImplemented(examples)
+    @test return _checkGetDecadeExamplesImplemented(examples)
 end
 
 function _getDecadeExamples()
@@ -50,44 +87,16 @@ function getDecadeErrorsOnInfiniteNumbers()
     @test_throws DomainError(NaN32,"argument must be finite") Utils.getDecade(NaN32)
 end
 
-function separatePrefactorAndDecadeTest()
-    examples = _getSeparatePrefactorAndDecadeExamples()
-    return _checkSeparatePrefactorAndDecadeExamplesImplemented(examples)
-end
-
-function _getSeparatePrefactorAndDecadeExamples()
-    examples = [
-    (1.456e-9, (1.456,-9)),
-    (1e-10, (1.0,-10)),
-    (2e-9, (2.0,-9)),
-    (1.0, (1.0,0)),
-    (0.0, (0.0,0)),
-    (7.123e8, (7.123,8)),
-    (12.123e99, (1.2123,100))
-    ]
-    return examples
-end
-
-function _checkSeparatePrefactorAndDecadeExamplesImplemented(examples::Array{Tuple{Float64,Tuple{Float64,Int64}}})
-    correct = true
-    for (number, (correctPrefactor, correctDecade)) in examples
-        (returnedPrefactor, returnedDecade) = Utils.separatePrefactorAndDecade(number)
-        correct &= (returnedPrefactor≈correctPrefactor) && (returnedDecade==correctDecade)
+function assertNumberIsFiniteTest()
+    infiniteNumbers = [ Inf, -Inf, NaN, NaN32, Inf32, NaN16, Inf16 ]
+    for number in infiniteNumbers
+        @test_throws DomainError(number,"argument must be finite") Utils.assertNumberIsFinite(number)
     end
-    return correct
-end
-
-function separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
-    @test_throws DomainError(Inf,"argument must be finite") Utils.separatePrefactorAndDecade(Inf)
-    @test_throws DomainError(-Inf,"argument must be finite") Utils.separatePrefactorAndDecade(-Inf)
-    @test_throws DomainError(Inf16,"argument must be finite") Utils.separatePrefactorAndDecade(Inf16)
-    @test_throws DomainError(NaN,"argument must be finite") Utils.separatePrefactorAndDecade(NaN)
-    @test_throws DomainError(NaN32,"argument must be finite") Utils.separatePrefactorAndDecade(NaN32)
 end
 
 function prettyPrintScientificNumberTest()
     (examples,significantDigits) = _getPrettyPrintingExamples()
-    return _checkPrettyPrintingExamplesImplemented(examples,significantDigits)
+    @test _checkPrettyPrintingExamplesImplemented(examples,significantDigits)
 end
 
 function _getPrettyPrintingExamples()
@@ -123,7 +132,7 @@ end
 
 function isElementOfTest()
     examples = _getIsElementOfExamples()
-    return _checkIsElementOfExamplesImplemented(examples)
+    @test _checkIsElementOfExamplesImplemented(examples)
 end
 
 function _getIsElementOfExamples()

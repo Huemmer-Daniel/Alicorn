@@ -5,7 +5,7 @@ using Test
 
 function run()
     @testset "UnitAtomExponents" begin
-        @test canInstantiateUnitAtomExponents()
+        canInstantiateUnitAtomExponents()
         UnitAtomExponentsErrorsOnInfiniteArguments()
     end
     @testset "UnitAtom" begin
@@ -14,12 +14,13 @@ function run()
 end
 
 function canInstantiateUnitAtomExponents()
+    pass = false
     try
         UnitAtomExponents(kg=1, m=2, s=3, A=4, K=5, mol=6, cd=7)
-        return true
+        pass = true
     catch
-        return false
     end
+    @test pass
 end
 
 function UnitAtomExponentsErrorsOnInfiniteArguments()
