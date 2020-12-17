@@ -1,15 +1,18 @@
 module UnitsTests
 
 using Test
+using ..TestingTools
 
 include("UnitPrefixTests.jl")
-include("UnitAtomTests.jl")
+include("BaseUnitExponentsTests.jl")
+include("BaseUnitTests.jl")
 include("UnitCatalogueTests.jl")
 
 function run()
     @testset "Units" begin
         UnitPrefixTests.run()
-        UnitAtomTests.run()
+        BaseUnitExponentsTests.run()
+        BaseUnitTests.run()
         UnitCatalogueTests.run()
     end
 end

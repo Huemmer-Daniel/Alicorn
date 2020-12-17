@@ -8,8 +8,8 @@ include("Units/Units.jl")
 using .Units
 export UnitPrefix
 
-export UnitAtom
-export UnitAtomExponents
+export BaseUnit
+export BaseUnitExponents
 
 export UnitCatalogue
 export providesUnitPrefix

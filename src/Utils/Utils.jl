@@ -1,22 +1,38 @@
 module Utils
 
 function separatePrefactorAndDecade(number::Real)
-    assertNumberIsFinite(number)
+    assertIsFinite(number)
     decade = getDecade(number)
     prefactor = number/10.0^decade
     return (prefactor,decade)
 end
 
 function getDecade(number::Real)
-    assertNumberIsFinite(number)
+    assertIsFinite(number)
     decade = number == 0 ? 0 : floor(log10(abs(number)))
     return convert(Int64,decade)
 end
 
-function assertNumberIsFinite(number::Real)
+function assertIsFinite(number::Real)
     if !isfinite(number)
         throw(DomainError(number,"argument must be finite"))
+    else
+        return true
     end
+end
+
+function assertElementsAreFinite(array::Array{T,N}) where {T<:Real,N}
+    if !arefinite(array)
+        throw(DomainError(array,"argument must have finite elements"))
+    else
+        return true
+    end
+end
+
+function arefinite(array::Array{T,N}) where {T<:Real,N}
+    elementsAreFinite = map(isfinite, array)
+    allAreFinite = prod(elementsAreFinite)
+    return allAreFinite
 end
 
 function prettyPrintScientificNumber(number::Real; sigdigits::Int64=4)

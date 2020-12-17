@@ -1,6 +1,7 @@
 module UtilsTests
 
 using Test
+using ..TestingTools
 using Alicorn.Utils
 
 function run()
@@ -9,7 +10,9 @@ function run()
         separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
         getDecadeTest()
         getDecadeErrorsOnInfiniteNumbers()
-        assertNumberIsFiniteTest()
+        assertIsFiniteTest()
+        assertElementsAreFiniteTest()
+        testArefinite()
         prettyPrintScientificNumberTest()
         isElementOfTest()
     end
@@ -87,10 +90,55 @@ function getDecadeErrorsOnInfiniteNumbers()
     @test_throws DomainError(NaN32,"argument must be finite") Utils.getDecade(NaN32)
 end
 
-function assertNumberIsFiniteTest()
-    infiniteNumbers = [ Inf, -Inf, NaN, NaN32, Inf32, NaN16, Inf16 ]
+function assertIsFiniteTest()
+    infiniteNumbers = TestingTools.getInfiniteNumbers()
     for number in infiniteNumbers
-        @test_throws DomainError(number,"argument must be finite") Utils.assertNumberIsFinite(number)
+        @test_throws DomainError(number,"argument must be finite") Utils.assertIsFinite(number)
+    end
+    finiteNumbers = [1, -1e-90, pi]
+    for number in finiteNumbers
+        @test Utils.assertIsFinite(number)
+    end
+end
+
+function assertElementsAreFiniteTest()
+    infiniteArrays = _getInfiniteArrayExamples()
+    for array in infiniteArrays
+        @test_throws DomainError(array,"argument must have finite elements") Utils.assertElementsAreFinite(array)
+    end
+    finiteArrays = _getFiniteArrayExamples()
+    for array in finiteArrays
+        @test Utils.assertElementsAreFinite(array)
+    end
+end
+
+function _getInfiniteArrayExamples()
+    finiteArray = [1, 2]
+    infiniteNumbers = TestingTools.getInfiniteNumbers()
+    infiniteArrays::Array{Array{Real,1},1} = []
+    for infNumber in infiniteNumbers
+        infArray = vcat(finiteArray, infNumber)
+        push!(infiniteArrays, infArray)
+    end
+    return infiniteArrays
+end
+
+function _getFiniteArrayExamples()
+    return [
+    [7, 8],
+    [7 8],
+    [1.1 pi; 7 -1.123e-9]
+    ]
+end
+
+function testArefinite()
+    infiniteArrays = _getInfiniteArrayExamples()
+    for array in infiniteArrays
+        @test !Utils.arefinite(array)
+    end
+    finiteArrays = _getFiniteArrayExamples()
+    for array in finiteArrays
+        @test Utils.arefinite(array)
     end
 end
 

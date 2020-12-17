@@ -4,6 +4,7 @@ using Alicorn
 using Alicorn.Utils
 using Test
 using Random
+using ..TestingTools
 
 function run()
     @testset "UnitPrefix" begin
@@ -91,17 +92,10 @@ end
 function _checkExamplesForPrettyPrintingImplemented(examples::Array{Tuple{UnitPrefix,String}})
     correct = true
     for (prefix,correctPrettyStr) in examples
-        generatedPrettyStr = _getGeneratedPrettyPrintingString(prefix)
-        correct &= generatedPrettyStr==correctPrettyStr
+        generatedPrettyStr = TestingTools.getShowString(prefix)
+        correct &= ( generatedPrettyStr == correctPrettyStr )
     end
     return correct
-end
-
-function _getGeneratedPrettyPrintingString(prefix::UnitPrefix)
-    io = IOBuffer()
-    show(io,prefix)
-    generatedString = String(take!(io))
-    return generatedString
 end
 
 end # module

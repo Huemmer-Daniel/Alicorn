@@ -4,10 +4,10 @@ export UnitPrefix
 struct UnitPrefix
     name::String
     symbol::String
-    value::Float64
+    value::Real
 
     function UnitPrefix(;name::String,symbol::String,value::Real)
-        Utils.assertNumberIsFinite(value)
+        Utils.assertIsFinite(value)
         _assertNameIsValidPrefix(name)
         new(name,symbol,value)
     end
