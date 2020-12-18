@@ -72,7 +72,7 @@ end
 
 function testPrettyPrinting()
     examples = _getExamplesForPrettyPrinting()
-    @test _checkExamplesForPrettyPrintingImplemented(examples)
+    @test TestingTools.verifyPrettyPrintingImplemented(examples)
 end
 
 function _getExamplesForPrettyPrinting()
@@ -87,15 +87,6 @@ function _getExamplesForPrettyPrinting()
         examples = append!(examples,[(prefix,prettyStr)])
     end
     return examples
-end
-
-function _checkExamplesForPrettyPrintingImplemented(examples::Array{Tuple{UnitPrefix,String}})
-    correct = true
-    for (prefix,correctPrettyStr) in examples
-        generatedPrettyStr = TestingTools.getShowString(prefix)
-        correct &= ( generatedPrettyStr == correctPrettyStr )
-    end
-    return correct
 end
 
 end # module

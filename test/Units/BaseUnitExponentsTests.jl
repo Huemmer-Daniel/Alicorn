@@ -72,15 +72,21 @@ end
 
 function testPrettyPrinting()
     examples = _getExamplesForPrettyPrinting()
-    @test_skip _checkExamplesForPrettyPrintingImplemented(examples)
+    @test TestingTools.verifyPrettyPrintingImplemented(examples)
 end
 
 function _getExamplesForPrettyPrinting()
-    return NaN
-end
-
-function _checkExamplesForPrettyPrintingImplemented(examples)
-    return false
+    examples = [
+    ( BaseUnitExponents(), "BaseUnitExponents 1"),
+    ( BaseUnitExponents(kg=1), "BaseUnitExponents kg"),
+    ( BaseUnitExponents(m=2), "BaseUnitExponents m^2"),
+    ( BaseUnitExponents(m=2, s=1.554), "BaseUnitExponents m^2 s^1.6"),
+    ( BaseUnitExponents(s=1.554, A=pi), "BaseUnitExponents s^1.6 A^3.1"),
+    ( BaseUnitExponents(s=1.554, A=pi, K=-1), "BaseUnitExponents s^1.6 A^3.1 K^-1"),
+    ( BaseUnitExponents(s=1.554, mol=pi, K=-1), "BaseUnitExponents s^1.6 K^-1 mol^3.1"),
+    ( BaseUnitExponents(cd=-70), "BaseUnitExponents cd^-7e+1"),
+    ]
+    return examples
 end
 
 end # module

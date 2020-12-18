@@ -23,4 +23,13 @@ function getShowString(object)
     return generatedString
 end
 
+function verifyPrettyPrintingImplemented(examples)
+    correct = true
+    for (object, correctPrettyStr) in examples
+        generatedPrettyStr = getShowString(object)
+        correct &= ( generatedPrettyStr == correctPrettyStr )
+    end
+    return correct
+end
+
 end # module
