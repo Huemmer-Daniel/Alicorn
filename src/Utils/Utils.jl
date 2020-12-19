@@ -80,4 +80,10 @@ function isElementOf(element::T, array::Array{T}) where T
     return occurences > 0
 end
 
+function assertNameIsValidSymbol(string::String)
+    if !Base.isidentifier(string)
+        throw(ArgumentError("name argument must be a valid identifier"))
+    end
+end
+
 end # module

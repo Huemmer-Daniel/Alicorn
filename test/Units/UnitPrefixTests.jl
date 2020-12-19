@@ -9,9 +9,9 @@ using ..TestingTools
 function run()
     @testset "UnitPrefix" begin
         canInstantiateUnitPrefix()
-        UnitPrefixFieldsCorrectlyInitialized()
-        UnitPrefixErrorsForInfiniteValues()
-        UnitPrefixErrorsForNonIdentifierNames()
+        UnitPrefix_ErrorsForInfiniteValues()
+        UnitPrefix_ErrorsForNonIdentifierNames()
+        UnitPrefix_FieldsCorrectlyInitialized()
         testEqualPrefixesAreIdentical()
         testPrettyPrinting()
     end
@@ -27,43 +27,38 @@ function canInstantiateUnitPrefix()
     @test pass
 end
 
-function UnitPrefixFieldsCorrectlyInitialized()
-    (prefix, randFields) = _generateRandomPrefix()
+function UnitPrefix_FieldsCorrectlyInitialized()
+    (prefix, randFields) = TestingTools.generateRandomPrefix()
     @test _verifyPrefixHasCorrectFields(prefix, randFields)
 end
 
-function _generateRandomPrefix()
-    randFields = _generateRandomPrefixFields()
-    prefix = UnitPrefix(name=randFields[1], symbol=randFields[2], value=randFields[3])
-    return (prefix, randFields)
-end
-
-function _generateRandomPrefixFields()
-    name = Random.randstring(['a':'z';'A':'Z'],12)
-    symbol = Random.randstring(2)
-    value = rand(Float64)
-    return (name, symbol, value)
-end
-
-function _verifyPrefixHasCorrectFields(prefix::UnitPrefix, randFields::Tuple{String,String,Float64})
-    (name, symbol, value) = randFields
-    correct = (prefix.name == name)
-    correct &= (prefix.symbol == symbol)
-    correct &= (prefix.value == value)
+function _verifyPrefixHasCorrectFields(prefix::UnitPrefix, randFields::Dict)
+    correct = (prefix.name == randFields["name"])
+    correct &= (prefix.symbol == randFields["symbol"])
+    correct &= (prefix.value == randFields["value"])
     return correct
 end
 
-function UnitPrefixErrorsForInfiniteValues()
-    @test_throws DomainError(Inf,"argument must be finite") UnitPrefix(name="test", symbol="t", value=Inf)
-    @test_throws DomainError(-Inf,"argument must be finite") UnitPrefix(name="test", symbol="t", value=-Inf)
-    @test_throws DomainError(NaN,"argument must be finite") UnitPrefix(name="test", symbol="t", value=NaN)
+function UnitPrefix_ErrorsForInfiniteValues()
+    infiniteNumbers = TestingTools.getInfiniteNumbers()
+    for number in infiniteNumbers
+        @test_throws DomainError(number,"argument must be finite") UnitPrefix(
+            name = "test",
+            symbol = "t",
+            value = number
+        )
+    end
 end
 
-function UnitPrefixErrorsForNonIdentifierNames()
-    @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="test test", symbol="t", value=2)
-    @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="test-test", symbol="t", value=2)
-    @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="test?test", symbol="t", value=2)
-    @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(name="}", symbol="t", value=2)
+function UnitPrefix_ErrorsForNonIdentifierNames()
+    invalidNames = TestingTools.getInvalidUnitElementNamesTestset()
+    for name in invalidNames
+        @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(
+            name = name,
+            symbol = "t",
+            value = 2
+        )
+    end
 end
 
 function testEqualPrefixesAreIdentical()
@@ -81,10 +76,12 @@ function _getExamplesForPrettyPrinting()
 
     examples = Array{Tuple{UnitPrefix,String}}([])
     for (value,valuePrettyStr) = zip(values,valuesPrettyStrs)
-        (name,symbol,) = _generateRandomPrefixFields()
-        prefix = UnitPrefix(value=value, name=name, symbol=symbol)
+        randFields = TestingTools.generateRandomPrefixFields()
+        name = randFields["name"]
+        symbol = randFields["symbol"]
+        prefix = UnitPrefix(value = value, name = name, symbol = symbol)
         prettyStr = "UnitPrefix $name ($symbol) of value " * valuePrettyStr
-        examples = append!(examples,[(prefix,prettyStr)])
+        examples = append!( examples, [ (prefix, prettyStr) ] )
     end
     return examples
 end

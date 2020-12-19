@@ -2,25 +2,68 @@ module BaseUnitTests
 
 using Alicorn
 using Test
+using ..TestingTools
 
 function run()
     @testset "BaseUnit" begin
-        @test_skip canInstantiateBaseUnit()
+        canInstantiateBaseUnit()
+        BaseUnit_ErrorsOnInfinitePrefactor()
+        BaseUnit_ErrorsForNonIdentifierNames()
+        BaseUnit_FieldsCorrectlyInitialized()
+        @test_skip testPrettyPrinting()
     end
 end
 
 function canInstantiateBaseUnit()
+    pass = false
     try
         BaseUnit(
             name="gram",
             symbol="g",
             prefactor=1e-3,
-            exponents=Dict( [ ("kilogram", 1) ] )
+            exponents=BaseUnitExponents(kg=1)
         )
-        return true
+        pass = true
     catch
-        return false
     end
+    @test pass
+end
+
+function BaseUnit_ErrorsOnInfinitePrefactor()
+    infiniteNumbers = TestingTools.getInfiniteNumbers()
+    for number in infiniteNumbers
+        @test_throws DomainError(number,"argument must be finite") BaseUnit(
+            name="gram",
+            symbol="g",
+            prefactor=number,
+            exponents=BaseUnitExponents(kg=1)
+        )
+    end
+end
+
+function BaseUnit_ErrorsForNonIdentifierNames()
+    invalidNames = TestingTools.getInvalidUnitElementNamesTestset()
+    for name in invalidNames
+        @test_throws ArgumentError("name argument must be a valid identifier") BaseUnit(
+            name = name,
+            symbol = "t",
+            prefactor = 2,
+            exponents = BaseUnitExponents()
+        )
+    end
+end
+
+function BaseUnit_FieldsCorrectlyInitialized()
+    (baseUnit, randFields) = TestingTools.generateRandomBaseUnit()
+    @test _verifyHasCorrectFields(baseUnit, randFields)
+end
+
+function _verifyHasCorrectFields(baseUnit::BaseUnit, randFields::Dict)
+    correct = (baseUnit.name == randFields["name"])
+    correct &= (baseUnit.symbol == randFields["symbol"])
+    correct &= (baseUnit.prefactor == randFields["prefactor"])
+    correct &= (baseUnit.exponents == randFields["exponents"])
+    return correct
 end
 
 end # module

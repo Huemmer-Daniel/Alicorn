@@ -6,7 +6,7 @@ using Alicorn.Utils
 
 function run()
     @testset "Utils" begin
-        separatePrefactorAndDecadeTest()
+        testSeparatePrefactorAndDecade()
         separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
         getDecadeTest()
         getDecadeErrorsOnInfiniteNumbers()
@@ -15,10 +15,11 @@ function run()
         testArefinite()
         prettyPrintScientificNumberTest()
         isElementOfTest()
+        @test_skip @testAassertIsValidSymbol()
     end
 end
 
-function separatePrefactorAndDecadeTest()
+function testSeparatePrefactorAndDecade()
     examples = _getSeparatePrefactorAndDecadeExamples()
     @test _checkSeparatePrefactorAndDecadeExamplesImplemented(examples)
 end

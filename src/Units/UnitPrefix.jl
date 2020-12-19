@@ -8,14 +8,8 @@ struct UnitPrefix
 
     function UnitPrefix(;name::String,symbol::String,value::Real)
         Utils.assertIsFinite(value)
-        _assertNameIsValidPrefix(name)
-        new(name,symbol,value)
-    end
-end
-
-function _assertNameIsValidPrefix(name::String)
-    if !Base.isidentifier(name)
-        throw(ArgumentError("name argument must be a valid identifier"))
+        Utils.assertNameIsValidSymbol(name)
+        new(name, symbol, value)
     end
 end
 
