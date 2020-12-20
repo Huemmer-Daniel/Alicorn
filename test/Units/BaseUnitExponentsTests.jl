@@ -10,7 +10,6 @@ function run()
         canInstantiateBaseUnitExponents()
         BaseUnitExponents_ErrorsOnInfiniteArguments()
         BaseUnitExponents_FieldsCorrectlyInitialized()
-        testPrettyPrinting()
     end
 end
 
@@ -51,25 +50,6 @@ function _verifyHasCorrectFields(baseUnitExp::BaseUnitExponents, randFields::Dic
     correct &= ( baseUnitExp.molExponent == randFields["mol"] )
     correct &= ( baseUnitExp.candelaExponent == randFields["cd"] )
     return correct
-end
-
-function testPrettyPrinting()
-    examples = _getExamplesForPrettyPrinting()
-    @test TestingTools.verifyPrettyPrintingImplemented(examples)
-end
-
-function _getExamplesForPrettyPrinting()
-    examples = [
-    ( BaseUnitExponents(), "BaseUnitExponents 1"),
-    ( BaseUnitExponents(kg=1), "BaseUnitExponents kg"),
-    ( BaseUnitExponents(m=2), "BaseUnitExponents m^2"),
-    ( BaseUnitExponents(m=2, s=1.554), "BaseUnitExponents m^2 s^1.6"),
-    ( BaseUnitExponents(s=1.554, A=pi), "BaseUnitExponents s^1.6 A^3.1"),
-    ( BaseUnitExponents(s=1.554, A=pi, K=-1), "BaseUnitExponents s^1.6 A^3.1 K^-1"),
-    ( BaseUnitExponents(s=1.554, mol=pi, K=-1), "BaseUnitExponents s^1.6 K^-1 mol^3.1"),
-    ( BaseUnitExponents(cd=-70), "BaseUnitExponents cd^-7e+1"),
-    ]
-    return examples
 end
 
 end # module

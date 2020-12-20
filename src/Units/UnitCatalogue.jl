@@ -77,17 +77,6 @@ function _generatePropertySymbolList(unitElementNames::Vector{String})
     return propertyList
 end
 
-function Base.show(io::IO, ucat::UnitCatalogue)
-    output = _generatePrettyPrintingOutput(ucat)
-    print(io,output)
-end
-
-function _generatePrettyPrintingOutput(ucat::UnitCatalogue)
-    nrOfPrefixes = length(listUnitPrefixes(ucat))
-    prettyString = "UnitCatalogue providing\n\t$nrOfPrefixes unit prefixes"
-    return prettyString
-end
-
 export remove!
 function remove!(ucat::UnitCatalogue, elementName::String)
     delete!(getfield(ucat,:prefixCatalogue),elementName)

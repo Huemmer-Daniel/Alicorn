@@ -13,7 +13,6 @@ function run()
         UnitPrefix_ErrorsForNonIdentifierNames()
         UnitPrefix_FieldsCorrectlyInitialized()
         testEqualPrefixesAreIdentical()
-        testPrettyPrinting()
     end
 end
 
@@ -63,27 +62,6 @@ end
 
 function testEqualPrefixesAreIdentical()
     @test UnitPrefix(name="nano",symbol="n",value=1e-9) === UnitPrefix(name="nano",symbol="n",value=1e-9)
-end
-
-function testPrettyPrinting()
-    examples = _getExamplesForPrettyPrinting()
-    @test TestingTools.verifyPrettyPrintingImplemented(examples)
-end
-
-function _getExamplesForPrettyPrinting()
-    values = [1.200e-10,1.234e-9,0,1,2.9,0.9,0.91,0.912,0.9127,101.9]
-    valuesPrettyStrs = ["1.2e-10", "1.23e-9", "0", "1", "2.9", "9e-1", "9.1e-1", "9.12e-1", "9.13e-1", "1.02e+2"]
-
-    examples = Array{Tuple{UnitPrefix,String}}([])
-    for (value,valuePrettyStr) = zip(values,valuesPrettyStrs)
-        randFields = TestingTools.generateRandomPrefixFields()
-        name = randFields["name"]
-        symbol = randFields["symbol"]
-        prefix = UnitPrefix(value = value, name = name, symbol = symbol)
-        prettyStr = "UnitPrefix $name ($symbol) of value " * valuePrettyStr
-        examples = append!( examples, [ (prefix, prettyStr) ] )
-    end
-    return examples
 end
 
 end # module

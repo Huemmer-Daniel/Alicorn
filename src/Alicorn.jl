@@ -17,4 +17,6 @@ export listUnitPrefixes
 export remove!
 export add!
 
+include("PrettyPrinting/PrettyPrinting.jl")
+
 end # module

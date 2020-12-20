@@ -7,22 +7,6 @@ function getInfiniteNumbers()
     return [ Inf, -Inf, Inf64, Inf32, Inf16, NaN, NaN64, NaN32, NaN16 ]
 end
 
-function getShowString(object)
-    io = IOBuffer()
-    show(io, object)
-    generatedString = String(take!(io))
-    return generatedString
-end
-
-function verifyPrettyPrintingImplemented(examples)
-    correct = true
-    for (object, correctPrettyStr) in examples
-        generatedPrettyStr = getShowString(object)
-        correct &= ( generatedPrettyStr == correctPrettyStr )
-    end
-    return correct
-end
-
 function generateRandomPrefix()
     randFields = generateRandomPrefixFields()
     prefix = UnitPrefix(

@@ -10,7 +10,6 @@ function run()
         BaseUnit_ErrorsOnInfinitePrefactor()
         BaseUnit_ErrorsForNonIdentifierNames()
         BaseUnit_FieldsCorrectlyInitialized()
-        @test_skip testPrettyPrinting()
     end
 end
 

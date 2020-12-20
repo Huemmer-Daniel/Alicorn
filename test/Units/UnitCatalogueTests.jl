@@ -15,8 +15,6 @@ function run()
         testProvidesUnitPrefix()
         testPropertynames()
 
-        testPrettyPrinting()
-
         testRemove!()
         testAdd!()
         add!ErrorsOnDuplicates()
@@ -145,26 +143,6 @@ function _getCorrectPropertyNames(ucat::UnitCatalogue)
         correctPropertySymbols[index] = Symbol(prefixName)
     end
     return correctPropertySymbols
-end
-
-function testPrettyPrinting()
-    ucat = UnitCatalogue()
-    correctPrettyString = _getCorrectPrettyString(ucat)
-    returnedPrettyString = _getGeneratedPrettyPrintingString(ucat)
-    @test (returnedPrettyString == correctPrettyString)
-end
-
-function _getCorrectPrettyString(ucat::UnitCatalogue)
-    nrOfUnitPrefixes = length(_listBasicPrefixNames())
-    prettyString = "UnitCatalogue providing\n\t$nrOfUnitPrefixes unit prefixes"
-    return prettyString
-end
-
-function _getGeneratedPrettyPrintingString(ucat::UnitCatalogue)
-    io = IOBuffer()
-    show(io,ucat)
-    generatedString = String(take!(io))
-    return generatedString
 end
 
 function testRemove!()

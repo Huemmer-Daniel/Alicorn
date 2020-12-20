@@ -5,3 +5,6 @@ UtilsTests.run()
 
 include("Units/UnitsTests.jl")
 UnitsTests.run()
+
+include("PrettyPrinting/PrettyPrintingTests.jl")
+PrettyPrintingTests.run()

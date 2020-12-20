@@ -13,9 +13,8 @@ function run()
         assertIsFiniteTest()
         assertElementsAreFiniteTest()
         testArefinite()
-        prettyPrintScientificNumberTest()
         isElementOfTest()
-        @test_skip @testAassertIsValidSymbol()
+        testAssertIsValidSymbol()
     end
 end
 
@@ -143,42 +142,6 @@ function testArefinite()
     end
 end
 
-function prettyPrintScientificNumberTest()
-    (examples,significantDigits) = _getPrettyPrintingExamples()
-    @test _checkPrettyPrintingExamplesImplemented(examples,significantDigits)
-end
-
-function _getPrettyPrintingExamples()
-    significantDigits = 3
-    examples = [
-    (1.200e-10,"1.2e-10"),
-    (1.234e-9,"1.23e-9"),
-    (0,"0"),
-    (1,"1"),
-    (2.9,"2.9"),
-    (0.9,"9e-1"),
-    (0.91,"9.1e-1"),
-    (0.912,"9.12e-1"),
-    (0.9127,"9.13e-1"),
-    (101.9,"1.02e+2"),
-    (Inf,"Inf"),
-    (NaN,"NaN"),
-    (NaN32,"NaN"),
-    (-Inf,"-Inf"),
-    (Inf32,"Inf"),
-    ]
-    return (examples,significantDigits)
-end
-
-function _checkPrettyPrintingExamplesImplemented(examples::Array{Tuple{Real,String}},significantDigits::Int64)
-    correct = true
-    for (number, correctPrettyStr) in examples
-        returnedPrettyString = Utils.prettyPrintScientificNumber(number, sigdigits=significantDigits)
-        correct &= returnedPrettyString==correctPrettyStr
-    end
-    return correct
-end
-
 function isElementOfTest()
     examples = _getIsElementOfExamples()
     @test _checkIsElementOfExamplesImplemented(examples)
@@ -199,6 +162,13 @@ function _checkIsElementOfExamplesImplemented(examples::Array{ Tuple{T, Array{T,
         correct &= (returnedResult == correctResult)
     end
     return correct
+end
+
+function testAssertIsValidSymbol()
+    invalidNames = TestingTools.getInvalidUnitElementNamesTestset()
+    for name in invalidNames
+        @test_throws ArgumentError("name argument must be a valid identifier") Utils.assertNameIsValidSymbol(name)
+    end
 end
 
 end # end
