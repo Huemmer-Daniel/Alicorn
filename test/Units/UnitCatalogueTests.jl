@@ -8,7 +8,8 @@ using Test
 function run()
     @testset "UnitCatalogue" begin
         canInstanciateUnitCatalogue()
-        canCallAllBasicPrefixes()
+        canCallAllPredefinedPrefixes()
+        canInstanciateEmptyUnitCatalogue()
 
         canListKnownPrefixes()
         errorsOnUnknownUnitElement()
@@ -31,7 +32,12 @@ function canInstanciateUnitCatalogue()
     @test pass
 end
 
-function canCallAllBasicPrefixes()
+function canInstanciateEmptyUnitCatalogue()
+    ucat = UnitCatalogue(addDefaultDefinitions = false)
+    @test isempty(listUnitPrefixes(ucat))
+end
+
+function canCallAllPredefinedPrefixes()
     basicPrefixes = _getBasicPrefixes()
     @test _canCallAllPrefixes(basicPrefixes)
 end

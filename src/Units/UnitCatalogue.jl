@@ -2,38 +2,16 @@ using ..Utils
 using ..Exceptions
 
 export UnitCatalogue
-struct UnitCatalogue
+mutable struct UnitCatalogue
     prefixCatalogue::Dict{String,UnitPrefix}
 
-    function UnitCatalogue()
-        prefixCatalogue = _getBasicPrefixesDict()
-        new(prefixCatalogue)
+    function UnitCatalogue(; addDefaultDefinitions = true)
+        unitCatalogue = new(Dict())
+        if addDefaultDefinitions
+            initializeDefaultDefinitions!(unitCatalogue)
+        end
+        return unitCatalogue
     end
-end
-
-function _getBasicPrefixesDict()::Dict{String, UnitPrefix}
-    return Dict([
-    ("yotta",UnitPrefix(name="yotta",symbol="Y",value=1e+24)),
-    ("zetta",UnitPrefix(name="zetta",symbol="Z",value=1e+21)),
-    ("exa",UnitPrefix(name="exa",symbol="E",value=1e+18)),
-    ("peta",UnitPrefix(name="peta",symbol="P",value=1e+15)),
-    ("tera",UnitPrefix(name="tera",symbol="T",value=1e+12)),
-    ("giga",UnitPrefix(name="giga",symbol="G",value=1e+9)),
-    ("mega",UnitPrefix(name="mega",symbol="M",value=1e+6)),
-    ("kilo",UnitPrefix(name="kilo",symbol="k",value=1e+3)),
-    ("hecto",UnitPrefix(name="hecto",symbol="h",value=1e+2)),
-    ("deca",UnitPrefix(name="deca",symbol="da",value=1e+1)),
-    ("deci",UnitPrefix(name="deci",symbol="d",value=1e-1)),
-    ("centi",UnitPrefix(name="centi",symbol="c",value=1e-2)),
-    ("milli",UnitPrefix(name="milli",symbol="m",value=1e-3)),
-    ("micro",UnitPrefix(name="micro",symbol="μ",value=1e-6)),
-    ("nano",UnitPrefix(name="nano",symbol="n",value=1e-9)),
-    ("pico",UnitPrefix(name="pico",symbol="p",value=1e-12)),
-    ("femto",UnitPrefix(name="femto",symbol="f",value=1e-15)),
-    ("atto",UnitPrefix(name="atto",symbol="a",value=1e-18)),
-    ("zepto",UnitPrefix(name="zepto",symbol="z",value=1e-21)),
-    ("yocto",UnitPrefix(name="yocto",symbol="y",value=1e-24))
-    ])
 end
 
 function Base.getproperty(unitCatalogue::UnitCatalogue, symbol::Symbol)
