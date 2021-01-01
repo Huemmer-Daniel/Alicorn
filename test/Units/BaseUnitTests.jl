@@ -10,6 +10,7 @@ function run()
         BaseUnit_ErrorsOnInfinitePrefactor()
         BaseUnit_ErrorsForNonIdentifierNames()
         BaseUnit_FieldsCorrectlyInitialized()
+        test_isequal()
     end
 end
 
@@ -63,6 +64,23 @@ function _verifyHasCorrectFields(baseUnit::BaseUnit, randFields::Dict)
     correct &= (baseUnit.prefactor == randFields["prefactor"])
     correct &= (baseUnit.exponents == randFields["exponents"])
     return correct
+end
+
+function test_isequal()
+    randomFields = TestingTools.generateRandomBaseUnitFields()
+    baseUnit1 = _initializeUnitFactorFromDict(randomFields)
+    baseUnit2 = _initializeUnitFactorFromDict(randomFields)
+    @test baseUnit1 == baseUnit2
+end
+
+function _initializeUnitFactorFromDict(fields::Dict)
+    baseUnit = BaseUnit(
+        name = fields["name"],
+        symbol = fields["symbol"],
+        prefactor = fields["prefactor"],
+        exponents = fields["exponents"]
+    )
+    return baseUnit
 end
 
 end # module

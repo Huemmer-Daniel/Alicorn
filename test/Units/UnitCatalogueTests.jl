@@ -54,12 +54,14 @@ end
 function _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitElementNames()
     unitPrefixes = TestingTools.getUnitPrefixTestSet()
     baseUnits = TestingTools.getBaseUnitTestSet()
+    randomUnitPrefix = TestingTools.getRandomUnitPrefix()
+    randomBaseUnit = TestingTools.getRandomBaseUnit()
 
-    usedPrefixName = unitPrefixes[1].name
-    usedBaseUnitName = baseUnits[1].name
+    usedPrefixName = randomUnitPrefix.name
+    usedBaseUnitName = randomBaseUnit.name
 
-    prefix_prefix_double = unitPrefixes[1]
-    baseUnit_baseUnit_double = baseUnits[1]
+    prefix_prefix_double = randomUnitPrefix
+    baseUnit_baseUnit_double = randomBaseUnit
 
     prefix_baseUnit_double = UnitPrefix(
         name=usedBaseUnitName,
@@ -67,7 +69,7 @@ function _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitElementNames()
         value=1
     )
     baseUnit_prefix_double = BaseUnit(
-        name=usedBaseUnitName,
+        name=usedPrefixName,
         symbol="t",
         prefactor=1,
         exponents=BaseUnitExponents()
@@ -143,6 +145,7 @@ end
 function _getUnitPrefixTestNames()
     unitPrefixTestSet = TestingTools.getUnitPrefixTestSet()
     unitPrefixNames = _getUnitElementNamesFrom(unitPrefixTestSet)
+    sort!(unitPrefixNames)
     return unitPrefixNames
 end
 
@@ -156,6 +159,7 @@ end
 function _getBaseUnitTestNames()
     baseUnitTestSet = TestingTools.getBaseUnitTestSet()
     baseUnitNames = _getUnitElementNamesFrom(baseUnitTestSet)
+    sort!(baseUnitNames)
     return baseUnitNames
 end
 
@@ -393,7 +397,7 @@ end
 
 function test_add!_forUnitPrefix()
     emptyUcat = UnitCatalogue([], [])
-    testUnitPrefix = TestingTools.getUnitPrefixTestSet()[1]
+    (testUnitPrefix,) = TestingTools.generateRandomUnitPrefix()
     _test_add!_forUnitElement(emptyUcat, testUnitPrefix)
 end
 
@@ -414,7 +418,7 @@ end
 
 function test_add!_forBaseUnit()
     emptyUcat = UnitCatalogue([], [])
-    testBaseUnit = TestingTools.getBaseUnitTestSet()[1]
+    (testBaseUnit,) = TestingTools.generateRandomBaseUnit()
     _test_add!_forUnitElement(emptyUcat, testBaseUnit)
 end
 

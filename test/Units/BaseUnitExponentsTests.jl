@@ -10,6 +10,7 @@ function run()
         canInstantiateBaseUnitExponents()
         BaseUnitExponents_ErrorsOnInfiniteArguments()
         BaseUnitExponents_FieldsCorrectlyInitialized()
+        test_isequal()
     end
 end
 
@@ -41,7 +42,6 @@ function BaseUnitExponents_FieldsCorrectlyInitialized()
     @test _verifyHasCorrectFields(baseUnitExp, randFields)
 end
 
-
 function _verifyHasCorrectFields(baseUnitExp::BaseUnitExponents, randFields::Dict)
     correct = ( baseUnitExp.kilogramExponent == randFields["kg"] )
     correct &= ( baseUnitExp.meterExponent == randFields["m"] )
@@ -50,6 +50,26 @@ function _verifyHasCorrectFields(baseUnitExp::BaseUnitExponents, randFields::Dic
     correct &= ( baseUnitExp.molExponent == randFields["mol"] )
     correct &= ( baseUnitExp.candelaExponent == randFields["cd"] )
     return correct
+end
+
+function test_isequal()
+    randomFields = TestingTools.generateRandomBaseUnitExponentsFields()
+    baseUnitExponents1 = _initializeUnitFactorFromDict(randomFields)
+    baseUnitExponents2 = _initializeUnitFactorFromDict(randomFields)
+    @test baseUnitExponents1 == baseUnitExponents2
+end
+
+function _initializeUnitFactorFromDict(fields::Dict)
+    baseUnitExponents = BaseUnitExponents(
+        kg = fields["kg"],
+        m = fields["m"],
+        s = fields["s"],
+        A = fields["A"],
+        K = fields["K"],
+        mol = fields["mol"],
+        cd = fields["cd"]
+    )
+    return baseUnitExponents
 end
 
 end # module

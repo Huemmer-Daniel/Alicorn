@@ -66,7 +66,7 @@ function _getUnitPrefixExamples()
 
     examples = Array{Tuple{UnitPrefix,String}}([])
     for (value,valuePrettyStr) = zip(values,valuesPrettyStrs)
-        randFields = TestingTools.generateRandomPrefixFields()
+        randFields = TestingTools.generateRandomUnitPrefixFields()
         name = randFields["name"]
         symbol = randFields["symbol"]
         prefix = UnitPrefix(value = value, name = name, symbol = symbol)

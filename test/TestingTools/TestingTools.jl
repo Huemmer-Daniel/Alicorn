@@ -7,22 +7,22 @@ function getInfiniteNumbers()
     return [ Inf, -Inf, Inf64, Inf32, Inf16, NaN, NaN64, NaN32, NaN16 ]
 end
 
-function generateRandomPrefix()
-    randFields = generateRandomPrefixFields()
-    prefix = UnitPrefix(
-        name = randFields["name"],
-        symbol = randFields["symbol"],
-        value = randFields["value"]
+function generateRandomUnitPrefix()
+    randomFields = generateRandomUnitPrefixFields()
+    randomPrefix = UnitPrefix(
+        name = randomFields["name"],
+        symbol = randomFields["symbol"],
+        value = randomFields["value"]
     )
-    return (prefix, randFields)
+    return (randomPrefix, randomFields)
 end
 
-function generateRandomPrefixFields()
-    randFields = Dict{String,Any}()
-    randFields["name"] = generateRandomName()
-    randFields["symbol"] = generateRandomSymbol()
-    randFields["value"] = generateRandomReal()
-    return randFields
+function generateRandomUnitPrefixFields()
+    randomFields = Dict{String,Any}()
+    randomFields["name"] = generateRandomName()
+    randomFields["symbol"] = generateRandomSymbol()
+    randomFields["value"] = generateRandomReal()
+    return randomFields
 end
 
 function generateRandomName()
@@ -43,17 +43,17 @@ function generateRandomReal(; dim = 1)
 end
 
 function generateRandomBaseUnitExponents()
-    randFields = generateRandomBaseUnitExponentsFields()
-    baseUnitExp = BaseUnitExponents(
-        kg = randFields["kg"],
-        m = randFields["m"],
-        s = randFields["s"],
-        A = randFields["A"],
-        K = randFields["K"],
-        mol = randFields["mol"],
-        cd = randFields["cd"]
+    randomFields = generateRandomBaseUnitExponentsFields()
+    randomBaseUnitExp = BaseUnitExponents(
+        kg = randomFields["kg"],
+        m = randomFields["m"],
+        s = randomFields["s"],
+        A = randomFields["A"],
+        K = randomFields["K"],
+        mol = randomFields["mol"],
+        cd = randomFields["cd"]
     )
-    return (baseUnitExp, randFields)
+    return (randomBaseUnitExp, randomFields)
 end
 
 function generateRandomBaseUnitExponentsFields()
@@ -67,24 +67,24 @@ function _getCoreSIUnits()
 end
 
 function generateRandomBaseUnit()
-    randFields = generateRandomBaseUnitFields()
+    randomFields = generateRandomBaseUnitFields()
     baseUnit = BaseUnit(
-        name = randFields["name"],
-        symbol = randFields["symbol"],
-        prefactor = randFields["prefactor"],
-        exponents = randFields["exponents"]
+        name = randomFields["name"],
+        symbol = randomFields["symbol"],
+        prefactor = randomFields["prefactor"],
+        exponents = randomFields["exponents"]
     )
-    return (baseUnit, randFields)
+    return (baseUnit, randomFields)
 end
 
 function generateRandomBaseUnitFields()
-    randFields = Dict{String,Any}()
-    randFields["name"] = generateRandomName()
-    randFields["symbol"] = generateRandomSymbol()
-    randFields["prefactor"] = generateRandomReal()
+    randomFields = Dict{String,Any}()
+    randomFields["name"] = generateRandomName()
+    randomFields["symbol"] = generateRandomSymbol()
+    randomFields["prefactor"] = generateRandomReal()
     (exponents,) = generateRandomBaseUnitExponents()
-    randFields["exponents"] = exponents
-    return randFields
+    randomFields["exponents"] = exponents
+    return randomFields
 end
 
 function getInvalidUnitElementNamesTestset()
@@ -128,17 +128,70 @@ end
 function getUnitPrefixTestSet()
     unitPrefixTestSet = [
         UnitPrefix(name="yotta", symbol="Y", value=1e+24),
-        UnitPrefix(name="zetta", symbol="Z", value=1e+21)
+        UnitPrefix(name="zetta", symbol="Z", value=1e+21),
+        UnitPrefix(name="milli", symbol="m", value=1e-3),
+        UnitPrefix(name="micro", symbol="μ", value=1e-6),
+        UnitPrefix(name="nano", symbol="n", value=1e-9),
+        UnitPrefix(name="pico", symbol="p", value=1e-12),
+        UnitPrefix(name="femto", symbol="f", value=1e-15),
+        UnitPrefix(name="atto", symbol="a", value=1e-18),
+        UnitPrefix(name="zepto", symbol="z", value=1e-21),
+        UnitPrefix(name="yocto", symbol="y", value=1e-24)
     ]
     return unitPrefixTestSet
+end
+
+function getRandomUnitPrefix()
+    prefixTestSet = getUnitPrefixTestSet()
+    testSetSize = length(prefixTestSet)
+    randomIndex = rand(1:testSetSize)
+    randomPrefix = prefixTestSet[randomIndex]
+    return randomPrefix
 end
 
 function getBaseUnitTestSet()
     baseUnitTestSet = [
         BaseUnit(name="gram", symbol="g", prefactor=1e-3, exponents=BaseUnitExponents(kg=1)),
-        BaseUnit(name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1))
+        BaseUnit(name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1)),
+        BaseUnit(name="hertz", symbol="Hz", prefactor=1, exponents=BaseUnitExponents(s=-1)),
+        BaseUnit(name="radian", symbol="rad", prefactor=1, exponents=BaseUnitExponents()),
+        BaseUnit(name="steradian", symbol="sr", prefactor=1, exponents=BaseUnitExponents()),
+        BaseUnit(name="newton", symbol="N", prefactor=1, exponents=BaseUnitExponents(kg=1, m=1, s=-2)),
+        BaseUnit(name="pascal", symbol="Pa", prefactor=1, exponents=BaseUnitExponents(kg=1, m=-1, s=-2)),
+        BaseUnit(name="joule", symbol="J", prefactor=1, exponents=BaseUnitExponents(kg=1, m=2, s=-2)),
+        BaseUnit(name="watt", symbol="W", prefactor=1, exponents=BaseUnitExponents(kg=1, m=2, s=-3))
     ]
     return baseUnitTestSet
+end
+
+function getRandomBaseUnit()
+    baseUnitTestSet = getBaseUnitTestSet()
+    testSetSize = length(baseUnitTestSet)
+    randomIndex = rand(1:testSetSize)
+    randomBaseUnit = baseUnitTestSet[randomIndex]
+    return randomBaseUnit
+end
+
+function generateRandomUnitFactor()
+    randomFields = generateRandomUnitFactorFields()
+    randomUnitFactor = UnitFactor(
+        randomFields["unitPrefix"],
+        randomFields["baseUnit"],
+        randomFields["exponent"]
+    )
+    return (randomUnitFactor, randomFields)
+end
+
+function generateRandomUnitFactorFields()
+    (randomPrefix,) = generateRandomUnitPrefix()
+    (randombaseUnit,) = generateRandomBaseUnit()
+    randomExponent = generateRandomReal()
+
+    randomFields = Dict{String,Any}()
+    randomFields["unitPrefix"] = randomPrefix
+    randomFields["baseUnit"] = randombaseUnit
+    randomFields["exponent"] = randomExponent
+    return randomFields
 end
 
 end # module

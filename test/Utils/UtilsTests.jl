@@ -10,6 +10,7 @@ function run()
         test_separatePrefactorAndDecade_errorsOnInfiniteNumbers()
         test_getDecade()
         test_getDecade_errorsOnInfiniteNumbers()
+        test_assertIsNonzero()
         test_assertIsFinite()
         test_assertElementsAreFinite()
         test_arefinite()
@@ -89,6 +90,11 @@ function test_getDecade_errorsOnInfiniteNumbers()
     @test_throws DomainError(Inf16,"argument must be finite") Utils.getDecade(Inf16)
     @test_throws DomainError(NaN,"argument must be finite") Utils.getDecade(NaN)
     @test_throws DomainError(NaN32,"argument must be finite") Utils.getDecade(NaN32)
+end
+
+function test_assertIsNonzero()
+    number = 0
+    @test_throws DomainError(number,"argument must be nonzero") Utils.assertIsNonzero(number)
 end
 
 function test_assertIsFinite()

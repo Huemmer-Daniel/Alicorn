@@ -13,6 +13,14 @@ function getDecade(number::Real)
     return convert(Int64,decade)
 end
 
+function assertIsNonzero(number::Real)
+    if number == 0
+        throw(DomainError(number,"argument must be nonzero"))
+    else
+        return true
+    end
+end
+
 function assertIsFinite(number::Real)
     if !isfinite(number)
         throw(DomainError(number,"argument must be finite"))

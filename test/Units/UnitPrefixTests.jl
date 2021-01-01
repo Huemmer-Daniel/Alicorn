@@ -12,6 +12,7 @@ function run()
         UnitPrefix_ErrorsForInfiniteValues()
         UnitPrefix_ErrorsForNonIdentifierNames()
         UnitPrefix_FieldsCorrectlyInitialized()
+        test_isequal()
         testEqualPrefixesAreIdentical()
     end
 end
@@ -27,7 +28,7 @@ function canInstantiateUnitPrefix()
 end
 
 function UnitPrefix_FieldsCorrectlyInitialized()
-    (prefix, randFields) = TestingTools.generateRandomPrefix()
+    (prefix, randFields) = TestingTools.generateRandomUnitPrefix()
     @test _verifyPrefixHasCorrectFields(prefix, randFields)
 end
 
@@ -60,8 +61,27 @@ function UnitPrefix_ErrorsForNonIdentifierNames()
     end
 end
 
+function test_isequal()
+    randomFields = TestingTools.generateRandomUnitPrefixFields()
+    prefix1 = _initializeUnitFactorFromDict(randomFields)
+    prefix2 = _initializeUnitFactorFromDict(randomFields)
+    @test prefix1 == prefix2
+end
+
+function _initializeUnitFactorFromDict(fields::Dict)
+    unitPrefix = UnitPrefix(
+        name = fields["name"],
+        symbol = fields["symbol"],
+        value = fields["value"]
+    )
+    return unitPrefix
+end
+
 function testEqualPrefixesAreIdentical()
-    @test UnitPrefix(name="nano",symbol="n",value=1e-9) === UnitPrefix(name="nano",symbol="n",value=1e-9)
+    randomFields = TestingTools.generateRandomUnitPrefixFields()
+    prefix1 = _initializeUnitFactorFromDict(randomFields)
+    prefix2 = _initializeUnitFactorFromDict(randomFields)
+    @test prefix1 === prefix2
 end
 
 end # module

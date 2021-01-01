@@ -11,6 +11,7 @@ export UnitElement
 export UnitPrefix
 export BaseUnitExponents
 export BaseUnit
+export UnitFactor
 
 export UnitCatalogue
 export listUnitPrefixes
