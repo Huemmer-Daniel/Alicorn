@@ -1,7 +1,7 @@
 using ..Utils
 
 export BaseUnit
-struct BaseUnit
+struct BaseUnit <: UnitElement
     name::String
     symbol::String
     prefactor::Real

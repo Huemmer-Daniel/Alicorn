@@ -6,14 +6,19 @@ include("Exceptions/Exceptions.jl")
 
 include("Units/Units.jl")
 using .Units
-export UnitPrefix
 
-export BaseUnit
+export UnitElement
+export UnitPrefix
 export BaseUnitExponents
+export BaseUnit
 
 export UnitCatalogue
-export providesUnitPrefix
 export listUnitPrefixes
+export listBaseUnits
+export listUnitPrefixNames
+export listBaseUnitNames
+export providesUnitPrefix
+export providesBaseUnit
 export remove!
 export add!
 

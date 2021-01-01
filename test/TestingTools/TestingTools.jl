@@ -91,4 +91,54 @@ function getInvalidUnitElementNamesTestset()
     return ["test test", "test-test", "test?test", "}"]
 end
 
+function dictsAreIdentical(dict1::Dict, dict2::Dict)
+    sameType = ( typeof(dict1) == typeof(dict2) )
+    if !sameType
+        return false
+    end
+
+    keysMatch = ( keys(dict1) == keys(dict2) )
+    if !keysMatch
+        return false
+    end
+
+    valuesMatch = true
+    for key in keys(dict1)
+        valuesMatch &= ( dict1[key] == dict2[key] )
+    end
+    return valuesMatch
+end
+
+function verifyFunctionWorksAsExpected(func, examples::Array)
+    correct = true
+    for (input, correctOutput) in examples
+        returnedOutput = func(input)
+        correct &= (returnedOutput == correctOutput)
+    end
+    return correct
+end
+
+function initializeTestUnitCatalogue()
+    unitPrefixes = getUnitPrefixTestSet()
+    baseUnits = getBaseUnitTestSet()
+    ucat = UnitCatalogue(unitPrefixes, baseUnits)
+    return ucat
+end
+
+function getUnitPrefixTestSet()
+    unitPrefixTestSet = [
+        UnitPrefix(name="yotta", symbol="Y", value=1e+24),
+        UnitPrefix(name="zetta", symbol="Z", value=1e+21)
+    ]
+    return unitPrefixTestSet
+end
+
+function getBaseUnitTestSet()
+    baseUnitTestSet = [
+        BaseUnit(name="gram", symbol="g", prefactor=1e-3, exponents=BaseUnitExponents(kg=1)),
+        BaseUnit(name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1))
+    ]
+    return baseUnitTestSet
+end
+
 end # module

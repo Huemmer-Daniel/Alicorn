@@ -1,5 +1,8 @@
 module Units
 
+export UnitElement
+abstract type UnitElement end
+
 include("UnitPrefix.jl")
 include("BaseUnitExponents.jl")
 include("BaseUnit.jl")

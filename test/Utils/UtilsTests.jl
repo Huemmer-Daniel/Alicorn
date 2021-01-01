@@ -6,24 +6,25 @@ using Alicorn.Utils
 
 function run()
     @testset "Utils" begin
-        testSeparatePrefactorAndDecade()
-        separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
-        getDecadeTest()
-        getDecadeErrorsOnInfiniteNumbers()
-        assertIsFiniteTest()
-        assertElementsAreFiniteTest()
-        testArefinite()
-        isElementOfTest()
-        testAssertIsValidSymbol()
+        test_separatePrefactorAndDecade()
+        test_separatePrefactorAndDecade_errorsOnInfiniteNumbers()
+        test_getDecade()
+        test_getDecade_errorsOnInfiniteNumbers()
+        test_assertIsFinite()
+        test_assertElementsAreFinite()
+        test_arefinite()
+        test_occurencesIn()
+        test_isElementOf()
+        test_assertIsValidSymbol()
     end
 end
 
-function testSeparatePrefactorAndDecade()
-    examples = _getSeparatePrefactorAndDecadeExamples()
-    @test _checkSeparatePrefactorAndDecadeExamplesImplemented(examples)
+function test_separatePrefactorAndDecade()
+    examples = _getExamplesFor_separatePrefactorAndDecade()
+    @test _testExamplesFor_separatePrefactorAndDecade(examples)
 end
 
-function _getSeparatePrefactorAndDecadeExamples()
+function _getExamplesFor_separatePrefactorAndDecade()
     examples = [
     (1.456e-9, (1.456,-9)),
     (1e-10, (1.0,-10)),
@@ -36,7 +37,7 @@ function _getSeparatePrefactorAndDecadeExamples()
     return examples
 end
 
-function _checkSeparatePrefactorAndDecadeExamplesImplemented(examples::Array{Tuple{Float64,Tuple{Float64,Int64}}})
+function _testExamplesFor_separatePrefactorAndDecade(examples::Array)
     correct = true
     for (number, (correctPrefactor, correctDecade)) in examples
         (returnedPrefactor, returnedDecade) = Utils.separatePrefactorAndDecade(number)
@@ -45,7 +46,7 @@ function _checkSeparatePrefactorAndDecadeExamplesImplemented(examples::Array{Tup
     return correct
 end
 
-function separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
+function test_separatePrefactorAndDecade_errorsOnInfiniteNumbers()
     @test_throws DomainError(Inf,"argument must be finite") Utils.separatePrefactorAndDecade(Inf)
     @test_throws DomainError(-Inf,"argument must be finite") Utils.separatePrefactorAndDecade(-Inf)
     @test_throws DomainError(Inf16,"argument must be finite") Utils.separatePrefactorAndDecade(Inf16)
@@ -54,12 +55,12 @@ function separatePrefactorAndDecadeErrorsOnInfiniteNumbers()
 end
 
 
-function getDecadeTest()
-    examples = _getDecadeExamples()
-    @test return _checkGetDecadeExamplesImplemented(examples)
+function test_getDecade()
+    examples = _getExamplesFor_getDecade()
+    @test return _testExamplesFor_getDecade(examples)
 end
 
-function _getDecadeExamples()
+function _getExamplesFor_getDecade()
     examples = [
     (1.456e-9,-9),
     (1e-10,-10),
@@ -73,7 +74,7 @@ function _getDecadeExamples()
     return examples
 end
 
-function _checkGetDecadeExamplesImplemented(examples::Array{Tuple{Float64,Int64}})
+function _testExamplesFor_getDecade(examples::Array{Tuple{Float64,Int64}})
     correct = true
     for (number, correctDecade) in examples
         returnedDecade = Utils.getDecade(number)
@@ -82,7 +83,7 @@ function _checkGetDecadeExamplesImplemented(examples::Array{Tuple{Float64,Int64}
     return correct
 end
 
-function getDecadeErrorsOnInfiniteNumbers()
+function test_getDecade_errorsOnInfiniteNumbers()
     @test_throws DomainError(Inf,"argument must be finite") Utils.getDecade(Inf)
     @test_throws DomainError(-Inf,"argument must be finite") Utils.getDecade(-Inf)
     @test_throws DomainError(Inf16,"argument must be finite") Utils.getDecade(Inf16)
@@ -90,7 +91,7 @@ function getDecadeErrorsOnInfiniteNumbers()
     @test_throws DomainError(NaN32,"argument must be finite") Utils.getDecade(NaN32)
 end
 
-function assertIsFiniteTest()
+function test_assertIsFinite()
     infiniteNumbers = TestingTools.getInfiniteNumbers()
     for number in infiniteNumbers
         @test_throws DomainError(number,"argument must be finite") Utils.assertIsFinite(number)
@@ -101,7 +102,7 @@ function assertIsFiniteTest()
     end
 end
 
-function assertElementsAreFiniteTest()
+function test_assertElementsAreFinite()
     infiniteArrays = _getInfiniteArrayExamples()
     for array in infiniteArrays
         @test_throws DomainError(array,"argument must have finite elements") Utils.assertElementsAreFinite(array)
@@ -131,7 +132,7 @@ function _getFiniteArrayExamples()
     ]
 end
 
-function testArefinite()
+function test_arefinite()
     infiniteArrays = _getInfiniteArrayExamples()
     for array in infiniteArrays
         @test !Utils.arefinite(array)
@@ -142,12 +143,36 @@ function testArefinite()
     end
 end
 
-function isElementOfTest()
-    examples = _getIsElementOfExamples()
-    @test _checkIsElementOfExamplesImplemented(examples)
+function test_occurencesIn()
+    examples = _getExamplesFor_occurencesIn()
+    @test _testExamplesFor_occurencesIn(examples)
 end
 
-function _getIsElementOfExamples()
+function _getExamplesFor_occurencesIn()
+    # example has structure (element, array, occurences of element in array)
+    examples = [
+    (1, [1, 2, 3, 1], 2),
+    (1, [7, 2, 3, 7], 0),
+    ("a", ["b" 2; 3 "a"], 1)
+    ]
+    return examples
+end
+
+function _testExamplesFor_occurencesIn(examples::Vector)
+    pass = true
+    for (el, array, correctOccurences) in examples
+        returnedOccurences = Utils.occurencesIn(el, array)
+        pass &= (returnedOccurences == correctOccurences)
+    end
+    return pass
+end
+
+function test_isElementOf()
+    examples = _getExamplesFor_isElementOf()
+    @test _testExamplesFor_isElementOf(examples)
+end
+
+function _getExamplesFor_isElementOf()
     examples::Array{ Tuple{T, Array{T,N} where N, Bool} where T } = [
     ("a", ["a" "b" "c" "d"], true),
     (1, [2 3; 4 5], false),
@@ -155,7 +180,7 @@ function _getIsElementOfExamples()
     return examples
 end
 
-function _checkIsElementOfExamplesImplemented(examples::Array{ Tuple{T, Array{T,N} where N, Bool} where T })
+function _testExamplesFor_isElementOf(examples::Array{ Tuple{T, Array{T,N} where N, Bool} where T })
     correct = true
     for (element, collection, correctResult) in examples
         returnedResult = Utils.isElementOf(element,collection)
@@ -164,7 +189,7 @@ function _checkIsElementOfExamplesImplemented(examples::Array{ Tuple{T, Array{T,
     return correct
 end
 
-function testAssertIsValidSymbol()
+function test_assertIsValidSymbol()
     invalidNames = TestingTools.getInvalidUnitElementNamesTestset()
     for name in invalidNames
         @test_throws ArgumentError("name argument must be a valid identifier") Utils.assertNameIsValidSymbol(name)

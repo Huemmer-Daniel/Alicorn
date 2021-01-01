@@ -35,6 +35,11 @@ function arefinite(array::Array{T,N}) where {T<:Real,N}
     return allAreFinite
 end
 
+function occurencesIn(element::T, array::Array{T}) where T
+    occurences = sum(array .== element)
+    return occurences
+end
+
 function isElementOf(element::T, array::Array{T}) where T
     occurences = sum(array .== element)
     return occurences > 0

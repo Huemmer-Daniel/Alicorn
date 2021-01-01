@@ -70,13 +70,22 @@ end
 ## BaseUnitExponents
 
 function Base.show(io::IO, baseUnitExp::BaseUnitExponents)
-    output = _generatePrettyPrintingOutput(baseUnitExp)
+    output = _generateLongPrettyPrintingOutput(baseUnitExp)
     print(io,output)
 end
 
-function _generatePrettyPrintingOutput(baseUnitExp::BaseUnitExponents)
-    prettyString = _generateStringRepresentation(baseUnitExp)
+function _generateLongPrettyPrintingOutput(baseUnitExp::BaseUnitExponents)
+    prettyString = _generateLongStringRepresentation(baseUnitExp)
     return "BaseUnitExponents " * prettyString
+end
+
+function _generateLongStringRepresentation(baseUnitExp::BaseUnitExponents)
+    exponents = _getExponentsAsArray(baseUnitExp)
+    prettyString = ""
+    for exp in exponents
+        prettyString = _addLongPrettyFactor(prettyString, exp)
+    end
+    return prettyString
 end
 
 function _getExponentsAsArray(baseUnitExp::BaseUnitExponents)
@@ -92,19 +101,30 @@ function _getExponentsAsArray(baseUnitExp::BaseUnitExponents)
     return exponents
 end
 
-function _generateStringRepresentation(baseUnitExp::BaseUnitExponents)
+function _addLongPrettyFactor(prettyString::String, exp::Tuple)
+    (symbol, exponent) = exp
+
+    expString = prettyPrintScientificNumber(exponent, sigdigits=2)
+    addString = "$symbol^$expString"
+
+    return _addStringWithWhitespace( prettyString, addString )
+end
+
+function _generateShortPrettyPrintingOutput(baseUnitExp::BaseUnitExponents)
+    prettyString = _generateShortStringRepresentation(baseUnitExp)
+    return "BaseUnitExponents " * prettyString
+end
+
+function _generateShortStringRepresentation(baseUnitExp::BaseUnitExponents)
     exponents = _getExponentsAsArray(baseUnitExp)
     prettyString = ""
     for exp in exponents
-        prettyString = _addPrettyFactor(prettyString, exp)
-    end
-    if prettyString == ""
-        prettyString = "1"
+        prettyString = _addShortPrettyFactor(prettyString, exp)
     end
     return prettyString
 end
 
-function _addPrettyFactor(prettyString::String, exp::Tuple)
+function _addShortPrettyFactor(prettyString::String, exp::Tuple)
     (symbol, exponent) = exp
 
     if exponent == 0
@@ -116,17 +136,15 @@ function _addPrettyFactor(prettyString::String, exp::Tuple)
         addString = "$symbol^$expString"
     end
 
-    addString = _fixSpacingForPrettyFactor(prettyString, addString)
-    return ( prettyString *= addString )
+    return _addStringWithWhitespace( prettyString, addString )
 end
 
-function _fixSpacingForPrettyFactor(prettyString::String, addString::String)
-    if prettyString != "" && prettyString[end] != " " && addString != ""
+function _addStringWithWhitespace(string, addString)
+    if string != "" && string[end] != " " && addString != ""
         addString  = " " * addString
     end
-    return addString
+    return string * addString
 end
-
 
 ## BaseUnit
 
@@ -145,10 +163,15 @@ function _generateStringRepresentation(baseUnit::BaseUnit)
     symbol = baseUnit.symbol
     prefactor = baseUnit.prefactor
     prefactorString = prettyPrintScientificNumber(prefactor, sigdigits=3)
-    exponentsString = _generateStringRepresentation(baseUnit.exponents)
-    return "$name (1 $symbol = " * prefactorString * " " * exponentsString *  ")"
-end
+    exponentsString = _generateShortStringRepresentation(baseUnit.exponents)
 
+    stringRepresentation = "$name (1"
+    stringRepresentation = _addStringWithWhitespace(stringRepresentation, "$symbol")
+    stringRepresentation = _addStringWithWhitespace(stringRepresentation, "=")
+    stringRepresentation = _addStringWithWhitespace(stringRepresentation, prefactorString)
+    stringRepresentation = _addStringWithWhitespace(stringRepresentation, exponentsString)
+    stringRepresentation *= ")"
+end
 
 ## UnitCatalogue
 
@@ -159,7 +182,8 @@ end
 
 function _generatePrettyPrintingOutput(ucat::UnitCatalogue)
     nrOfPrefixes = length(listUnitPrefixes(ucat))
-    prettyString = "UnitCatalogue providing\n\t$nrOfPrefixes unit prefixes"
+    nrOfBaseUnits = length(listBaseUnits(ucat))
+    prettyString = "UnitCatalogue providing\n\t$nrOfPrefixes unit prefixes\n\t$nrOfBaseUnits base units"
     return prettyString
 end
 

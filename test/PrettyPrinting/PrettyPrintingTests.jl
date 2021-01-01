@@ -3,10 +3,11 @@ module PrettyPrintingTests
 using Alicorn
 using Test
 using ..TestingTools
+using ..UnitsTests
 
 function run()
     @testset "PrettyPrinting" begin
-        testScientificNumberPrettyPrinting()
+        test_prettyPrintScientificNumber()
         testUnitPrefixPrettyPrinting()
         testBaseUnitExponentsPrettyPrinting()
         testBaseUnitPrettyPrinting()
@@ -16,7 +17,7 @@ end
 
 ## Numbers
 
-function testScientificNumberPrettyPrinting()
+function test_prettyPrintScientificNumber()
     (examples, significantDigits) = _getPrettyPrintingExamples()
     @test _checkPrettyPrintingExamplesImplemented(examples, significantDigits)
 end
@@ -101,18 +102,31 @@ end
 
 function _getBaseUnitExponentsExamples()
     examples = [
-    ( BaseUnitExponents(), "BaseUnitExponents 1"),
-    ( BaseUnitExponents(kg=1), "BaseUnitExponents kg"),
-    ( BaseUnitExponents(m=2), "BaseUnitExponents m^2"),
-    ( BaseUnitExponents(m=2, s=1.554), "BaseUnitExponents m^2 s^1.6"),
-    ( BaseUnitExponents(s=1.554, A=pi), "BaseUnitExponents s^1.6 A^3.1"),
-    ( BaseUnitExponents(s=1.554, A=pi, K=-1), "BaseUnitExponents s^1.6 A^3.1 K^-1"),
-    ( BaseUnitExponents(s=1.554, mol=pi, K=-1), "BaseUnitExponents s^1.6 K^-1 mol^3.1"),
-    ( BaseUnitExponents(cd=-70), "BaseUnitExponents cd^-7e+1"),
+    ( BaseUnitExponents(), "BaseUnitExponents kg^0 m^0 s^0 A^0 K^0 mol^0 cd^0"),
+    ( BaseUnitExponents(kg=1), "BaseUnitExponents kg^1 m^0 s^0 A^0 K^0 mol^0 cd^0"),
+    ( BaseUnitExponents(m=2), "BaseUnitExponents kg^0 m^2 s^0 A^0 K^0 mol^0 cd^0"),
+    ( BaseUnitExponents(m=2, s=1.554), "BaseUnitExponents kg^0 m^2 s^1.6 A^0 K^0 mol^0 cd^0"),
+    ( BaseUnitExponents(s=1.554, A=pi), "BaseUnitExponents kg^0 m^0 s^1.6 A^3.1 K^0 mol^0 cd^0"),
+    ( BaseUnitExponents(s=1.554, A=pi, K=-1), "BaseUnitExponents kg^0 m^0 s^1.6 A^3.1 K^-1 mol^0 cd^0"),
+    ( BaseUnitExponents(s=1.554, mol=pi, K=-1), "BaseUnitExponents kg^0 m^0 s^1.6 A^0 K^-1 mol^3.1 cd^0"),
+    ( BaseUnitExponents(cd=-70), "BaseUnitExponents kg^0 m^0 s^0 A^0 K^0 mol^0 cd^-7e+1")
     ]
     return examples
 end
 
+# function _getBaseUnitExponentsExamples()
+#     examples = [
+#     ( BaseUnitExponents(), "BaseUnitExponents 1"),
+#     ( BaseUnitExponents(kg=1), "BaseUnitExponents kg"),
+#     ( BaseUnitExponents(m=2), "BaseUnitExponents m^2"),
+#     ( BaseUnitExponents(m=2, s=1.554), "BaseUnitExponents m^2 s^1.6"),
+#     ( BaseUnitExponents(s=1.554, A=pi), "BaseUnitExponents s^1.6 A^3.1"),
+#     ( BaseUnitExponents(s=1.554, A=pi, K=-1), "BaseUnitExponents s^1.6 A^3.1 K^-1"),
+#     ( BaseUnitExponents(s=1.554, mol=pi, K=-1), "BaseUnitExponents s^1.6 K^-1 mol^3.1"),
+#     ( BaseUnitExponents(cd=-70), "BaseUnitExponents cd^-7e+1")
+#     ]
+#     return examples
+# end
 
 ## BaseUnit
 
@@ -143,14 +157,24 @@ function _getBaseUnitExamples()
         "BaseUnit electronvolt (1 eV = 1.61e-19 kg m^2 s^-2)"
     )
 
-    return [example1, example2]
+    example3 = (
+        BaseUnit(
+            name = "unitless",
+            symbol = "<unitless>",
+            prefactor = 1,
+            exponents = BaseUnitExponents()
+        ),
+        "BaseUnit unitless (1 <unitless> = 1)"
+    )
+
+    return [example1, example2, example3]
 end
 
 
 ## UnitCatalogue
 
 function testUnitCataloguePrettyPrinting()
-    ucat = UnitCatalogue()
+    ucat = TestingTools.initializeTestUnitCatalogue()
     correctPrettyString = _getCorrectPrettyString(ucat)
     returnedPrettyString = getShowString(ucat)
     @test (returnedPrettyString == correctPrettyString)
@@ -158,7 +182,8 @@ end
 
 function _getCorrectPrettyString(ucat::UnitCatalogue)
     nrOfUnitPrefixes = length(listUnitPrefixes(ucat))
-    prettyString = "UnitCatalogue providing\n\t$nrOfUnitPrefixes unit prefixes"
+    nrOfBaseUnits = length(listBaseUnits(ucat))
+    prettyString = "UnitCatalogue providing\n\t$nrOfUnitPrefixes unit prefixes\n\t$nrOfBaseUnits base units"
     return prettyString
 end
 
