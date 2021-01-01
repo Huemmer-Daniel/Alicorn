@@ -71,7 +71,7 @@ end
 
 function Base.show(io::IO, baseUnitExp::BaseUnitExponents)
     output = _generateLongPrettyPrintingOutput(baseUnitExp)
-    print(io,output)
+    print(io, output)
 end
 
 function _generateLongPrettyPrintingOutput(baseUnitExp::BaseUnitExponents)
@@ -150,7 +150,7 @@ end
 
 function Base.show(io::IO, baseUnit::BaseUnit)
     output = generatePrettyPrintingOutput(baseUnit)
-    print(io,output)
+    print(io, output)
 end
 
 function generatePrettyPrintingOutput(baseUnit::BaseUnit)
@@ -171,13 +171,45 @@ function _generateStringRepresentation(baseUnit::BaseUnit)
     stringRepresentation = _addStringWithWhitespace(stringRepresentation, prefactorString)
     stringRepresentation = _addStringWithWhitespace(stringRepresentation, exponentsString)
     stringRepresentation *= ")"
+    return stringRepresentation
+end
+
+## UnitFactor
+
+function Base.show(io::IO, unitFactor::UnitFactor)
+    output = generatePrettyPrintingOutput(unitFactor)
+    print(io, output)
+end
+
+function generatePrettyPrintingOutput(unitFactor::UnitFactor)
+    stringRepresentation = _generateStringRepresentation(unitFactor)
+    return "UnitFactor " * stringRepresentation
+end
+
+function _generateStringRepresentation(unitFactor::UnitFactor)
+    prefixSymbol = unitFactor.unitPrefix.symbol
+    baseUnitSymbol = unitFactor.baseUnit.symbol
+    exponent = unitFactor.exponent
+    exponentString = _generateUnitFactorExponentString(exponent)
+
+    stringRepresentation = prefixSymbol * baseUnitSymbol * exponentString
+    return stringRepresentation
+end
+
+function _generateUnitFactorExponentString(exponent::Real)
+    if exponent == 1
+        exponentString = ""
+    else
+        exponentString = "^" * prettyPrintScientificNumber(exponent, sigdigits=2)
+    end
+    return exponentString
 end
 
 ## UnitCatalogue
 
 function Base.show(io::IO, ucat::UnitCatalogue)
     output = _generatePrettyPrintingOutput(ucat)
-    print(io,output)
+    print(io, output)
 end
 
 function _generatePrettyPrintingOutput(ucat::UnitCatalogue)

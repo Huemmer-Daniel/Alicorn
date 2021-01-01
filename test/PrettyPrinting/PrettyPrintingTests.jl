@@ -11,6 +11,7 @@ function run()
         testUnitPrefixPrettyPrinting()
         testBaseUnitExponentsPrettyPrinting()
         testBaseUnitPrettyPrinting()
+        testUnitFactorPrettyPrinting()
         testUnitCataloguePrettyPrinting()
     end
 end
@@ -57,7 +58,7 @@ end
 
 function testUnitPrefixPrettyPrinting()
     examples = _getUnitPrefixExamples()
-    @test verifyPrettyPrintingImplemented(examples)
+    @test _verifyPrettyPrintingImplemented(examples)
 end
 
 function _getUnitPrefixExamples()
@@ -76,7 +77,7 @@ function _getUnitPrefixExamples()
     return examples
 end
 
-function verifyPrettyPrintingImplemented(examples)
+function _verifyPrettyPrintingImplemented(examples)
     correct = true
     for (object, correctPrettyStr) in examples
         generatedPrettyStr = getShowString(object)
@@ -92,12 +93,11 @@ function getShowString(object)
     return generatedString
 end
 
-
 ## BaseUnitExponents
 
 function testBaseUnitExponentsPrettyPrinting()
     examples = _getBaseUnitExponentsExamples()
-    @test verifyPrettyPrintingImplemented(examples)
+    @test _verifyPrettyPrintingImplemented(examples)
 end
 
 function _getBaseUnitExponentsExamples()
@@ -114,62 +114,39 @@ function _getBaseUnitExponentsExamples()
     return examples
 end
 
-# function _getBaseUnitExponentsExamples()
-#     examples = [
-#     ( BaseUnitExponents(), "BaseUnitExponents 1"),
-#     ( BaseUnitExponents(kg=1), "BaseUnitExponents kg"),
-#     ( BaseUnitExponents(m=2), "BaseUnitExponents m^2"),
-#     ( BaseUnitExponents(m=2, s=1.554), "BaseUnitExponents m^2 s^1.6"),
-#     ( BaseUnitExponents(s=1.554, A=pi), "BaseUnitExponents s^1.6 A^3.1"),
-#     ( BaseUnitExponents(s=1.554, A=pi, K=-1), "BaseUnitExponents s^1.6 A^3.1 K^-1"),
-#     ( BaseUnitExponents(s=1.554, mol=pi, K=-1), "BaseUnitExponents s^1.6 K^-1 mol^3.1"),
-#     ( BaseUnitExponents(cd=-70), "BaseUnitExponents cd^-7e+1")
-#     ]
-#     return examples
-# end
-
 ## BaseUnit
 
 function testBaseUnitPrettyPrinting()
     examples = _getBaseUnitExamples()
-    @test verifyPrettyPrintingImplemented(examples)
+    @test _verifyPrettyPrintingImplemented(examples)
 end
-
 
 function _getBaseUnitExamples()
-    example1 = (
-        BaseUnit(
-            name = "Newton",
-            symbol = "N",
-            prefactor = 1,
-            exponents = BaseUnitExponents(kg=1, m=1, s=-2)
-        ),
-        "BaseUnit Newton (1 N = 1 kg m s^-2)"
-    )
-
-    example2 = (
-        BaseUnit(
-            name = "electronvolt",
-            symbol = "eV",
-            prefactor = 1.609176634E-19,
-            exponents = BaseUnitExponents(kg=1, m=2, s=-2)
-        ),
-        "BaseUnit electronvolt (1 eV = 1.61e-19 kg m^2 s^-2)"
-    )
-
-    example3 = (
-        BaseUnit(
-            name = "unitless",
-            symbol = "<unitless>",
-            prefactor = 1,
-            exponents = BaseUnitExponents()
-        ),
-        "BaseUnit unitless (1 <unitless> = 1)"
-    )
-
-    return [example1, example2, example3]
+    ucat = UnitCatalogue()
+    examples = [
+        (ucat.newton, "BaseUnit newton (1 N = 1 kg m s^-2)"),
+        (ucat.electronvolt, "BaseUnit electronvolt (1 eV = 1.6e-19 kg m^2 s^-2)"),
+        (ucat.unitless, "BaseUnit unitless (1 <unitless> = 1)")
+    ]
+    return examples
 end
 
+## UnitFactor
+
+function testUnitFactorPrettyPrinting()
+    examples = _getUnitFactorExamples()
+    @test _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getUnitFactorExamples()
+    ucat = UnitCatalogue()
+    examples = [
+        (UnitFactor(ucat.nano, ucat.meter, 2), "UnitFactor nm^2"),
+        (UnitFactor(ucat.tera, ucat.mol, -pi), "UnitFactor Tmol^-3.1"),
+        (UnitFactor(ucat.deca, ucat.dalton, 1), "UnitFactor daDa")
+    ]
+    return examples
+end
 
 ## UnitCatalogue
 
