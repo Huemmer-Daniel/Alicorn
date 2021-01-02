@@ -54,7 +54,7 @@ function BaseUnit_ErrorsForNonIdentifierNames()
 end
 
 function BaseUnit_FieldsCorrectlyInitialized()
-    (baseUnit, randFields) = TestingTools.generateRandomBaseUnit()
+    (baseUnit, randFields) = TestingTools.generateRandomBaseUnitWithFields()
     @test _verifyHasCorrectFields(baseUnit, randFields)
 end
 

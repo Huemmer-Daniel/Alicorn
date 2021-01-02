@@ -187,13 +187,23 @@ function generatePrettyPrintingOutput(unitFactor::UnitFactor)
 end
 
 function _generateStringRepresentation(unitFactor::UnitFactor)
-    prefixSymbol = unitFactor.unitPrefix.symbol
+    prefix = unitFactor.unitPrefix
+    prefixSymbol = _generateUnitFactorPrefixString(prefix)
     baseUnitSymbol = unitFactor.baseUnit.symbol
     exponent = unitFactor.exponent
     exponentString = _generateUnitFactorExponentString(exponent)
 
     stringRepresentation = prefixSymbol * baseUnitSymbol * exponentString
     return stringRepresentation
+end
+
+function _generateUnitFactorPrefixString(unitPrefix::UnitPrefix)
+    if unitPrefix == emptyUnitPrefix
+        unitPrefixString = ""
+    else
+        unitPrefixString = unitPrefix.symbol
+    end
+    return unitPrefixString
 end
 
 function _generateUnitFactorExponentString(exponent::Real)

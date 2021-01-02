@@ -38,7 +38,7 @@ function BaseUnitExponents_ErrorsOnInfiniteArguments()
 end
 
 function BaseUnitExponents_FieldsCorrectlyInitialized()
-    (baseUnitExp, randFields) = TestingTools.generateRandomBaseUnitExponents()
+    (baseUnitExp, randFields) = TestingTools.generateRandomBaseUnitExponentsWithFields()
     @test _verifyHasCorrectFields(baseUnitExp, randFields)
 end
 

@@ -8,6 +8,12 @@ function getInfiniteNumbers()
 end
 
 function generateRandomUnitPrefix()
+    (randomPrefix,) = generateRandomUnitPrefixWithFields()
+    return randomPrefix
+end
+
+
+function generateRandomUnitPrefixWithFields()
     randomFields = generateRandomUnitPrefixFields()
     randomPrefix = UnitPrefix(
         name = randomFields["name"],
@@ -42,7 +48,20 @@ function generateRandomReal(; dim = 1)
     return  20 * randReal .- 10
 end
 
+function generateRandomNonzeroReal(; dim = 1)
+    randomReal = 0
+    while randomReal == 0
+        randomReal = generateRandomReal()
+    end
+    return randomReal
+end
+
 function generateRandomBaseUnitExponents()
+    (randomBaseUnitExponents,) =  generateRandomBaseUnitExponentsWithFields()
+    return randomBaseUnitExponents
+end
+
+function generateRandomBaseUnitExponentsWithFields()
     randomFields = generateRandomBaseUnitExponentsFields()
     randomBaseUnitExp = BaseUnitExponents(
         kg = randomFields["kg"],
@@ -67,6 +86,11 @@ function _getCoreSIUnits()
 end
 
 function generateRandomBaseUnit()
+    (randomBaseUnit,) = generateRandomBaseUnitWithFields()
+    return randomBaseUnit
+end
+
+function generateRandomBaseUnitWithFields()
     randomFields = generateRandomBaseUnitFields()
     baseUnit = BaseUnit(
         name = randomFields["name"],
@@ -82,7 +106,7 @@ function generateRandomBaseUnitFields()
     randomFields["name"] = generateRandomName()
     randomFields["symbol"] = generateRandomSymbol()
     randomFields["prefactor"] = generateRandomReal()
-    (exponents,) = generateRandomBaseUnitExponents()
+    exponents = generateRandomBaseUnitExponents()
     randomFields["exponents"] = exponents
     return randomFields
 end
@@ -173,6 +197,10 @@ function getRandomBaseUnit()
 end
 
 function generateRandomUnitFactor()
+    (randomUnitFactor,) = generateRandomUnitFactorWithFields()
+end
+
+function generateRandomUnitFactorWithFields()
     randomFields = generateRandomUnitFactorFields()
     randomUnitFactor = UnitFactor(
         randomFields["unitPrefix"],
@@ -183,8 +211,8 @@ function generateRandomUnitFactor()
 end
 
 function generateRandomUnitFactorFields()
-    (randomPrefix,) = generateRandomUnitPrefix()
-    (randombaseUnit,) = generateRandomBaseUnit()
+    randomPrefix = generateRandomUnitPrefix()
+    randombaseUnit = generateRandomBaseUnit()
     randomExponent = generateRandomReal()
 
     randomFields = Dict{String,Any}()

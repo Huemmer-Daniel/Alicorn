@@ -7,6 +7,9 @@ using ..TestingTools
 function run()
     @testset "UnitFactor" begin
         canInstanciateUnitFactor()
+        canInstanciateUnitFactorWithoutPrefix()
+        canInstanciateUnitFactorWithoutExponent()
+        canInstanciateUnitFactorWithoutPrefixAndExponent()
         UnitFactor_ErrorsOnInfiniteExponent()
         UnitFactor_ErrorsOnZeroExponent()
         test_UnitFactor_fieldsCorrectlyInitialized()
@@ -17,9 +20,9 @@ end
 function canInstanciateUnitFactor()
     pass = false
     try
-        unitPrefix = TestingTools.getUnitPrefixTestSet()[1]
-        baseUnit = TestingTools.getBaseUnitTestSet()[1]
-        exponent = 3
+        unitPrefix = TestingTools.generateRandomUnitPrefix()
+        baseUnit = TestingTools.generateRandomBaseUnit()
+        exponent = TestingTools.generateRandomNonzeroReal()
         UnitFactor(unitPrefix, baseUnit, exponent)
         pass = true
     catch
@@ -33,8 +36,8 @@ function UnitFactor_ErrorsOnInfiniteExponent()
 end
 
 function _verify_UnitFactor_ErrorsOnExponents(exponents::Vector{T}) where T <: Real
-    unitPrefix = TestingTools.getUnitPrefixTestSet()[1]
-    baseUnit = TestingTools.getBaseUnitTestSet()[1]
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
     for exponent in exponents
         _verify_UnitFactor_ErrorsOnExponent(unitPrefix, baseUnit, exponent)
     end
@@ -45,14 +48,14 @@ function _verify_UnitFactor_ErrorsOnExponent(unitPrefix::UnitPrefix, baseUnit::B
 end
 
 function UnitFactor_ErrorsOnZeroExponent()
-    unitPrefix = TestingTools.getUnitPrefixTestSet()[1]
-    baseUnit = TestingTools.getBaseUnitTestSet()[1]
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
     exponent = 0
     @test_throws DomainError(exponent,"argument must be nonzero") UnitFactor(unitPrefix, baseUnit, exponent)
 end
 
 function test_UnitFactor_fieldsCorrectlyInitialized()
-    (unitFactor, randomFields) = TestingTools.generateRandomUnitFactor()
+    (unitFactor, randomFields) = TestingTools.generateRandomUnitFactorWithFields()
     @test _verifyHasCorrectFields(unitFactor, randomFields)
 end
 
@@ -77,6 +80,41 @@ function _initializeUnitFactorFromDict(fields::Dict)
         fields["exponent"]
     )
     return unitFactor
+end
+
+function canInstanciateUnitFactorWithoutPrefix()
+    pass = false
+    try
+        baseUnit = TestingTools.generateRandomBaseUnit()
+        exponent = TestingTools.generateRandomNonzeroReal()
+        UnitFactor(baseUnit, exponent)
+        pass = true
+    catch
+    end
+    @test pass
+end
+
+function canInstanciateUnitFactorWithoutExponent()
+    pass = false
+    try
+        unitPrefix = TestingTools.generateRandomUnitPrefix()
+        baseUnit = TestingTools.generateRandomBaseUnit()
+        UnitFactor(unitPrefix, baseUnit)
+        pass = true
+    catch
+    end
+    @test pass
+end
+
+function canInstanciateUnitFactorWithoutPrefixAndExponent()
+    pass = false
+    try
+        baseUnit = TestingTools.generateRandomBaseUnit()
+        UnitFactor(baseUnit)
+        pass = true
+    catch
+    end
+    @test pass
 end
 
 end # module

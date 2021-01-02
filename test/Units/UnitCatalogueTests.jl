@@ -274,11 +274,11 @@ end
 
 function canInstanciateDefaultUnitCatalogue()
     pass = false
-    try
+    # try
         ucat = UnitCatalogue()
         pass = true
-    catch
-    end
+    # catch
+    # end
     @test pass
 end
 
@@ -286,7 +286,8 @@ function defaultDefinitionsImplemented()
     defaultUcat = UnitCatalogue()
     prefixesImplemented = _checkIfDefaultUnitPrefixesImplemented(defaultUcat)
     baseUnitsImplemented = _checkIfDefaultBaseUnitsImplemented(defaultUcat)
-    @test prefixesImplemented && baseUnitsImplemented
+    emptyPrefixImplemented = _checkIfEmptyUnitPrefixImplemented(defaultUcat)
+    @test prefixesImplemented && baseUnitsImplemented && emptyPrefixImplemented
 end
 
 function _checkIfDefaultUnitPrefixesImplemented(defaultUcat::UnitCatalogue)
@@ -395,9 +396,18 @@ function _getDefaultBaseUnits()
     return defaultBaseUnits
 end
 
+function _checkIfEmptyUnitPrefixImplemented(defaultUcat)
+    emptyUnitPrefixImplemented = false
+    try
+        emptyUnitPrefixImplemented = (defaultUcat.emptyUnitPrefix == Alicorn.emptyUnitPrefix)
+    catch
+    end
+    return emptyUnitPrefixImplemented
+end
+
 function test_add!_forUnitPrefix()
     emptyUcat = UnitCatalogue([], [])
-    (testUnitPrefix,) = TestingTools.generateRandomUnitPrefix()
+    testUnitPrefix = TestingTools.generateRandomUnitPrefix()
     _test_add!_forUnitElement(emptyUcat, testUnitPrefix)
 end
 
@@ -418,7 +428,7 @@ end
 
 function test_add!_forBaseUnit()
     emptyUcat = UnitCatalogue([], [])
-    (testBaseUnit,) = TestingTools.generateRandomBaseUnit()
+    testBaseUnit = TestingTools.generateRandomBaseUnit()
     _test_add!_forUnitElement(emptyUcat, testBaseUnit)
 end
 

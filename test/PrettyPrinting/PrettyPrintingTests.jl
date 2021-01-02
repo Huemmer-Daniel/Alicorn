@@ -143,7 +143,8 @@ function _getUnitFactorExamples()
     examples = [
         (UnitFactor(ucat.nano, ucat.meter, 2), "UnitFactor nm^2"),
         (UnitFactor(ucat.tera, ucat.mol, -pi), "UnitFactor Tmol^-3.1"),
-        (UnitFactor(ucat.deca, ucat.dalton, 1), "UnitFactor daDa")
+        (UnitFactor(ucat.deca, ucat.dalton, 1), "UnitFactor daDa"),
+        (UnitFactor(ucat.dalton, 1), "UnitFactor Da")
     ]
     return examples
 end

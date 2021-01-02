@@ -12,3 +12,6 @@ struct UnitPrefix <: UnitElement
         new(name, symbol, value)
     end
 end
+
+export emptyUnitPrefix
+emptyUnitPrefix = UnitPrefix(name = "emptyUnitPrefix", symbol = "<emptyUnitPrefix>", value = 1)

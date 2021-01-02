@@ -1,10 +1,10 @@
 include("TestingTools/TestingTools.jl")
 
 include("Utils/UtilsTests.jl")
-# UtilsTests.run()
-#
+UtilsTests.run()
+
 include("Units/UnitsTests.jl")
-# UnitsTests.run() TODO
+UnitsTests.run()
 
 include("PrettyPrinting/PrettyPrintingTests.jl")
 PrettyPrintingTests.run()

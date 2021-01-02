@@ -14,6 +14,8 @@ function run()
         UnitPrefix_FieldsCorrectlyInitialized()
         test_isequal()
         testEqualPrefixesAreIdentical()
+
+        emptyUnitPrefixIsDefined()
     end
 end
 
@@ -28,7 +30,7 @@ function canInstantiateUnitPrefix()
 end
 
 function UnitPrefix_FieldsCorrectlyInitialized()
-    (prefix, randFields) = TestingTools.generateRandomUnitPrefix()
+    (prefix, randFields) = TestingTools.generateRandomUnitPrefixWithFields()
     @test _verifyPrefixHasCorrectFields(prefix, randFields)
 end
 
@@ -82,6 +84,15 @@ function testEqualPrefixesAreIdentical()
     prefix1 = _initializeUnitFactorFromDict(randomFields)
     prefix2 = _initializeUnitFactorFromDict(randomFields)
     @test prefix1 === prefix2
+end
+
+function emptyUnitPrefixIsDefined()
+    emptyPrefix = UnitPrefix(
+        name = "emptyUnitPrefix",
+        symbol = "<emptyUnitPrefix>",
+        value = 1
+    )
+    @test Alicorn.emptyUnitPrefix == emptyPrefix
 end
 
 end # module
