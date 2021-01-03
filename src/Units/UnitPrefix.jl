@@ -6,7 +6,7 @@ struct UnitPrefix <: UnitElement
     symbol::String
     value::Real
 
-    function UnitPrefix(;name::String,symbol::String,value::Real)
+    function UnitPrefix(;name::String, symbol::String, value::Real)
         Utils.assertIsFinite(value)
         Utils.assertNameIsValidSymbol(name)
         new(name, symbol, value)
@@ -14,4 +14,4 @@ struct UnitPrefix <: UnitElement
 end
 
 export emptyUnitPrefix
-emptyUnitPrefix = UnitPrefix(name = "emptyUnitPrefix", symbol = "<emptyUnitPrefix>", value = 1)
+emptyUnitPrefix = UnitPrefix(name = "empty", symbol = "<empty>", value = 1)

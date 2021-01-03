@@ -287,7 +287,8 @@ function defaultDefinitionsImplemented()
     prefixesImplemented = _checkIfDefaultUnitPrefixesImplemented(defaultUcat)
     baseUnitsImplemented = _checkIfDefaultBaseUnitsImplemented(defaultUcat)
     emptyPrefixImplemented = _checkIfEmptyUnitPrefixImplemented(defaultUcat)
-    @test prefixesImplemented && baseUnitsImplemented && emptyPrefixImplemented
+    unitlessBaseUnitImplemented = _checkIfUnitlessBaseUnitImplemented(defaultUcat)
+    @test prefixesImplemented && baseUnitsImplemented && emptyPrefixImplemented && unitlessBaseUnitImplemented
 end
 
 function _checkIfDefaultUnitPrefixesImplemented(defaultUcat::UnitCatalogue)
@@ -389,20 +390,28 @@ function _getDefaultBaseUnits()
         BaseUnit(name="liter", symbol="l", prefactor=0.001, exponents=BaseUnitExponents(m=3)),
         BaseUnit(name="tonne", symbol="t", prefactor=1000, exponents=BaseUnitExponents(kg=1)),
         BaseUnit(name="dalton", symbol="Da", prefactor=1.66053906660e-27, exponents=BaseUnitExponents(kg=1)),
-        BaseUnit(name="electronvolt", symbol="eV", prefactor=1.602176634e-19, exponents=BaseUnitExponents(kg=1, m=2, s=-2)),
-        # additional units
-        BaseUnit(name="unitless", symbol="<unitless>", prefactor=1, exponents=BaseUnitExponents())
+        BaseUnit(name="electronvolt", symbol="eV", prefactor=1.602176634e-19, exponents=BaseUnitExponents(kg=1, m=2, s=-2))
     ]
     return defaultBaseUnits
 end
 
-function _checkIfEmptyUnitPrefixImplemented(defaultUcat)
+function _checkIfEmptyUnitPrefixImplemented(defaultUcat::UnitCatalogue)
     emptyUnitPrefixImplemented = false
     try
-        emptyUnitPrefixImplemented = (defaultUcat.emptyUnitPrefix == Alicorn.emptyUnitPrefix)
+        emptyUnitPrefixImplemented = (defaultUcat.empty == Alicorn.emptyUnitPrefix)
     catch
     end
     return emptyUnitPrefixImplemented
+end
+
+
+function _checkIfUnitlessBaseUnitImplemented(defaultUcat::UnitCatalogue)
+    unitlessBaseUnitImplemented = false
+    # try
+        unitlessBaseUnitImplemented = (defaultUcat.unitless == Alicorn.unitlessBaseUnit)
+    # catch
+    # end
+    return unitlessBaseUnitImplemented
 end
 
 function test_add!_forUnitPrefix()

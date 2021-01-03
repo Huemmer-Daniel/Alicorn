@@ -3,6 +3,7 @@ function initializeWithDefaultDefinitions()
     baseUnits = _getDefaultBaseUnits()
     ucat = UnitCatalogue( unitPrefixes, baseUnits )
     add!(ucat, emptyUnitPrefix)
+    add!(ucat, unitlessBaseUnit)
     return ucat
 end
 
@@ -76,8 +77,6 @@ function _getDefaultBaseUnits()
         BaseUnit(name="liter", symbol="l", prefactor=0.001, exponents=BaseUnitExponents(m=3)),
         BaseUnit(name="tonne", symbol="t", prefactor=1000, exponents=BaseUnitExponents(kg=1)),
         BaseUnit(name="dalton", symbol="Da", prefactor=1.66053906660e-27, exponents=BaseUnitExponents(kg=1)),
-        BaseUnit(name="electronvolt", symbol="eV", prefactor=1.602176634e-19, exponents=BaseUnitExponents(kg=1, m=2, s=-2)),
-        # additional units
-        BaseUnit(name="unitless", symbol="<unitless>", prefactor=1, exponents=BaseUnitExponents())
+        BaseUnit(name="electronvolt", symbol="eV", prefactor=1.602176634e-19, exponents=BaseUnitExponents(kg=1, m=2, s=-2))
     ]
 end

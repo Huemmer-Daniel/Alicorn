@@ -10,7 +10,7 @@ function run()
         canInstantiateBaseUnitExponents()
         BaseUnitExponents_ErrorsOnInfiniteArguments()
         BaseUnitExponents_FieldsCorrectlyInitialized()
-        test_isequal()
+        test_equality()
     end
 end
 
@@ -52,10 +52,11 @@ function _verifyHasCorrectFields(baseUnitExp::BaseUnitExponents, randFields::Dic
     return correct
 end
 
-function test_isequal()
-    randomFields = TestingTools.generateRandomBaseUnitExponentsFields()
-    baseUnitExponents1 = _initializeUnitFactorFromDict(randomFields)
-    baseUnitExponents2 = _initializeUnitFactorFromDict(randomFields)
+function test_equality()
+    randomFields1 = TestingTools.generateRandomBaseUnitExponentsFields()
+    randomFields2 = deepcopy(randomFields1)
+    baseUnitExponents1 = _initializeUnitFactorFromDict(randomFields1)
+    baseUnitExponents2 = _initializeUnitFactorFromDict(randomFields2)
     @test baseUnitExponents1 == baseUnitExponents2
 end
 

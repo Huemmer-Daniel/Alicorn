@@ -10,19 +10,19 @@ mutable struct UnitCatalogue
         _assertUnitElementNamesAreUnique(unitPrefixes, baseUnits)
         unitPrefixCatalogue = _generateUnitElementCatalogueFromVector(unitPrefixes)
         baseUnitCatalogue = _generateUnitElementCatalogueFromVector(baseUnits)
-        new(unitPrefixCatalogue, baseUnitCatalogue)
+        return new(unitPrefixCatalogue, baseUnitCatalogue)
     end
+end
 
-    function UnitCatalogue(unitPrefixes::Vector, baseUnits::Vector)
-        unitPrefixes = convert(Vector{UnitPrefix}, unitPrefixes)
-        baseUnits = convert(Vector{BaseUnit}, baseUnits)
-        UnitCatalogue(unitPrefixes, baseUnits)
-    end
+function UnitCatalogue(unitPrefixes::Vector, baseUnits::Vector)
+    unitPrefixes = convert(Vector{UnitPrefix}, unitPrefixes)
+    baseUnits = convert(Vector{BaseUnit}, baseUnits)
+    return UnitCatalogue(unitPrefixes, baseUnits)
+end
 
-    function UnitCatalogue()
-        unitCatalogue = initializeWithDefaultDefinitions()
-        return unitCatalogue
-    end
+function UnitCatalogue()
+    unitCatalogue = initializeWithDefaultDefinitions()
+    return unitCatalogue
 end
 
 function _generateUnitElementCatalogueFromVector(unitElements::Vector{T}) where T <: UnitElement

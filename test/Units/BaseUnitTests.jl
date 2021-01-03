@@ -10,7 +10,9 @@ function run()
         BaseUnit_ErrorsOnInfinitePrefactor()
         BaseUnit_ErrorsForNonIdentifierNames()
         BaseUnit_FieldsCorrectlyInitialized()
-        test_isequal()
+        test_equality()
+
+        unitlessBaseUnitIsDefined()
     end
 end
 
@@ -66,10 +68,11 @@ function _verifyHasCorrectFields(baseUnit::BaseUnit, randFields::Dict)
     return correct
 end
 
-function test_isequal()
-    randomFields = TestingTools.generateRandomBaseUnitFields()
-    baseUnit1 = _initializeUnitFactorFromDict(randomFields)
-    baseUnit2 = _initializeUnitFactorFromDict(randomFields)
+function test_equality()
+    randomFields1 = TestingTools.generateRandomBaseUnitFields()
+    randomFields2 = deepcopy(randomFields1)
+    baseUnit1 = _initializeUnitFactorFromDict(randomFields1)
+    baseUnit2 = _initializeUnitFactorFromDict(randomFields2)
     @test baseUnit1 == baseUnit2
 end
 
@@ -81,6 +84,16 @@ function _initializeUnitFactorFromDict(fields::Dict)
         exponents = fields["exponents"]
     )
     return baseUnit
+end
+
+function unitlessBaseUnitIsDefined()
+    unitless = BaseUnit(
+        name = "unitless",
+        symbol = "<unitless>",
+        prefactor = 1,
+        exponents = BaseUnitExponents()
+    )
+    @test (Alicorn.unitlessBaseUnit == unitless)
 end
 
 end # module

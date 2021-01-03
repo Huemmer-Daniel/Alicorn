@@ -7,13 +7,15 @@ using ..TestingTools
 function run()
     @testset "UnitFactor" begin
         canInstanciateUnitFactor()
-        canInstanciateUnitFactorWithoutPrefix()
-        canInstanciateUnitFactorWithoutExponent()
-        canInstanciateUnitFactorWithoutPrefixAndExponent()
         UnitFactor_ErrorsOnInfiniteExponent()
         UnitFactor_ErrorsOnZeroExponent()
         test_UnitFactor_fieldsCorrectlyInitialized()
-        test_isequal()
+        test_equality()
+
+        canInstanciateUnitFactorWithoutPrefix()
+        canInstanciateUnitFactorWithoutExponent()
+        canInstanciateUnitFactorWithoutPrefixAndExponent()
+        canInstanciateUnitlessUnitFactor()
     end
 end
 
@@ -66,10 +68,11 @@ function _verifyHasCorrectFields(unitFactor::UnitFactor, randomFields::Dict)
     return correct
 end
 
-function test_isequal()
-    randomFields = TestingTools.generateRandomUnitFactorFields()
-    unitFactor1 = _initializeUnitFactorFromDict(randomFields)
-    unitFactor2 = _initializeUnitFactorFromDict(randomFields)
+function test_equality()
+    randomFields1 = TestingTools.generateRandomUnitFactorFields()
+    randomFields2 = deepcopy(randomFields1)
+    unitFactor1 = _initializeUnitFactorFromDict(randomFields1)
+    unitFactor2 = _initializeUnitFactorFromDict(randomFields2)
     @test unitFactor1 == unitFactor2
 end
 
@@ -115,6 +118,11 @@ function canInstanciateUnitFactorWithoutPrefixAndExponent()
     catch
     end
     @test pass
+end
+
+function canInstanciateUnitlessUnitFactor()
+    unitlessUnitFactor = UnitFactor(Alicorn.emptyUnitPrefix, Alicorn.unitlessBaseUnit, 1)
+    @test (UnitFactor() == unitlessUnitFactor)
 end
 
 end # module

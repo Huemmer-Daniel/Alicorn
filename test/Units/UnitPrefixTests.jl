@@ -12,7 +12,7 @@ function run()
         UnitPrefix_ErrorsForInfiniteValues()
         UnitPrefix_ErrorsForNonIdentifierNames()
         UnitPrefix_FieldsCorrectlyInitialized()
-        test_isequal()
+        test_equality()
         testEqualPrefixesAreIdentical()
 
         emptyUnitPrefixIsDefined()
@@ -63,10 +63,11 @@ function UnitPrefix_ErrorsForNonIdentifierNames()
     end
 end
 
-function test_isequal()
-    randomFields = TestingTools.generateRandomUnitPrefixFields()
-    prefix1 = _initializeUnitFactorFromDict(randomFields)
-    prefix2 = _initializeUnitFactorFromDict(randomFields)
+function test_equality()
+    randomFields1 = TestingTools.generateRandomUnitPrefixFields()
+    randomFields2 = deepcopy(randomFields1)
+    prefix1 = _initializeUnitFactorFromDict(randomFields1)
+    prefix2 = _initializeUnitFactorFromDict(randomFields2)
     @test prefix1 == prefix2
 end
 
@@ -88,8 +89,8 @@ end
 
 function emptyUnitPrefixIsDefined()
     emptyPrefix = UnitPrefix(
-        name = "emptyUnitPrefix",
-        symbol = "<emptyUnitPrefix>",
+        name = "empty",
+        symbol = "<empty>",
         value = 1
     )
     @test Alicorn.emptyUnitPrefix == emptyPrefix

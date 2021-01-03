@@ -13,3 +13,6 @@ struct BaseUnit <: UnitElement
         new(name, symbol, prefactor, exponents)
     end
 end
+
+export unitlessBaseUnit
+unitlessBaseUnit = BaseUnit(name = "unitless", symbol = "<unitless>", prefactor = 1, exponents = BaseUnitExponents())

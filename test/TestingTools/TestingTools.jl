@@ -198,6 +198,7 @@ end
 
 function generateRandomUnitFactor()
     (randomUnitFactor,) = generateRandomUnitFactorWithFields()
+    return randomUnitFactor
 end
 
 function generateRandomUnitFactorWithFields()
@@ -219,6 +220,26 @@ function generateRandomUnitFactorFields()
     randomFields["unitPrefix"] = randomPrefix
     randomFields["baseUnit"] = randombaseUnit
     randomFields["exponent"] = randomExponent
+    return randomFields
+end
+
+function generateRandomUnit()
+    (randomUnit,) = generateRandomUnitWithFields()
+    return randomUnit
+end
+
+function generateRandomUnitWithFields()
+    randomFields = generateRandomUnitFields()
+    randomUnit = Unit(randomFields)
+    return (randomUnit, randomFields)
+end
+
+function generateRandomUnitFields()
+    randomFields = Vector{UnitFactor}()
+    for index in 1:4
+        randomUnitFactor = generateRandomUnitFactor()
+        randomFields = vcat(randomFields, randomUnitFactor)
+    end
     return randomFields
 end
 
