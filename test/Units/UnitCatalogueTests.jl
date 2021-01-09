@@ -8,31 +8,31 @@ using ..TestingTools
 
 function run()
     @testset "UnitCatalogue" begin
-        canInstanciateUnitCatalogue()
+        @test canInstanciateUnitCatalogue()
         test_UnitCatalogue_errorsOnDuplicateUnitElementNames()
 
-        test_listUnitPrefixes()
-        test_listBaseUnits()
+        @test listUnitPrefixes_implemented()
+        @test listBaseUnits_implemented()
 
-        test_listUnitPrefixNames()
-        test_listBaseUnitNames()
+        @test listUnitPrefixNames_implemented()
+        @test listBaseUnitNames_implemented()
 
-        test_providesUnitPrefix()
-        test_providesBaseUnit()
+        @test providesUnitPrefix_implemented()
+        @test providesBaseUnit_implemented()
 
-        test_getproperty()
-        test_propertynames()
+        @test getproperty_implemented()
+        @test propertynames_implemented()
         test_propertynames_errorsOnUnknownUnitElement()
 
-        canInstanciateEmptyUnitCatalogue()
+        @test canInstanciateEmptyUnitCatalogue()
 
-        canInstanciateDefaultUnitCatalogue()
-        defaultDefinitionsImplemented()
+        @test canInstanciateDefaultUnitCatalogue()
+        @test defaultDefinitionsImplemented()
 
-        test_add!_forUnitPrefix()
-        test_add!_forBaseUnit()
+        @test add!_forUnitPrefix_implemented()
+        @test add!_forBaseUnit_implemented()
         test_add!_errorsOnDuplicates()
-        test_remove!()
+        @test remove!_implemented()
     end
 end
 
@@ -43,7 +43,7 @@ function canInstanciateUnitCatalogue()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
 function test_UnitCatalogue_errorsOnDuplicateUnitElementNames()
@@ -91,11 +91,11 @@ function _testExamples_UnitCatalogue_errorsOnDuplicateUnitElementNames(examples:
     end
 end
 
-function test_listUnitPrefixes()
+function listUnitPrefixes_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     unitPrefixTestCatalogue = _getUnitPrefixTestCatalogue()
     returnedUnitPrefixCatalogue = listUnitPrefixes(ucat)
-    @test _cataloguesAreIdentical(unitPrefixTestCatalogue, returnedUnitPrefixCatalogue)
+    return _cataloguesAreIdentical(unitPrefixTestCatalogue, returnedUnitPrefixCatalogue)
 end
 
 function _getUnitPrefixTestCatalogue()
@@ -122,11 +122,11 @@ function _cataloguesAreIdentical(cat1::Dict{String,T}, cat2::Dict{String,T}) whe
     return TestingTools.dictsAreIdentical(cat1, cat2)
 end
 
-function test_listBaseUnits()
+function listBaseUnits_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     baseUnitTestCatalogue = _getBaseUnitTestCatalogue()
     returnedBaseUnitCatalogue = listBaseUnits(ucat)
-    @test _cataloguesAreIdentical(baseUnitTestCatalogue, returnedBaseUnitCatalogue)
+    return _cataloguesAreIdentical(baseUnitTestCatalogue, returnedBaseUnitCatalogue)
 end
 
 function _getBaseUnitTestCatalogue()
@@ -135,11 +135,11 @@ function _getBaseUnitTestCatalogue()
     return baseUnitTestCatalogue
 end
 
-function test_listUnitPrefixNames()
+function listUnitPrefixNames_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     unitPrefixNames = _getUnitPrefixTestNames()
     returnedUnitPrefixNames = listUnitPrefixNames(ucat)
-    @test returnedUnitPrefixNames == unitPrefixNames
+    return returnedUnitPrefixNames == unitPrefixNames
 end
 
 function _getUnitPrefixTestNames()
@@ -149,11 +149,11 @@ function _getUnitPrefixTestNames()
     return unitPrefixNames
 end
 
-function test_listBaseUnitNames()
+function listBaseUnitNames_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     baseUnitNames = _getBaseUnitTestNames()
     returnedBaseUnitNames = listBaseUnitNames(ucat)
-    @test returnedBaseUnitNames == baseUnitNames
+    return returnedBaseUnitNames == baseUnitNames
 end
 
 function _getBaseUnitTestNames()
@@ -163,10 +163,10 @@ function _getBaseUnitTestNames()
     return baseUnitNames
 end
 
-function test_providesUnitPrefix()
+function providesUnitPrefix_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     examples = _getExamplesFor_providesUnitPrefix()
-    _testExamplesFor_providesUnitPrefix(ucat, examples)
+    return _testExamplesFor_providesUnitPrefix(ucat, examples)
 end
 
 function _getExamplesFor_providesUnitPrefix()
@@ -186,10 +186,10 @@ function _testExamplesFor_providesUnitPrefix(ucat::UnitCatalogue, examples::Arra
     return TestingTools.verifyFunctionWorksAsExpected(functionToTest, examples)
 end
 
-function test_providesBaseUnit()
+function providesBaseUnit_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     examples = _getExamplesFor_providesBaseUnit()
-    @test _testExamplesFor_providesBaseUnit(examples, ucat)
+    return _testExamplesFor_providesBaseUnit(examples, ucat)
 end
 
 function _getExamplesFor_providesBaseUnit()
@@ -209,11 +209,11 @@ function _testExamplesFor_providesBaseUnit(examples::Array{Tuple{String, Bool}},
     return TestingTools.verifyFunctionWorksAsExpected(functionToTest, examples)
 end
 
-function test_getproperty()
+function getproperty_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     unitElementNames = _getAllUnitElementNamesFromTestSets()
     pass = _canAccessUnitElementsWith_getproperty(ucat, unitElementNames)
-    @test pass
+    return pass
 end
 
 function _getAllUnitElementNamesFromTestSets()
@@ -242,11 +242,11 @@ function _accessAllWith_getproperty(ucat::UnitCatalogue, unitElementNames::Vecto
     end
 end
 
-function test_propertynames()
+function propertynames_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
     correctPropertySymbols = _getCorrectPropertySymbols(ucat)
     returnedPropertySymbols = Base.propertynames(ucat)
-    @test (returnedPropertySymbols == correctPropertySymbols)
+    return (returnedPropertySymbols == correctPropertySymbols)
 end
 
 function _getCorrectPropertySymbols(ucat::UnitCatalogue)
@@ -269,17 +269,17 @@ end
 
 function canInstanciateEmptyUnitCatalogue()
     ucat = UnitCatalogue( [], [] )
-    @test isempty(listUnitPrefixes(ucat)) && isempty(listBaseUnits(ucat))
+    return isempty(listUnitPrefixes(ucat)) && isempty(listBaseUnits(ucat))
 end
 
 function canInstanciateDefaultUnitCatalogue()
     pass = false
-    # try
+    try
         ucat = UnitCatalogue()
         pass = true
-    # catch
-    # end
-    @test pass
+    catch
+    end
+    return pass
 end
 
 function defaultDefinitionsImplemented()
@@ -288,7 +288,7 @@ function defaultDefinitionsImplemented()
     baseUnitsImplemented = _checkIfDefaultBaseUnitsImplemented(defaultUcat)
     emptyPrefixImplemented = _checkIfEmptyUnitPrefixImplemented(defaultUcat)
     unitlessBaseUnitImplemented = _checkIfUnitlessBaseUnitImplemented(defaultUcat)
-    @test prefixesImplemented && baseUnitsImplemented && emptyPrefixImplemented && unitlessBaseUnitImplemented
+    return prefixesImplemented && baseUnitsImplemented && emptyPrefixImplemented && unitlessBaseUnitImplemented
 end
 
 function _checkIfDefaultUnitPrefixesImplemented(defaultUcat::UnitCatalogue)
@@ -414,15 +414,15 @@ function _checkIfUnitlessBaseUnitImplemented(defaultUcat::UnitCatalogue)
     return unitlessBaseUnitImplemented
 end
 
-function test_add!_forUnitPrefix()
+function add!_forUnitPrefix_implemented()
     emptyUcat = UnitCatalogue([], [])
     testUnitPrefix = TestingTools.generateRandomUnitPrefix()
-    _test_add!_forUnitElement(emptyUcat, testUnitPrefix)
+    return _test_add!_forUnitElement(emptyUcat, testUnitPrefix)
 end
 
 function _test_add!_forUnitElement(ucat::UnitCatalogue, unitElement::T) where T <: UnitElement
     add!(ucat, unitElement)
-    @test _checkIfAdditionSuccessful(ucat, unitElement)
+    return _checkIfAdditionSuccessful(ucat, unitElement)
 end
 
 function _checkIfAdditionSuccessful(ucat::UnitCatalogue, unitElement::T) where T <: UnitElement
@@ -435,16 +435,15 @@ function _checkIfAdditionSuccessful(ucat::UnitCatalogue, unitElement::T) where T
     return additionSuccessful
 end
 
-function test_add!_forBaseUnit()
+function add!_forBaseUnit_implemented()
     emptyUcat = UnitCatalogue([], [])
     testBaseUnit = TestingTools.generateRandomBaseUnit()
-    _test_add!_forUnitElement(emptyUcat, testBaseUnit)
+    return _test_add!_forUnitElement(emptyUcat, testBaseUnit)
 end
 
 function test_add!_errorsOnDuplicates()
     examples = _getExamplesFor_add!_errorsOnDuplicate()
     _testExamplesFor_add!_errorsOnDuplicate(examples)
-    # @test_throws Exceptions.DublicationError("catalogue already contains an element \"nano\"") add!(ucat, unitPrefix)
 end
 
 function _getExamplesFor_add!_errorsOnDuplicate()
@@ -468,10 +467,11 @@ function _testExamplesFor_add!_errorsOnDuplicate(examples::Vector)
     end
 end
 
-function test_remove!()
+function remove!_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
-    @test _test_remove!_forUnitPrefix(ucat)
-    @test _test_remove!_forBaseUnit(ucat)
+    pass = _test_remove!_forUnitPrefix(ucat)
+    pass &= _test_remove!_forBaseUnit(ucat)
+    return pass
 end
 
 function _test_remove!_forUnitPrefix(ucat::UnitCatalogue)

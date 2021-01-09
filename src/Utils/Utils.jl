@@ -59,4 +59,17 @@ function assertNameIsValidSymbol(string::String)
     end
 end
 
+function tryCastingToInt(number::Real)
+    try
+        number = convert(Int, number)
+    catch
+    end
+    return number
+end
+
+function tryCastingToInt(collection)
+    collection = map(tryCastingToInt, collection)
+    return collection
+end
+
 end # module

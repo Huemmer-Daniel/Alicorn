@@ -6,16 +6,20 @@ using ..TestingTools
 
 function run()
     @testset "UnitFactor" begin
-        canInstanciateUnitFactor()
-        UnitFactor_ErrorsOnInfiniteExponent()
-        UnitFactor_ErrorsOnZeroExponent()
-        test_UnitFactor_fieldsCorrectlyInitialized()
-        test_equality()
+        @test canInstanciateUnitFactor()
+        test_UnitFactor_ErrorsOnInfiniteExponent()
+        test_UnitFactor_ErrorsOnZeroExponent()
+        test_UnitFactor_TriesCastingExponentsToInt()
+        @test UnitFactor_actsAsScalarInBroadcast()
+        @test UnitFactor_fieldsCorrectlyInitialized()
+        @test equality_implemented()
 
-        canInstanciateUnitFactorWithoutPrefix()
-        canInstanciateUnitFactorWithoutExponent()
-        canInstanciateUnitFactorWithoutPrefixAndExponent()
-        canInstanciateUnitlessUnitFactor()
+        @test canInstanciateUnitFactorWithoutPrefix()
+        @test canInstanciateUnitFactorWithoutExponent()
+        @test canInstanciateUnitFactorWithoutPrefixAndExponent()
+        @test canInstanciateUnitlessUnitFactor()
+
+        @test unitlessUnitFactorIsDefined()
     end
 end
 
@@ -29,10 +33,10 @@ function canInstanciateUnitFactor()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
-function UnitFactor_ErrorsOnInfiniteExponent()
+function test_UnitFactor_ErrorsOnInfiniteExponent()
     infiniteExponents = TestingTools.getInfiniteNumbers()
     _verify_UnitFactor_ErrorsOnExponents(infiniteExponents)
 end
@@ -49,16 +53,45 @@ function _verify_UnitFactor_ErrorsOnExponent(unitPrefix::UnitPrefix, baseUnit::B
     @test_throws DomainError(exponent,"argument must be finite") UnitFactor(unitPrefix, baseUnit, exponent)
 end
 
-function UnitFactor_ErrorsOnZeroExponent()
+function test_UnitFactor_ErrorsOnZeroExponent()
     unitPrefix = TestingTools.generateRandomUnitPrefix()
     baseUnit = TestingTools.generateRandomBaseUnit()
     exponent = 0
     @test_throws DomainError(exponent,"argument must be nonzero") UnitFactor(unitPrefix, baseUnit, exponent)
 end
 
-function test_UnitFactor_fieldsCorrectlyInitialized()
+function test_UnitFactor_TriesCastingExponentsToInt()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    exponent = 3.0
+    unitFactor = UnitFactor(unitPrefix, baseUnit, exponent)
+    @test isa(unitFactor.exponent, Int)
+end
+
+function UnitFactor_actsAsScalarInBroadcast()
+    (unitFactor1, unitFactor2) = _generateTwoDifferentUnitFactorsWithoutUsingBroadcasting()
+    unitFactorArray = [ unitFactor1, unitFactor2 ]
+    pass = false
+    try
+        elementwiseComparison = (unitFactorArray .== unitFactor1)
+        pass = elementwiseComparison == [true, false]
+    catch
+    end
+    return pass
+end
+
+function _generateTwoDifferentUnitFactorsWithoutUsingBroadcasting()
+    unitFactor1 = TestingTools.generateRandomUnitFactor()
+    unitFactor2 = unitFactor1
+    while unitFactor2 == unitFactor1
+        unitFactor2 = TestingTools.generateRandomUnitFactor()
+    end
+    return (unitFactor1, unitFactor2)
+end
+
+function UnitFactor_fieldsCorrectlyInitialized()
     (unitFactor, randomFields) = TestingTools.generateRandomUnitFactorWithFields()
-    @test _verifyHasCorrectFields(unitFactor, randomFields)
+    return _verifyHasCorrectFields(unitFactor, randomFields)
 end
 
 function _verifyHasCorrectFields(unitFactor::UnitFactor, randomFields::Dict)
@@ -68,12 +101,12 @@ function _verifyHasCorrectFields(unitFactor::UnitFactor, randomFields::Dict)
     return correct
 end
 
-function test_equality()
+function equality_implemented()
     randomFields1 = TestingTools.generateRandomUnitFactorFields()
     randomFields2 = deepcopy(randomFields1)
     unitFactor1 = _initializeUnitFactorFromDict(randomFields1)
     unitFactor2 = _initializeUnitFactorFromDict(randomFields2)
-    @test unitFactor1 == unitFactor2
+    return unitFactor1 == unitFactor2
 end
 
 function _initializeUnitFactorFromDict(fields::Dict)
@@ -94,7 +127,7 @@ function canInstanciateUnitFactorWithoutPrefix()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
 function canInstanciateUnitFactorWithoutExponent()
@@ -106,7 +139,7 @@ function canInstanciateUnitFactorWithoutExponent()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
 function canInstanciateUnitFactorWithoutPrefixAndExponent()
@@ -117,12 +150,17 @@ function canInstanciateUnitFactorWithoutPrefixAndExponent()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
 function canInstanciateUnitlessUnitFactor()
     unitlessUnitFactor = UnitFactor(Alicorn.emptyUnitPrefix, Alicorn.unitlessBaseUnit, 1)
-    @test (UnitFactor() == unitlessUnitFactor)
+    return ( UnitFactor() == unitlessUnitFactor )
+end
+
+function unitlessUnitFactorIsDefined()
+    unitless = UnitFactor( Alicorn.emptyUnitPrefix, Alicorn.unitlessBaseUnit, 1)
+    return (Alicorn.unitlessUnitFactor == unitless)
 end
 
 end # module

@@ -6,23 +6,24 @@ using Alicorn.Utils
 
 function run()
     @testset "Utils" begin
-        test_separatePrefactorAndDecade()
+        @test separatePrefactorAndDecade_implemented()
         test_separatePrefactorAndDecade_errorsOnInfiniteNumbers()
-        test_getDecade()
+        @test getDecade_implemented()
         test_getDecade_errorsOnInfiniteNumbers()
         test_assertIsNonzero()
         test_assertIsFinite()
         test_assertElementsAreFinite()
-        test_arefinite()
-        test_occurencesIn()
-        test_isElementOf()
+        @test arefinite_implemented()
+        @test occurencesIn_implemented()
+        @test isElementOf_implemented()
         test_assertIsValidSymbol()
+        @test tryCastingToInt_implemented()
     end
 end
 
-function test_separatePrefactorAndDecade()
+function separatePrefactorAndDecade_implemented()
     examples = _getExamplesFor_separatePrefactorAndDecade()
-    @test _testExamplesFor_separatePrefactorAndDecade(examples)
+    return _testExamplesFor_separatePrefactorAndDecade(examples)
 end
 
 function _getExamplesFor_separatePrefactorAndDecade()
@@ -55,10 +56,9 @@ function test_separatePrefactorAndDecade_errorsOnInfiniteNumbers()
     @test_throws DomainError(NaN32,"argument must be finite") Utils.separatePrefactorAndDecade(NaN32)
 end
 
-
-function test_getDecade()
+function getDecade_implemented()
     examples = _getExamplesFor_getDecade()
-    @test return _testExamplesFor_getDecade(examples)
+    return _testExamplesFor_getDecade(examples)
 end
 
 function _getExamplesFor_getDecade()
@@ -138,20 +138,25 @@ function _getFiniteArrayExamples()
     ]
 end
 
-function test_arefinite()
+function arefinite_implemented()
+    pass = true
+
     infiniteArrays = _getInfiniteArrayExamples()
     for array in infiniteArrays
-        @test !Utils.arefinite(array)
+        pass &= !Utils.arefinite(array)
     end
+
     finiteArrays = _getFiniteArrayExamples()
     for array in finiteArrays
-        @test Utils.arefinite(array)
+        pass &= Utils.arefinite(array)
     end
+
+    return pass
 end
 
-function test_occurencesIn()
+function occurencesIn_implemented()
     examples = _getExamplesFor_occurencesIn()
-    @test _testExamplesFor_occurencesIn(examples)
+    return _testExamplesFor_occurencesIn(examples)
 end
 
 function _getExamplesFor_occurencesIn()
@@ -173,9 +178,9 @@ function _testExamplesFor_occurencesIn(examples::Vector)
     return pass
 end
 
-function test_isElementOf()
+function isElementOf_implemented()
     examples = _getExamplesFor_isElementOf()
-    @test _testExamplesFor_isElementOf(examples)
+    return _testExamplesFor_isElementOf(examples)
 end
 
 function _getExamplesFor_isElementOf()
@@ -200,6 +205,31 @@ function test_assertIsValidSymbol()
     for name in invalidNames
         @test_throws ArgumentError("name argument must be a valid identifier") Utils.assertNameIsValidSymbol(name)
     end
+end
+
+function tryCastingToInt_implemented()
+    examples = _getExamplesFor_tryCastingToInt()
+    return _testExamplesFor_tryCastingToInt(examples)
+end
+
+function _getExamplesFor_tryCastingToInt()
+    examples = [
+    (1.0, 1),
+    (pi, pi),
+    (-9.0, -9),
+    ( (1.0, 2), (1, 2) ),
+    ( [1.0, 2], [1, 2])
+    ]
+    return examples
+end
+
+function _testExamplesFor_tryCastingToInt(examples::Vector)
+    pass = true
+    for (exampleNumber, correctResult) in examples
+        returnedResult = Utils.tryCastingToInt(exampleNumber)
+        pass &= (returnedResult == correctResult)
+    end
+    return pass
 end
 
 end # end

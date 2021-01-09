@@ -36,7 +36,7 @@ function generateRandomName()
 end
 
 function generateRandomSymbol()
-    return Random.randstring(2)
+    return Random.randstring(['a':'z';'A':'Z'],2)
 end
 
 function generateRandomReal(; dim = 1)
@@ -54,6 +54,12 @@ function generateRandomNonzeroReal(; dim = 1)
         randomReal = generateRandomReal()
     end
     return randomReal
+end
+
+function generateRandomExponent(; dim = 1)
+    randomExponent = generateRandomReal(dim=dim)
+    randomExponent = Alicorn.Utils.tryCastingToInt(randomExponent)
+    return randomExponent
 end
 
 function generateRandomBaseUnitExponents()
@@ -77,7 +83,7 @@ end
 
 function generateRandomBaseUnitExponentsFields()
     coreSIUnits = _getCoreSIUnits()
-    randExponents = generateRandomReal( dim = 7 )
+    randExponents = generateRandomExponent(dim = 7)
     return Dict( zip(coreSIUnits, randExponents) )
 end
 
@@ -201,6 +207,23 @@ function generateRandomUnitFactor()
     return randomUnitFactor
 end
 
+function generateRandomUnitFactors(length::Int)
+    randomUnitFactors = Vector{UnitFactor}()
+    for index in 1:length
+        randomUnitFactor = _generateDifferentRandomUnitFactor(randomUnitFactors)
+        randomUnitFactors = vcat(randomUnitFactors, randomUnitFactor)
+    end
+    return randomUnitFactors
+end
+
+function _generateDifferentRandomUnitFactor(randomUnitFactors::Vector{UnitFactor})
+    randomUnitFactor = generateRandomUnitFactor()
+    while Alicorn.Utils.isElementOf(randomUnitFactor, randomUnitFactors)
+        randomUnitFactor = generateRandomUnitFactor()
+    end
+    return randomUnitFactor
+end
+
 function generateRandomUnitFactorWithFields()
     randomFields = generateRandomUnitFactorFields()
     randomUnitFactor = UnitFactor(
@@ -214,7 +237,7 @@ end
 function generateRandomUnitFactorFields()
     randomPrefix = generateRandomUnitPrefix()
     randombaseUnit = generateRandomBaseUnit()
-    randomExponent = generateRandomReal()
+    randomExponent = generateRandomExponent()
 
     randomFields = Dict{String,Any}()
     randomFields["unitPrefix"] = randomPrefix
@@ -229,18 +252,9 @@ function generateRandomUnit()
 end
 
 function generateRandomUnitWithFields()
-    randomFields = generateRandomUnitFields()
+    randomFields = generateRandomUnitFactors(4)
     randomUnit = Unit(randomFields)
     return (randomUnit, randomFields)
-end
-
-function generateRandomUnitFields()
-    randomFields = Vector{UnitFactor}()
-    for index in 1:4
-        randomUnitFactor = generateRandomUnitFactor()
-        randomFields = vcat(randomFields, randomUnitFactor)
-    end
-    return randomFields
 end
 
 end # module

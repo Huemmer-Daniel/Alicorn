@@ -7,8 +7,9 @@ include("UnitPrefixTests.jl")
 include("BaseUnitExponentsTests.jl")
 include("BaseUnitTests.jl")
 include("UnitFactorTests.jl")
-include("UnitTests.jl")
 include("UnitCatalogueTests.jl")
+include("UnitTests.jl")
+include("unitArithmeticsTests.jl")
 
 function run()
     @testset "Units" begin
@@ -16,8 +17,9 @@ function run()
         BaseUnitExponentsTests.run()
         BaseUnitTests.run()
         UnitFactorTests.run()
-        UnitTests.run()
         UnitCatalogueTests.run()
+        UnitTests.run()
+        unitArithmeticsTests.run()
     end
 end
 

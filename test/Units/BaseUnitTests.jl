@@ -6,13 +6,14 @@ using ..TestingTools
 
 function run()
     @testset "BaseUnit" begin
-        canInstantiateBaseUnit()
-        BaseUnit_ErrorsOnInfinitePrefactor()
-        BaseUnit_ErrorsForNonIdentifierNames()
-        BaseUnit_FieldsCorrectlyInitialized()
-        test_equality()
+        @test canInstantiateBaseUnit()
+        test_BaseUnit_ErrorsOnInfinitePrefactor()
+        test_BaseUnit_ErrorsForNonIdentifierNames()
+        @test BaseUnit_FieldsCorrectlyInitialized()
+        @test equality_implemented()
 
-        unitlessBaseUnitIsDefined()
+        @test unitlessBaseUnitIsDefined()
+        @test BaseUnit_actsAsScalarInBroadcast()
     end
 end
 
@@ -28,10 +29,10 @@ function canInstantiateBaseUnit()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
-function BaseUnit_ErrorsOnInfinitePrefactor()
+function test_BaseUnit_ErrorsOnInfinitePrefactor()
     infiniteNumbers = TestingTools.getInfiniteNumbers()
     for number in infiniteNumbers
         @test_throws DomainError(number,"argument must be finite") BaseUnit(
@@ -43,7 +44,7 @@ function BaseUnit_ErrorsOnInfinitePrefactor()
     end
 end
 
-function BaseUnit_ErrorsForNonIdentifierNames()
+function test_BaseUnit_ErrorsForNonIdentifierNames()
     invalidNames = TestingTools.getInvalidUnitElementNamesTestset()
     for name in invalidNames
         @test_throws ArgumentError("name argument must be a valid identifier") BaseUnit(
@@ -57,7 +58,7 @@ end
 
 function BaseUnit_FieldsCorrectlyInitialized()
     (baseUnit, randFields) = TestingTools.generateRandomBaseUnitWithFields()
-    @test _verifyHasCorrectFields(baseUnit, randFields)
+    return _verifyHasCorrectFields(baseUnit, randFields)
 end
 
 function _verifyHasCorrectFields(baseUnit::BaseUnit, randFields::Dict)
@@ -68,12 +69,12 @@ function _verifyHasCorrectFields(baseUnit::BaseUnit, randFields::Dict)
     return correct
 end
 
-function test_equality()
+function equality_implemented()
     randomFields1 = TestingTools.generateRandomBaseUnitFields()
     randomFields2 = deepcopy(randomFields1)
     baseUnit1 = _initializeUnitFactorFromDict(randomFields1)
     baseUnit2 = _initializeUnitFactorFromDict(randomFields2)
-    @test baseUnit1 == baseUnit2
+    return baseUnit1 == baseUnit2
 end
 
 function _initializeUnitFactorFromDict(fields::Dict)
@@ -93,7 +94,28 @@ function unitlessBaseUnitIsDefined()
         prefactor = 1,
         exponents = BaseUnitExponents()
     )
-    @test (Alicorn.unitlessBaseUnit == unitless)
+    return (Alicorn.unitlessBaseUnit == unitless)
+end
+
+function BaseUnit_actsAsScalarInBroadcast()
+    (baseUnit1, baseUnit2) = _generateTwoDifferentBaseUnitsWithoutUsingBroadcasting()
+    baseUnitArray = [ baseUnit1, baseUnit2 ]
+    pass = false
+    try
+        elementwiseComparison = (baseUnitArray .== baseUnit1)
+        pass = elementwiseComparison == [true, false]
+    catch
+    end
+    return pass
+end
+
+function _generateTwoDifferentBaseUnitsWithoutUsingBroadcasting()
+    baseUnit1 = TestingTools.generateRandomBaseUnit()
+    baseUnit2 = baseUnit1
+    while baseUnit2 == baseUnit1
+        baseUnit2 = TestingTools.generateRandomBaseUnit()
+    end
+    return (baseUnit1, baseUnit2)
 end
 
 end # module

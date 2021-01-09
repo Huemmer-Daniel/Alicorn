@@ -7,20 +7,21 @@ using ..UnitsTests
 
 function run()
     @testset "PrettyPrinting" begin
-        test_prettyPrintScientificNumber()
-        testUnitPrefixPrettyPrinting()
-        testBaseUnitExponentsPrettyPrinting()
-        testBaseUnitPrettyPrinting()
-        testUnitFactorPrettyPrinting()
-        testUnitCataloguePrettyPrinting()
+        @test prettyPrintScientificNumber()
+        @test unitPrefixPrettyPrinting()
+        @test baseUnitExponentsPrettyPrinting()
+        @test baseUnitPrettyPrinting()
+        @test unitFactorPrettyPrinting()
+        @test unitCataloguePrettyPrinting()
+        @test_skip UnitPrettyPrinting()
     end
 end
 
 ## Numbers
 
-function test_prettyPrintScientificNumber()
+function prettyPrintScientificNumber()
     (examples, significantDigits) = _getPrettyPrintingExamples()
-    @test _checkPrettyPrintingExamplesImplemented(examples, significantDigits)
+    return _checkPrettyPrintingExamplesImplemented(examples, significantDigits)
 end
 
 function _getPrettyPrintingExamples()
@@ -56,9 +57,9 @@ end
 
 ## UnitPrefix
 
-function testUnitPrefixPrettyPrinting()
+function unitPrefixPrettyPrinting()
     examples = _getUnitPrefixExamples()
-    @test _verifyPrettyPrintingImplemented(examples)
+    return _verifyPrettyPrintingImplemented(examples)
 end
 
 function _getUnitPrefixExamples()
@@ -80,13 +81,13 @@ end
 function _verifyPrettyPrintingImplemented(examples)
     correct = true
     for (object, correctPrettyStr) in examples
-        generatedPrettyStr = getShowString(object)
+        generatedPrettyStr = _getShowString(object)
         correct &= ( generatedPrettyStr == correctPrettyStr )
     end
     return correct
 end
 
-function getShowString(object)
+function _getShowString(object)
     io = IOBuffer()
     show(io, object)
     generatedString = String(take!(io))
@@ -95,9 +96,9 @@ end
 
 ## BaseUnitExponents
 
-function testBaseUnitExponentsPrettyPrinting()
+function baseUnitExponentsPrettyPrinting()
     examples = _getBaseUnitExponentsExamples()
-    @test _verifyPrettyPrintingImplemented(examples)
+    return _verifyPrettyPrintingImplemented(examples)
 end
 
 function _getBaseUnitExponentsExamples()
@@ -116,9 +117,9 @@ end
 
 ## BaseUnit
 
-function testBaseUnitPrettyPrinting()
+function baseUnitPrettyPrinting()
     examples = _getBaseUnitExamples()
-    @test _verifyPrettyPrintingImplemented(examples)
+    return _verifyPrettyPrintingImplemented(examples)
 end
 
 function _getBaseUnitExamples()
@@ -133,9 +134,9 @@ end
 
 ## UnitFactor
 
-function testUnitFactorPrettyPrinting()
+function unitFactorPrettyPrinting()
     examples = _getUnitFactorExamples()
-    @test _verifyPrettyPrintingImplemented(examples)
+    return _verifyPrettyPrintingImplemented(examples)
 end
 
 function _getUnitFactorExamples()
@@ -151,11 +152,11 @@ end
 
 ## UnitCatalogue
 
-function testUnitCataloguePrettyPrinting()
+function unitCataloguePrettyPrinting()
     ucat = TestingTools.initializeTestUnitCatalogue()
     correctPrettyString = _getCorrectPrettyString(ucat)
-    returnedPrettyString = getShowString(ucat)
-    @test (returnedPrettyString == correctPrettyString)
+    returnedPrettyString = _getShowString(ucat)
+    return (returnedPrettyString == correctPrettyString)
 end
 
 function _getCorrectPrettyString(ucat::UnitCatalogue)
@@ -163,6 +164,20 @@ function _getCorrectPrettyString(ucat::UnitCatalogue)
     nrOfBaseUnits = length(listBaseUnits(ucat))
     prettyString = "UnitCatalogue providing\n\t$nrOfUnitPrefixes unit prefixes\n\t$nrOfBaseUnits base units"
     return prettyString
+end
+
+## Unit
+
+function unitPrettyPrinting()
+    examples = _getUnitExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getUnitExamples()
+    ucat = UnitCatalogue()
+    examples = [
+    ]
+    return examples
 end
 
 end # module

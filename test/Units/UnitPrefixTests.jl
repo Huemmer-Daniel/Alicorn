@@ -8,14 +8,15 @@ using ..TestingTools
 
 function run()
     @testset "UnitPrefix" begin
-        canInstantiateUnitPrefix()
-        UnitPrefix_ErrorsForInfiniteValues()
-        UnitPrefix_ErrorsForNonIdentifierNames()
-        UnitPrefix_FieldsCorrectlyInitialized()
-        test_equality()
-        testEqualPrefixesAreIdentical()
+        @test canInstantiateUnitPrefix()
+        test_UnitPrefix_ErrorsForInfiniteValues()
+        test_UnitPrefix_ErrorsForNonIdentifierNames()
+        @test UnitPrefix_FieldsCorrectlyInitialized()
+        @test equality_implemented()
+        @test equalPrefixesAreIdentical()
 
-        emptyUnitPrefixIsDefined()
+        @test emptyUnitPrefixIsDefined()
+        @test UnitPrefix_actsAsScalarInBroadcast()
     end
 end
 
@@ -26,22 +27,10 @@ function canInstantiateUnitPrefix()
         pass = true
     catch
     end
-    @test pass
+    return pass
 end
 
-function UnitPrefix_FieldsCorrectlyInitialized()
-    (prefix, randFields) = TestingTools.generateRandomUnitPrefixWithFields()
-    @test _verifyPrefixHasCorrectFields(prefix, randFields)
-end
-
-function _verifyPrefixHasCorrectFields(prefix::UnitPrefix, randFields::Dict)
-    correct = (prefix.name == randFields["name"])
-    correct &= (prefix.symbol == randFields["symbol"])
-    correct &= (prefix.value == randFields["value"])
-    return correct
-end
-
-function UnitPrefix_ErrorsForInfiniteValues()
+function test_UnitPrefix_ErrorsForInfiniteValues()
     infiniteNumbers = TestingTools.getInfiniteNumbers()
     for number in infiniteNumbers
         @test_throws DomainError(number,"argument must be finite") UnitPrefix(
@@ -52,7 +41,7 @@ function UnitPrefix_ErrorsForInfiniteValues()
     end
 end
 
-function UnitPrefix_ErrorsForNonIdentifierNames()
+function test_UnitPrefix_ErrorsForNonIdentifierNames()
     invalidNames = TestingTools.getInvalidUnitElementNamesTestset()
     for name in invalidNames
         @test_throws ArgumentError("name argument must be a valid identifier") UnitPrefix(
@@ -63,12 +52,24 @@ function UnitPrefix_ErrorsForNonIdentifierNames()
     end
 end
 
-function test_equality()
+function UnitPrefix_FieldsCorrectlyInitialized()
+    (prefix, randFields) = TestingTools.generateRandomUnitPrefixWithFields()
+    return _verifyPrefixHasCorrectFields(prefix, randFields)
+end
+
+function _verifyPrefixHasCorrectFields(prefix::UnitPrefix, randFields::Dict)
+    correct = (prefix.name == randFields["name"])
+    correct &= (prefix.symbol == randFields["symbol"])
+    correct &= (prefix.value == randFields["value"])
+    return correct
+end
+
+function equality_implemented()
     randomFields1 = TestingTools.generateRandomUnitPrefixFields()
     randomFields2 = deepcopy(randomFields1)
     prefix1 = _initializeUnitFactorFromDict(randomFields1)
     prefix2 = _initializeUnitFactorFromDict(randomFields2)
-    @test prefix1 == prefix2
+    return prefix1 == prefix2
 end
 
 function _initializeUnitFactorFromDict(fields::Dict)
@@ -80,11 +81,11 @@ function _initializeUnitFactorFromDict(fields::Dict)
     return unitPrefix
 end
 
-function testEqualPrefixesAreIdentical()
+function equalPrefixesAreIdentical()
     randomFields = TestingTools.generateRandomUnitPrefixFields()
     prefix1 = _initializeUnitFactorFromDict(randomFields)
     prefix2 = _initializeUnitFactorFromDict(randomFields)
-    @test prefix1 === prefix2
+    return prefix1 === prefix2
 end
 
 function emptyUnitPrefixIsDefined()
@@ -93,7 +94,28 @@ function emptyUnitPrefixIsDefined()
         symbol = "<empty>",
         value = 1
     )
-    @test Alicorn.emptyUnitPrefix == emptyPrefix
+    return Alicorn.emptyUnitPrefix == emptyPrefix
+end
+
+function UnitPrefix_actsAsScalarInBroadcast()
+    (unitPrefix1, unitPrefix2) = _generateTwoDifferentUnitPrefixesWithoutUsingBroadcasting()
+    unitPrefixArray = [ unitPrefix1, unitPrefix2 ]
+    pass = false
+    try
+        elementwiseComparison = (unitPrefixArray .== unitPrefix1)
+        pass = elementwiseComparison == [true, false]
+    catch
+    end
+    return pass
+end
+
+function _generateTwoDifferentUnitPrefixesWithoutUsingBroadcasting()
+    unitPrefix1 = TestingTools.generateRandomUnitPrefix()
+    unitPrefix2 = unitPrefix1
+    while unitPrefix2 == unitPrefix1
+        unitPrefix2 = TestingTools.generateRandomUnitPrefix()
+    end
+    return (unitPrefix1, unitPrefix2)
 end
 
 end # module
