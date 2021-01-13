@@ -12,7 +12,6 @@ function generateRandomUnitPrefix()
     return randomPrefix
 end
 
-
 function generateRandomUnitPrefixWithFields()
     randomFields = generateRandomUnitPrefixFields()
     randomPrefix = UnitPrefix(
@@ -139,10 +138,19 @@ function dictsAreIdentical(dict1::Dict, dict2::Dict)
     return valuesMatch
 end
 
-function verifyFunctionWorksAsExpected(func, examples::Array)
+function testMonadicFunction(func, examples::Array)
     correct = true
     for (input, correctOutput) in examples
         returnedOutput = func(input)
+        correct &= (returnedOutput == correctOutput)
+    end
+    return correct
+end
+
+function testDyadicFunction(func, examples::Array)
+    correct = true
+    for (input1, input2, correctOutput) in examples
+        returnedOutput = func(input1, input2)
         correct &= (returnedOutput == correctOutput)
     end
     return correct

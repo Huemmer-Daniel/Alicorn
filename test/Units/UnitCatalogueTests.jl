@@ -183,7 +183,7 @@ end
 
 function _testExamplesFor_providesUnitPrefix(ucat::UnitCatalogue, examples::Array{Tuple{String, Bool}})
     functionToTest(prefixName) = providesUnitPrefix(ucat, prefixName)
-    return TestingTools.verifyFunctionWorksAsExpected(functionToTest, examples)
+    return TestingTools.testMonadicFunction(functionToTest, examples)
 end
 
 function providesBaseUnit_implemented()
@@ -206,7 +206,7 @@ end
 
 function _testExamplesFor_providesBaseUnit(examples::Array{Tuple{String, Bool}}, ucat::UnitCatalogue)
     functionToTest(baseUnitName) = providesBaseUnit(ucat, baseUnitName)
-    return TestingTools.verifyFunctionWorksAsExpected(functionToTest, examples)
+    return TestingTools.testMonadicFunction(functionToTest, examples)
 end
 
 function getproperty_implemented()

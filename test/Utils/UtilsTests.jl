@@ -156,7 +156,7 @@ end
 
 function occurencesIn_implemented()
     examples = _getExamplesFor_occurencesIn()
-    return _testExamplesFor_occurencesIn(examples)
+    return TestingTools.testDyadicFunction(Utils.occurencesIn, examples)
 end
 
 function _getExamplesFor_occurencesIn()
@@ -169,18 +169,10 @@ function _getExamplesFor_occurencesIn()
     return examples
 end
 
-function _testExamplesFor_occurencesIn(examples::Vector)
-    pass = true
-    for (el, array, correctOccurences) in examples
-        returnedOccurences = Utils.occurencesIn(el, array)
-        pass &= (returnedOccurences == correctOccurences)
-    end
-    return pass
-end
 
 function isElementOf_implemented()
     examples = _getExamplesFor_isElementOf()
-    return _testExamplesFor_isElementOf(examples)
+    return TestingTools.testDyadicFunction(Utils.isElementOf, examples)
 end
 
 function _getExamplesFor_isElementOf()
@@ -189,15 +181,6 @@ function _getExamplesFor_isElementOf()
     (1, [2 3; 4 5], false),
     ]
     return examples
-end
-
-function _testExamplesFor_isElementOf(examples::Array{ Tuple{T, Array{T,N} where N, Bool} where T })
-    correct = true
-    for (element, collection, correctResult) in examples
-        returnedResult = Utils.isElementOf(element,collection)
-        correct &= (returnedResult == correctResult)
-    end
-    return correct
 end
 
 function test_assertIsValidSymbol()
@@ -209,7 +192,7 @@ end
 
 function tryCastingToInt_implemented()
     examples = _getExamplesFor_tryCastingToInt()
-    return _testExamplesFor_tryCastingToInt(examples)
+    TestingTools.testMonadicFunction(Utils.tryCastingToInt, examples)
 end
 
 function _getExamplesFor_tryCastingToInt()
@@ -221,15 +204,6 @@ function _getExamplesFor_tryCastingToInt()
     ( [1.0, 2], [1, 2])
     ]
     return examples
-end
-
-function _testExamplesFor_tryCastingToInt(examples::Vector)
-    pass = true
-    for (exampleNumber, correctResult) in examples
-        returnedResult = Utils.tryCastingToInt(exampleNumber)
-        pass &= (returnedResult == correctResult)
-    end
-    return pass
 end
 
 end # end

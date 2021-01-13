@@ -13,7 +13,7 @@ function run()
         @test baseUnitPrettyPrinting()
         @test unitFactorPrettyPrinting()
         @test unitCataloguePrettyPrinting()
-        @test_skip UnitPrettyPrinting()
+        @test_skip unitPrettyPrinting()
     end
 end
 
@@ -176,6 +176,13 @@ end
 function _getUnitExamples()
     ucat = UnitCatalogue()
     examples = [
+        ( Alicorn.unitlessUnit, "Unit <unitless>"),
+        ( Unit(ucat.gram), "Unit g"),
+        ( ucat.meter * ucat.second^(-2), "Unit m s^-2"),
+        ( ucat.kilo * ucat.gram, "Unit kg"),
+        ( (ucat.kilo * ucat.gram)^pi , "Unit kg^3.1"),
+        ( (ucat.kilo * ucat.gram)^pi , "Unit kg^3.1"),
+        ( (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2) , "Unit kg^3.1 TH^-2")
     ]
     return examples
 end

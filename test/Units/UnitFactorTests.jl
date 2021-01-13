@@ -12,6 +12,9 @@ function run()
         test_UnitFactor_TriesCastingExponentsToInt()
         @test UnitFactor_actsAsScalarInBroadcast()
         @test UnitFactor_fieldsCorrectlyInitialized()
+        test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNonemptyPrefix()
+        test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNontrivialExponent()
+
         @test equality_implemented()
 
         @test canInstanciateUnitFactorWithoutPrefix()
@@ -116,6 +119,15 @@ function _initializeUnitFactorFromDict(fields::Dict)
         fields["exponent"]
     )
     return unitFactor
+end
+
+function test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNonemptyPrefix()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    @test_throws Core.ArgumentError("unitless BaseUnit requires empty UnitPrefix") UnitFactor(unitPrefix, Alicorn.unitlessBaseUnit, 1)
+end
+
+function test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNontrivialExponent()
+    @test_throws Core.ArgumentError("unitless BaseUnit requires exponent 1") UnitFactor(Alicorn.emptyUnitPrefix, Alicorn.unitlessBaseUnit, 2)
 end
 
 function canInstanciateUnitFactorWithoutPrefix()

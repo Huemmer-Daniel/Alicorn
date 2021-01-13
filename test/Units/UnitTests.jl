@@ -14,9 +14,10 @@ function run()
         @test equality_implemented()
 
         @test canInstanciateUnitWithSingleUnitFactor()
-        @test canInstanciateUnitlessUnitWithoutArguments()
+        @test canInstanciateUnitWithSingleBaseUnit()
 
         @test unitlessUnitIsDefined()
+        @test canInstanciateUnitlessUnitWithoutArguments()
     end
 end
 
@@ -156,16 +157,27 @@ function canInstanciateUnitWithSingleUnitFactor()
     return pass
 end
 
-function canInstanciateUnitlessUnitWithoutArguments()
-    unitlessUnitFactor = UnitFactor()
-    unitlessUnit = Unit(unitlessUnitFactor)
-    unitlessUnitReturned = Unit()
-    return (unitlessUnitReturned == unitlessUnit)
+function canInstanciateUnitWithSingleBaseUnit()
+    pass = false
+    try
+        baseUnit = TestingTools.generateRandomBaseUnit()
+        Unit(baseUnit)
+        pass = true
+    catch
+    end
+    return pass
 end
 
 function unitlessUnitIsDefined()
     unitless = Unit( Alicorn.unitlessUnitFactor )
     return (Alicorn.unitlessUnit == unitless)
 end
+
+function canInstanciateUnitlessUnitWithoutArguments()
+    unitlessUnit = Alicorn.unitlessUnit
+    unitlessUnitReturned = Unit()
+    return (unitlessUnitReturned == unitlessUnit)
+end
+
 
 end # module
