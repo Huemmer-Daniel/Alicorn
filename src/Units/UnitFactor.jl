@@ -28,8 +28,6 @@ function _assertTrivialExponentIfUnitless(baseUnit::BaseUnit, exponent::Real)
     end
 end
 
-Base.broadcastable(unitFactor::UnitFactor) = Ref(unitFactor)
-
 function UnitFactor(baseUnit::BaseUnit, exponent::Real)
     return UnitFactor(emptyUnitPrefix, baseUnit, exponent)
 end

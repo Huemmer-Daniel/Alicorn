@@ -19,6 +19,8 @@ function run()
 
         @test unitlessUnitIsDefined()
         @test canInstanciateUnitlessUnitWithoutArguments()
+
+        @test Unit_actsAsScalarInBroadcast()
     end
 end
 
@@ -187,5 +189,17 @@ function canInstanciateUnitlessUnitWithoutArguments()
     return (unitlessUnitReturned == unitlessUnit)
 end
 
+function Unit_actsAsScalarInBroadcast()
+    unit1 = TestingTools.generateRandomUnit()
+    unit2 = TestingTools.generateRandomUnit()
+    unitArray = [ unit1, unit2 ]
+    pass = false
+    try
+        elementwiseComparison = (unitArray .== unit1)
+        pass = elementwiseComparison == [true, false]
+    catch
+    end
+    return pass
+end
 
 end # module
