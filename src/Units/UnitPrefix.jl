@@ -1,7 +1,7 @@
 using ..Utils
 
 export UnitPrefix
-struct UnitPrefix <: UnitElement
+struct UnitPrefix <: AbstractUnitElement
     name::String
     symbol::String
     value::Real

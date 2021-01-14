@@ -1,5 +1,5 @@
 export Unit
-struct Unit
+struct Unit <: AbstractUnit
     unitFactors::Vector{UnitFactor}
 
     function Unit(unitFactors::Vector{UnitFactor})

@@ -1,7 +1,7 @@
 using ..Utils
 
 export UnitFactor
-struct UnitFactor
+struct UnitFactor <: AbstractUnit
     unitPrefix::UnitPrefix
     baseUnit::BaseUnit
     exponent::Real

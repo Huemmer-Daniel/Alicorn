@@ -9,7 +9,7 @@ using ..TestingTools
 function run()
     @testset "UnitCatalogue" begin
         @test canInstanciateUnitCatalogue()
-        test_UnitCatalogue_errorsOnDuplicateUnitElementNames()
+        test_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames()
 
         @test listUnitPrefixes_implemented()
         @test listBaseUnits_implemented()
@@ -22,7 +22,7 @@ function run()
 
         @test getproperty_implemented()
         @test propertynames_implemented()
-        test_propertynames_errorsOnUnknownUnitElement()
+        test_propertynames_errorsOnUnknownUnitFactorElement()
 
         @test canInstanciateEmptyUnitCatalogue()
 
@@ -46,12 +46,12 @@ function canInstanciateUnitCatalogue()
     return pass
 end
 
-function test_UnitCatalogue_errorsOnDuplicateUnitElementNames()
-    examples = _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitElementNames()
-    _testExamples_UnitCatalogue_errorsOnDuplicateUnitElementNames(examples)
+function test_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames()
+    examples = _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames()
+    _testExamples_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames(examples)
 end
 
-function _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitElementNames()
+function _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames()
     unitPrefixes = TestingTools.getUnitPrefixTestSet()
     baseUnits = TestingTools.getBaseUnitTestSet()
     randomUnitPrefix = TestingTools.getRandomUnitPrefix()
@@ -85,7 +85,7 @@ function _getExamplesFor_UnitCatalogue_errorsOnDuplicateUnitElementNames()
     return examples
 end
 
-function _testExamples_UnitCatalogue_errorsOnDuplicateUnitElementNames(examples::Vector)
+function _testExamples_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames(examples::Vector)
     for (unitPrefixes, baseUnits) in examples
         @test_throws Exceptions.DublicationError("names of unit elements have to be unique") UnitCatalogue(unitPrefixes, baseUnits)
     end
@@ -100,25 +100,25 @@ end
 
 function _getUnitPrefixTestCatalogue()
     unitPrefixTestSet = TestingTools.getUnitPrefixTestSet()
-    unitPrefixTestCatalogue = _generateUnitElementCatalogueFromSet(unitPrefixTestSet)
+    unitPrefixTestCatalogue = _generateUnitFactorElementCatalogueFromSet(unitPrefixTestSet)
     return unitPrefixTestCatalogue
 end
 
-function _generateUnitElementCatalogueFromSet(unitElementSet::Vector{T}) where T <: UnitElement
-    names = _getUnitElementNamesFrom(unitElementSet)
-    catalogue = Dict( zip(names, unitElementSet) )
+function _generateUnitFactorElementCatalogueFromSet(unitFactorElementSet::Vector{T}) where T <: UnitFactorElement
+    names = _getUnitFactorElementNamesFrom(unitFactorElementSet)
+    catalogue = Dict( zip(names, unitFactorElementSet) )
 end
 
-function _getUnitElementNamesFrom(unitElements::Array{T}) where T <: UnitElement
-    nrOfElements = length(unitElements)
-    unitElementNames = Array{String}(undef, nrOfElements)
-    for (index, element) in enumerate(unitElements)
-        unitElementNames[index] = element.name
+function _getUnitFactorElementNamesFrom(unitFactorElements::Array{T}) where T <: UnitFactorElement
+    nrOfElements = length(unitFactorElements)
+    unitFactorElementNames = Array{String}(undef, nrOfElements)
+    for (index, element) in enumerate(unitFactorElements)
+        unitFactorElementNames[index] = element.name
     end
-    return unitElementNames
+    return unitFactorElementNames
 end
 
-function _cataloguesAreIdentical(cat1::Dict{String,T}, cat2::Dict{String,T}) where T <: UnitElement
+function _cataloguesAreIdentical(cat1::Dict{String,T}, cat2::Dict{String,T}) where T <: UnitFactorElement
     return TestingTools.dictsAreIdentical(cat1, cat2)
 end
 
@@ -131,7 +131,7 @@ end
 
 function _getBaseUnitTestCatalogue()
     baseUnitTestSet = TestingTools.getBaseUnitTestSet()
-    baseUnitTestCatalogue = _generateUnitElementCatalogueFromSet(baseUnitTestSet)
+    baseUnitTestCatalogue = _generateUnitFactorElementCatalogueFromSet(baseUnitTestSet)
     return baseUnitTestCatalogue
 end
 
@@ -144,7 +144,7 @@ end
 
 function _getUnitPrefixTestNames()
     unitPrefixTestSet = TestingTools.getUnitPrefixTestSet()
-    unitPrefixNames = _getUnitElementNamesFrom(unitPrefixTestSet)
+    unitPrefixNames = _getUnitFactorElementNamesFrom(unitPrefixTestSet)
     sort!(unitPrefixNames)
     return unitPrefixNames
 end
@@ -158,7 +158,7 @@ end
 
 function _getBaseUnitTestNames()
     baseUnitTestSet = TestingTools.getBaseUnitTestSet()
-    baseUnitNames = _getUnitElementNamesFrom(baseUnitTestSet)
+    baseUnitNames = _getUnitFactorElementNamesFrom(baseUnitTestSet)
     sort!(baseUnitNames)
     return baseUnitNames
 end
@@ -211,33 +211,33 @@ end
 
 function getproperty_implemented()
     ucat = TestingTools.initializeTestUnitCatalogue()
-    unitElementNames = _getAllUnitElementNamesFromTestSets()
-    pass = _canAccessUnitElementsWith_getproperty(ucat, unitElementNames)
+    unitFactorElementNames = _getAllUnitFactorElementNamesFromTestSets()
+    pass = _canAccessUnitFactorElementsWith_getproperty(ucat, unitFactorElementNames)
     return pass
 end
 
-function _getAllUnitElementNamesFromTestSets()
+function _getAllUnitFactorElementNamesFromTestSets()
     unitPrefixTestSet = TestingTools.getUnitPrefixTestSet()
-    unitPrefixNames =  _getUnitElementNamesFrom(unitPrefixTestSet)
+    unitPrefixNames =  _getUnitFactorElementNamesFrom(unitPrefixTestSet)
 
     baseUnitTestSet = TestingTools.getBaseUnitTestSet()
-    baseUnitNames = _getUnitElementNamesFrom(baseUnitTestSet)
+    baseUnitNames = _getUnitFactorElementNamesFrom(baseUnitTestSet)
 
     allNames = vcat(unitPrefixNames, baseUnitNames)
 end
 
-function _canAccessUnitElementsWith_getproperty(ucat::UnitCatalogue, unitElementNames::Vector{String})
+function _canAccessUnitFactorElementsWith_getproperty(ucat::UnitCatalogue, unitFactorElementNames::Vector{String})
     pass = false
     try
-        _accessAllWith_getproperty(ucat::UnitCatalogue, unitElementNames::Vector{String})
+        _accessAllWith_getproperty(ucat::UnitCatalogue, unitFactorElementNames::Vector{String})
         pass = true
     catch
     end
     return pass
 end
 
-function _accessAllWith_getproperty(ucat::UnitCatalogue, unitElementNames::Vector{String})
-    for name in unitElementNames
+function _accessAllWith_getproperty(ucat::UnitCatalogue, unitFactorElementNames::Vector{String})
+    for name in unitFactorElementNames
         getproperty(ucat, Symbol(name))
     end
 end
@@ -250,18 +250,18 @@ function propertynames_implemented()
 end
 
 function _getCorrectPropertySymbols(ucat::UnitCatalogue)
-    unitElementNames = _getAllUnitElementNamesFromTestSets()
-    unitElementNames = sort!(unitElementNames)
+    unitFactorElementNames = _getAllUnitFactorElementNamesFromTestSets()
+    unitFactorElementNames = sort!(unitFactorElementNames)
 
-    nrOfProperties = length(unitElementNames)
+    nrOfProperties = length(unitFactorElementNames)
     correctPropertySymbols = Array{Symbol}(undef,nrOfProperties)
-    for (index, unitElementName) in enumerate(unitElementNames)
-        correctPropertySymbols[index] = Symbol(unitElementName)
+    for (index, unitFactorElementName) in enumerate(unitFactorElementNames)
+        correctPropertySymbols[index] = Symbol(unitFactorElementName)
     end
     return correctPropertySymbols
 end
 
-function test_propertynames_errorsOnUnknownUnitElement()
+function test_propertynames_errorsOnUnknownUnitFactorElement()
     ucat = TestingTools.initializeTestUnitCatalogue()
     @test_throws KeyError("nonsense") ucat.nonsense
     @test_throws KeyError("prefixCatalogue") ucat.prefixCatalogue
@@ -293,7 +293,7 @@ end
 
 function _checkIfDefaultUnitPrefixesImplemented(defaultUcat::UnitCatalogue)
     defaultUnitPrefixes = _getDefaultUnitPrefixes()
-    return _canCallAllUnitElements(defaultUcat, defaultUnitPrefixes)
+    return _canCallAllUnitFactorElements(defaultUcat, defaultUnitPrefixes)
 end
 
 function _getDefaultUnitPrefixes()
@@ -322,18 +322,18 @@ function _getDefaultUnitPrefixes()
     return predefinedPrefixes
 end
 
-function _canCallAllUnitElements(ucat::UnitCatalogue, unitElements::Vector{T}) where T <: UnitElement
+function _canCallAllUnitFactorElements(ucat::UnitCatalogue, unitFactorElements::Vector{T}) where T <: UnitFactorElement
     pass = true
-    for element in unitElements
-        pass &= _canCallUnitElement(ucat, element)
+    for element in unitFactorElements
+        pass &= _canCallUnitFactorElement(ucat, element)
     end
     return pass
 end
 
-function _canCallUnitElement(ucat::UnitCatalogue, unitElement::UnitElement)
+function _canCallUnitFactorElement(ucat::UnitCatalogue, unitFactorElement::UnitFactorElement)
     try
-        elementSymbol = Symbol(unitElement.name)
-        return getproperty(ucat, elementSymbol) === unitElement
+        elementSymbol = Symbol(unitFactorElement.name)
+        return getproperty(ucat, elementSymbol) === unitFactorElement
     catch
         return false
     end
@@ -341,7 +341,7 @@ end
 
 function _checkIfDefaultBaseUnitsImplemented(defaultUcat::UnitCatalogue)
     defaultBaseUnits = _getDefaultBaseUnits()
-    return _canCallAllUnitElements(defaultUcat, defaultBaseUnits)
+    return _canCallAllUnitFactorElements(defaultUcat, defaultBaseUnits)
 end
 
 function _getDefaultBaseUnits()
@@ -417,19 +417,19 @@ end
 function add!_forUnitPrefix_implemented()
     emptyUcat = UnitCatalogue([], [])
     testUnitPrefix = TestingTools.generateRandomUnitPrefix()
-    return _test_add!_forUnitElement(emptyUcat, testUnitPrefix)
+    return _test_add!_forUnitFactorElement(emptyUcat, testUnitPrefix)
 end
 
-function _test_add!_forUnitElement(ucat::UnitCatalogue, unitElement::T) where T <: UnitElement
-    add!(ucat, unitElement)
-    return _checkIfAdditionSuccessful(ucat, unitElement)
+function _test_add!_forUnitFactorElement(ucat::UnitCatalogue, unitFactorElement::T) where T <: UnitFactorElement
+    add!(ucat, unitFactorElement)
+    return _checkIfAdditionSuccessful(ucat, unitFactorElement)
 end
 
-function _checkIfAdditionSuccessful(ucat::UnitCatalogue, unitElement::T) where T <: UnitElement
-    elementSymbol = Symbol(unitElement.name)
+function _checkIfAdditionSuccessful(ucat::UnitCatalogue, unitFactorElement::T) where T <: UnitFactorElement
+    elementSymbol = Symbol(unitFactorElement.name)
     additionSuccessful = false
     try
-        additionSuccessful = ( getproperty(ucat, elementSymbol) == unitElement )
+        additionSuccessful = ( getproperty(ucat, elementSymbol) == unitFactorElement )
     catch
     end
     return additionSuccessful
@@ -438,7 +438,7 @@ end
 function add!_forBaseUnit_implemented()
     emptyUcat = UnitCatalogue([], [])
     testBaseUnit = TestingTools.generateRandomBaseUnit()
-    return _test_add!_forUnitElement(emptyUcat, testBaseUnit)
+    return _test_add!_forUnitFactorElement(emptyUcat, testBaseUnit)
 end
 
 function test_add!_errorsOnDuplicates()

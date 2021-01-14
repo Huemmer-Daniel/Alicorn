@@ -7,10 +7,13 @@ include("Exceptions/Exceptions.jl")
 include("Units/Units.jl")
 using .Units
 
+export AbstractUnitElement
+export AbstractUnit
 export UnitElement
 export UnitPrefix
 export BaseUnitExponents
 export BaseUnit
+export UnitFactorElement
 export UnitFactor
 export Unit
 

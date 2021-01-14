@@ -7,9 +7,9 @@ mutable struct UnitCatalogue
     baseUnitCatalogue::Dict{String, BaseUnit}
 
     function UnitCatalogue(unitPrefixes::Vector{UnitPrefix}, baseUnits::Vector{BaseUnit})
-        _assertUnitElementNamesAreUnique(unitPrefixes, baseUnits)
-        unitPrefixCatalogue = _generateUnitElementCatalogueFromVector(unitPrefixes)
-        baseUnitCatalogue = _generateUnitElementCatalogueFromVector(baseUnits)
+        _assertUnitFactorElementNamesAreUnique(unitPrefixes, baseUnits)
+        unitPrefixCatalogue = _generateUnitFactorElementCatalogueFromVector(unitPrefixes)
+        baseUnitCatalogue = _generateUnitFactorElementCatalogueFromVector(baseUnits)
         return new(unitPrefixCatalogue, baseUnitCatalogue)
     end
 end
@@ -25,36 +25,36 @@ function UnitCatalogue()
     return unitCatalogue
 end
 
-function _generateUnitElementCatalogueFromVector(unitElements::Vector{T}) where T <: UnitElement
-    unitElementNames = _getUnitElementNames(unitElements)
-    catalogue = Dict(zip(unitElementNames,unitElements))
+function _generateUnitFactorElementCatalogueFromVector(unitFactorElements::Vector{T}) where T <: UnitFactorElement
+    unitFactorElementNames = _getUnitFactorElementNames(unitFactorElements)
+    catalogue = Dict(zip(unitFactorElementNames,unitFactorElements))
 end
 
-function _getUnitElementNames(unitElements::Vector{T}) where T <: UnitElement
-    nrOfElements = length(unitElements)
-    unitElementNames = Array{String}(undef, nrOfElements)
-    for (index, element) in enumerate(unitElements)
-        unitElementNames[index] = element.name
+function _getUnitFactorElementNames(unitFactorElements::Vector{T}) where T <: UnitFactorElement
+    nrOfElements = length(unitFactorElements)
+    unitFactorElementNames = Array{String}(undef, nrOfElements)
+    for (index, element) in enumerate(unitFactorElements)
+        unitFactorElementNames[index] = element.name
     end
-    return unitElementNames
+    return unitFactorElementNames
 end
 
-function _assertUnitElementNamesAreUnique(unitPrefixes::Vector{UnitPrefix}, baseUnits::Vector{BaseUnit})
-    allUnitElementNames = _getAllUnitElementNames(unitPrefixes, baseUnits)
-    for name in allUnitElementNames
-        _assertNamesIsUnique(allUnitElementNames, name)
+function _assertUnitFactorElementNamesAreUnique(unitPrefixes::Vector{UnitPrefix}, baseUnits::Vector{BaseUnit})
+    allUnitFactorElementNames = _getAllUnitFactorElementNames(unitPrefixes, baseUnits)
+    for name in allUnitFactorElementNames
+        _assertNamesIsUnique(allUnitFactorElementNames, name)
     end
 end
 
-function _getAllUnitElementNames(unitPrefixes::Vector{UnitPrefix}, baseUnits::Vector{BaseUnit})
-    unitPrefixNames = _getUnitElementNames(unitPrefixes)
-    baseUnitNames = _getUnitElementNames(baseUnits)
-    allUnitElementNames = [unitPrefixNames; baseUnitNames]
-    return allUnitElementNames
+function _getAllUnitFactorElementNames(unitPrefixes::Vector{UnitPrefix}, baseUnits::Vector{BaseUnit})
+    unitPrefixNames = _getUnitFactorElementNames(unitPrefixes)
+    baseUnitNames = _getUnitFactorElementNames(baseUnits)
+    allUnitFactorElementNames = [unitPrefixNames; baseUnitNames]
+    return allUnitFactorElementNames
 end
 
-function _assertNamesIsUnique(allUnitElementNames::Vector{String}, name::String)
-    if Utils.occurencesIn(name, allUnitElementNames) > 1
+function _assertNamesIsUnique(allUnitFactorElementNames::Vector{String}, name::String)
+    if Utils.occurencesIn(name, allUnitFactorElementNames) > 1
         throw(Exceptions.DublicationError("names of unit elements have to be unique"))
     end
 end
@@ -107,17 +107,17 @@ end
 function Base.propertynames(unitCatalogue::UnitCatalogue)
     prefixNames = listUnitPrefixNames(unitCatalogue)
     baseUnitNames = listBaseUnitNames(unitCatalogue)
-    unitElementNames = vcat(prefixNames, baseUnitNames)
+    unitFactorElementNames = vcat(prefixNames, baseUnitNames)
 
-    propertyList = _generatePropertySymbolList(unitElementNames)
+    propertyList = _generatePropertySymbolList(unitFactorElementNames)
     return propertyList
 end
 
-function _generatePropertySymbolList(unitElementNames::Vector{String})
-    sort!(unitElementNames)
-    nrOfProperties = length(unitElementNames)
+function _generatePropertySymbolList(unitFactorElementNames::Vector{String})
+    sort!(unitFactorElementNames)
+    nrOfProperties = length(unitFactorElementNames)
     propertyList = Array{Symbol}(undef,nrOfProperties)
-    for (index, name) in enumerate(unitElementNames)
+    for (index, name) in enumerate(unitFactorElementNames)
         propertyList[index] = Symbol(name)
     end
     return propertyList
@@ -125,45 +125,45 @@ end
 
 export add!
 function add!(ucat::UnitCatalogue, prefix::UnitPrefix)
-    _addUnitElement!(ucat, :prefixCatalogue, prefix)
+    _addUnitFactorElement!(ucat, :prefixCatalogue, prefix)
     return ucat
 end
 
-function _addUnitElement!(ucat::UnitCatalogue, targetCatalogue::Symbol, element::UnitElement)
+function _addUnitFactorElement!(ucat::UnitCatalogue, targetCatalogue::Symbol, element::UnitFactorElement)
     _assertElementNameIsUnique(ucat, element)
     getfield(ucat, targetCatalogue)[element.name] = element
 end
 
-function _assertElementNameIsUnique(ucat::UnitCatalogue, unitElement::UnitElement)
-    knownElements = _listUnitElementNames(ucat)
-    if Utils.isElementOf(unitElement.name, knownElements)
-        throw(Exceptions.DublicationError("catalogue already contains an element \"$(unitElement.name)\""))
+function _assertElementNameIsUnique(ucat::UnitCatalogue, unitFactorElement::UnitFactorElement)
+    knownElements = _listUnitFactorElementNames(ucat)
+    if Utils.isElementOf(unitFactorElement.name, knownElements)
+        throw(Exceptions.DublicationError("catalogue already contains an element \"$(unitFactorElement.name)\""))
     end
 end
 
-function _listUnitElementNames(ucat::UnitCatalogue)
+function _listUnitFactorElementNames(ucat::UnitCatalogue)
     prefixNames = listUnitPrefixNames(ucat)
     baseUnitNames = listBaseUnitNames(ucat)
-    unitElementNames = vcat(prefixNames, baseUnitNames)
-    return unitElementNames
+    unitFactorElementNames = vcat(prefixNames, baseUnitNames)
+    return unitFactorElementNames
 end
 
 function add!(ucat::UnitCatalogue, baseUnit::BaseUnit)
-    _addUnitElement!(ucat, :baseUnitCatalogue, baseUnit)
+    _addUnitFactorElement!(ucat, :baseUnitCatalogue, baseUnit)
     return ucat
 end
 
 export remove!
 function remove!(ucat::UnitCatalogue, elementName::String)
     if providesUnitPrefix(ucat, elementName)
-        _removeUnitElement!(ucat, :prefixCatalogue, elementName)
+        _removeUnitFactorElement!(ucat, :prefixCatalogue, elementName)
     elseif providesBaseUnit(ucat, elementName)
-        _removeUnitElement!(ucat, :baseUnitCatalogue, elementName)
+        _removeUnitFactorElement!(ucat, :baseUnitCatalogue, elementName)
     end
     return ucat
 end
 
-function _removeUnitElement!(ucat::UnitCatalogue, targetCatalogue::Symbol, elementName::String)
+function _removeUnitFactorElement!(ucat::UnitCatalogue, targetCatalogue::Symbol, elementName::String)
     delete!( getfield(ucat, targetCatalogue), elementName )
     return ucat
 end
