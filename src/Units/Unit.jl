@@ -112,6 +112,10 @@ function Unit(baseUnit::BaseUnit)
     return Unit( UnitFactor(baseUnit) )
 end
 
+function Unit(unit::Unit)
+    return unit
+end
+
 function Unit()
     unitlessFactor = UnitFactor()
     return Unit(unitlessFactor)

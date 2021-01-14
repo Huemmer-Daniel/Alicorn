@@ -107,22 +107,6 @@ function _assertHasTrivialExponent(unit::Unit)
     end
 end
 
-function Base.:*(baseUnit1::BaseUnit, baseUnit2::BaseUnit)
-    return Unit(baseUnit1) * Unit(baseUnit2)
-end
-
-function Base.:/(baseUnit1::BaseUnit, baseUnit2::BaseUnit)
-    return Unit(baseUnit1) / Unit(baseUnit2)
-end
-
-function Base.:*(unitFactor1::UnitFactor, unitFactor2::UnitFactor)
-    return Unit(unitFactor1) * Unit(unitFactor2)
-end
-
-function Base.:/(unitFactor1::UnitFactor, unitFactor2::UnitFactor)
-    return Unit(unitFactor1) / Unit(unitFactor2)
-end
-
 function Base.:*(unit1::Unit, unit2::Unit)
     unitFactors1 = unit1.unitFactors
     unitFactors2 = unit2.unitFactors
@@ -143,50 +127,10 @@ function _inv_unitFactors(unitFactors::Vector{UnitFactor})
     return inverseUnitFactors
 end
 
-function Base.:*(baseUnit::BaseUnit, unitFactor::UnitFactor)
-    return Unit(baseUnit) * Unit(unitFactor)
+function Base.:*(abstractUnit1::AbstractUnit, abstractUnit2::AbstractUnit)
+    return Unit(abstractUnit1) * Unit(abstractUnit2)
 end
 
-function Base.:*(unitFactor::UnitFactor, baseUnit::BaseUnit)
-    return Unit(unitFactor) * Unit(baseUnit)
-end
-
-function Base.:/(baseUnit::BaseUnit, unitFactor::UnitFactor)
-    return Unit(baseUnit) / Unit(unitFactor)
-end
-
-function Base.:/(unitFactor::UnitFactor, baseUnit::BaseUnit)
-    return Unit(unitFactor) / Unit(baseUnit)
-end
-
-function Base.:*(baseUnit::BaseUnit, unit::Unit)
-    return Unit(baseUnit) * unit
-end
-
-function Base.:*(unit::Unit, baseUnit::BaseUnit)
-    return unit * Unit(baseUnit)
-end
-
-function Base.:/(baseUnit::BaseUnit, unit::Unit)
-    return Unit(baseUnit) / unit
-end
-
-function Base.:/(unit::Unit, baseUnit::BaseUnit)
-    return unit / Unit(baseUnit)
-end
-
-function Base.:*(unitFactor::UnitFactor, unit::Unit)
-    return Unit(unitFactor) * unit
-end
-
-function Base.:*(unit::Unit, unitFactor::UnitFactor)
-    return unit * Unit(unitFactor)
-end
-
-function Base.:/(unitFactor::UnitFactor, unit::Unit)
-    return Unit(unitFactor) / unit
-end
-
-function Base.:/(unit::Unit, unitFactor::UnitFactor)
-    return unit / Unit(unitFactor)
+function Base.:/(abstractUnit1::AbstractUnit, abstractUnit2::AbstractUnit)
+    return Unit(abstractUnit1) / Unit(abstractUnit2)
 end

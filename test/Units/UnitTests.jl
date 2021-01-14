@@ -15,6 +15,7 @@ function run()
 
         @test canInstanciateUnitWithSingleUnitFactor()
         @test canInstanciateUnitWithSingleBaseUnit()
+        @test Unit_actsAsIdentityOnUnit()
 
         @test unitlessUnitIsDefined()
         @test canInstanciateUnitlessUnitWithoutArguments()
@@ -165,6 +166,13 @@ function canInstanciateUnitWithSingleBaseUnit()
         pass = true
     catch
     end
+    return pass
+end
+
+function Unit_actsAsIdentityOnUnit()
+    unit = TestingTools.generateRandomUnit()
+    sameUnit = Unit(unit)
+    pass = (sameUnit === unit)
     return pass
 end
 
