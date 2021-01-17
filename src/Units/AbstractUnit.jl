@@ -22,7 +22,7 @@ Base.broadcastable(abstractUnit::AbstractUnit) = Ref(abstractUnit)
 # AbstractUnit
 
 export convertToUnit
-function convertToUnit(abstractUnit::AbstractUnit)
+function convertToUnit(abstractUnit::AbstractUnit)::Unit
     subtype = typeof(abstractUnit)
     error("subtype $subtype of AbstractUnit misses an implementation of the convertToUnit function")
 end

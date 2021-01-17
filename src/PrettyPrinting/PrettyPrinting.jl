@@ -1,7 +1,8 @@
 module PrettyPrinting
 
-using ..Units
 using ..Utils
+using ..Units
+using ..Quantities
 
 function _addStringWithWhitespace(string, addString)
     if string != "" && string[end] != " " && addString != ""
@@ -17,5 +18,7 @@ include("BaseUnit.jl")
 include("UnitFactor.jl")
 include("UnitCatalogue.jl")
 include("Unit.jl")
+
+include("SimpleQuantity.jl")
 
 end # module

@@ -44,7 +44,7 @@ function generateRandomReal(; dim = 1)
     else
         randReal = rand(Float64, dim)
     end
-    return  20 * randReal .- 10
+    return  20 .* randReal .- 10
 end
 
 function generateRandomNonzeroReal(; dim = 1)

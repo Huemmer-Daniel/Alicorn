@@ -30,6 +30,11 @@ export providesBaseUnit
 export remove!
 export add!
 
+include("Quantities/Quantities.jl")
+using .Quantities
+
+export SimpleQuantity
+
 include("PrettyPrinting/PrettyPrinting.jl")
 
 end # module

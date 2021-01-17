@@ -14,7 +14,9 @@ function run()
         @test unitFactorPrettyPrinting()
         @test unitCataloguePrettyPrinting()
         @test unitPrettyPrinting()
-    end
+
+        @test simpleQuantityPrettyPrinting()
+        end
 end
 
 ## Numbers
@@ -184,6 +186,33 @@ function _getUnitExamples()
         ( (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2) , "Unit kg^3.1 TH^-2")
     ]
     return examples
+end
+
+function simpleQuantityPrettyPrinting()
+    examples = _getSimpleQuantityExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getSimpleQuantityExamples()
+    ucat = UnitCatalogue()
+    unit = (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2)
+
+    int = 712
+    float = 4.345193
+    complex = 1 + 3im
+    array = [1 2; 3.4 5]
+    typeofArray = typeof(array)
+
+    examples = [
+        # integer
+        ( SimpleQuantity( int, unit ), "712 kg^3.1 TH^-2" ),
+        # float
+        ( SimpleQuantity( float, unit ), "4.345193 kg^3.1 TH^-2" ),
+        # complex
+        ( SimpleQuantity( complex, unit ), "1 + 3im kg^3.1 TH^-2" ),
+        # array
+        ( SimpleQuantity( array, unit ), "SimpleQuantity{$typeofArray} of unit kg^3.1 TH^-2" )
+    ]
 end
 
 end # module
