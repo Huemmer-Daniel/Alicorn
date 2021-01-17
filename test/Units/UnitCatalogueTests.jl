@@ -390,7 +390,9 @@ function _getDefaultBaseUnits()
         BaseUnit(name="liter", symbol="l", prefactor=0.001, exponents=BaseUnitExponents(m=3)),
         BaseUnit(name="tonne", symbol="t", prefactor=1000, exponents=BaseUnitExponents(kg=1)),
         BaseUnit(name="dalton", symbol="Da", prefactor=1.66053906660e-27, exponents=BaseUnitExponents(kg=1)),
-        BaseUnit(name="electronvolt", symbol="eV", prefactor=1.602176634e-19, exponents=BaseUnitExponents(kg=1, m=2, s=-2))
+        BaseUnit(name="electronvolt", symbol="eV", prefactor=1.602176634e-19, exponents=BaseUnitExponents(kg=1, m=2, s=-2)),
+        # additional units
+        BaseUnit(name="angstrom", symbol="Å", prefactor=1e-10, exponents=BaseUnitExponents(m=1))
     ]
     return defaultBaseUnits
 end

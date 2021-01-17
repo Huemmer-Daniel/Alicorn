@@ -8,7 +8,10 @@ include("Units/Units.jl")
 using .Units
 
 export AbstractUnitElement
+
 export AbstractUnit
+export convertToUnit
+
 export UnitElement
 export UnitPrefix
 export BaseUnitExponents

@@ -46,3 +46,52 @@ end
 
 export unitlessUnitFactor
 unitlessUnitFactor = UnitFactor( emptyUnitPrefix, unitlessBaseUnit, 1)
+
+function Base.inv(unitFactor::UnitFactor)
+    if unitFactor == UnitFactor(unitlessBaseUnit)
+        return unitFactor
+    else
+        inverseUnitFactor = UnitFactor(unitFactor.unitPrefix, unitFactor.baseUnit, -unitFactor.exponent)
+        return inverseUnitFactor
+    end
+end
+
+function Base.:^(unitFactor::UnitFactor, exponent::Real)
+    unitPrefix = unitFactor.unitPrefix
+    baseUnit = unitFactor.baseUnit
+
+    newExponent = unitFactor.exponent * exponent
+    try
+        newExponent = convert(Int, newExponent)
+    catch
+    end
+
+    newUnitFactor = UnitFactor(unitPrefix, baseUnit, newExponent)
+    return newUnitFactor
+end
+
+function Base.:*(unitPrefix::UnitPrefix, unitFactor::UnitFactor)
+    _assertHasEmptyPrefix(unitFactor)
+    _assertHasTrivialExponent(unitFactor)
+
+    baseUnit = unitFactor.baseUnit
+    return UnitFactor(unitPrefix, baseUnit)
+end
+
+function _assertHasEmptyPrefix(unitFactor::UnitFactor)
+    prefix = unitFactor.unitPrefix
+    if !(prefix == emptyUnitPrefix)
+        throw(Base.ArgumentError("prefix of UnitFactor needs to be emptyUnitPrefix for multiplication of UnitPrefix with UnitFactor"))
+    end
+end
+
+function _assertHasTrivialExponent(unitFactor::UnitFactor)
+    exponent = unitFactor.exponent
+    if !(exponent == 1)
+        throw(Base.ArgumentError("exponent of UnitFactor needs to be 1 for multiplication of UnitPrefix with UnitFactor"))
+    end
+end
+
+function convertToUnit(unitFactor::UnitFactor)
+    return Unit([unitFactor])
+end

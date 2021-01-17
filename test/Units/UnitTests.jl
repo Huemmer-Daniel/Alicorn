@@ -21,6 +21,23 @@ function run()
         @test canInstanciateUnitlessUnitWithoutArguments()
 
         @test Unit_actsAsScalarInBroadcast()
+
+        @test inv_implemented()
+        @test exponenciation_implemented()
+
+        @test multiplication_implemented()
+        @test division_implemented()
+
+        @test BaseUnit_Unit_multiplication_implemented()
+        @test BaseUnit_Unit_division_implemented()
+
+        @test UnitFactor_Unit_multiplication_implemented()
+        @test UnitFactor_Unit_division_implemented()
+
+        @test UnitPrefix_Unit_multiplication_implemented()
+        test_UnitPrefix_Unit_multiplication_ErrorsForMultipleFactorUnit()
+        test_UnitPrefix_Unit_multiplication_ErrorsOnNonemptyPrefixInUnit()
+        test_UnitPrefix_Unit_multiplication_ErrorsOnNontrivialExponentInUnit()
     end
 end
 
@@ -196,10 +213,290 @@ function Unit_actsAsScalarInBroadcast()
     pass = false
     try
         elementwiseComparison = (unitArray .== unit1)
-        pass = elementwiseComparison == [true, false]
+        pass = (elementwiseComparison == [true, false])
     catch
     end
     return pass
+end
+
+function inv_implemented()
+    examples = _getExamplesFor_inv()
+    return TestingTools.testMonadicFunction(inv, examples)
+end
+
+function _getExamplesFor_inv()
+    unitFactors = TestingTools.generateRandomUnitFactors(2)
+
+    unitFactor1 = unitFactors[1]
+    inverseUnitFactor1 = inv(unitFactor1)
+
+    unitFactor2 = unitFactors[2]
+    inverseUnitFactor2 = inv(unitFactor2)
+
+    unitlessUnit = Alicorn.unitlessUnit
+
+    examples = [
+        ( Unit([unitFactor1, unitFactor2]), Unit([inverseUnitFactor1, inverseUnitFactor2]) ),
+        (unitlessUnit, unitlessUnit)
+    ]
+    return examples
+end
+
+function exponenciation_implemented()
+    examples = _getExamplesFor_exponenciation()
+    return TestingTools.testDyadicFunction(Base.:^, examples)
+end
+
+function _getExamplesFor_exponenciation()
+    unitPrefix1 = TestingTools.generateRandomUnitPrefix()
+    baseUnit1 = TestingTools.generateRandomBaseUnit()
+    unitPrefix2 = TestingTools.generateRandomUnitPrefix()
+    baseUnit2 = TestingTools.generateRandomBaseUnit()
+
+    examples = [
+        (
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 2), UnitFactor(unitPrefix1, baseUnit1, 3)]),
+            3,
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 6), UnitFactor(unitPrefix1, baseUnit1, 9)]),
+        ),
+        (
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 1), UnitFactor(unitPrefix1, baseUnit1, 2)]),
+            4.0,
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 4), UnitFactor(unitPrefix1, baseUnit1, 8)]),
+        ),
+        (
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 1.4), UnitFactor(unitPrefix1, baseUnit1, 2.5)]),
+            2,
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 2.8), UnitFactor(unitPrefix1, baseUnit1, 5)])
+        ),
+        (
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, 1.4), UnitFactor(unitPrefix1, baseUnit1, 2.5)]),
+            -2,
+            Unit([ UnitFactor(unitPrefix1, baseUnit1, -2.8), UnitFactor(unitPrefix1, baseUnit1, -5)])
+        )
+    ]
+    return examples
+end
+
+function multiplication_implemented()
+    examples = _getExamplesFor_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_multiplication()
+    unitlessUnit = Alicorn.unitlessUnit
+
+    unitFactors = TestingTools.generateRandomUnitFactors(2)
+    unitFactor1 = unitFactors[1]
+    inverseUnitFactor1 = inv(unitFactor1)
+    unitFactor2 = unitFactors[2]
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1, factor2 are instances of Unit
+    examples = [
+        ( Unit(unitFactor1), Unit(unitFactor2), Unit([ unitFactor1, unitFactor2 ]) ),
+        ( Unit(unitFactor1), Unit(inverseUnitFactor1), unitlessUnit ),
+        ( Unit(unitFactor1), unitlessUnit, Unit(unitFactor1) ),
+        ( unitlessUnit, Unit(unitFactor1), Unit(unitFactor1) ),
+        ( unitlessUnit, unitlessUnit, unitlessUnit ),
+    ]
+    return examples
+end
+
+function division_implemented()
+    examples = _getExamplesFor_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_division()
+    unitlessUnit = Alicorn.unitlessUnit
+
+    unitFactors = TestingTools.generateRandomUnitFactors(2)
+    unitFactor1 = unitFactors[1]
+    inverseUnitFactor1 = inv(unitFactor1)
+    unitFactor2 = unitFactors[2]
+    inverseUnitFactor2 = inv(unitFactor2)
+
+    # format: dividend, divisor, correct result for dividend / divisor
+    # where dividend, divisor are instances of Unit
+    examples = [
+        ( Unit(unitFactor1), Unit(unitFactor2), Unit([ unitFactor1, inverseUnitFactor2 ]) ),
+        ( Unit(unitFactor1), Unit(unitFactor1), unitlessUnit ),
+        ( Unit(unitFactor1), unitlessUnit, Unit(unitFactor1) ),
+        ( unitlessUnit, Unit(unitFactor1), Unit(inverseUnitFactor1) ),
+        ( unitlessUnit, unitlessUnit, unitlessUnit )
+    ]
+    return examples
+end
+
+
+function BaseUnit_Unit_multiplication_implemented()
+    examples = _getExamplesFor_BaseUnit_Unit_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_BaseUnit_Unit_multiplication()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnit = Alicorn.unitlessUnit
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    inverseBaseUnit = inv(baseUnit)
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    inverseUnitFactor = inv(unitFactor)
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1, factor2 instances of BaseUnit or Unit
+    examples = [
+        # factor1 is BaseUnit, factor2 is Unit
+        ( baseUnit, Unit(unitFactor), Unit([UnitFactor(baseUnit), unitFactor]) ),
+        ( baseUnit, Unit(inverseBaseUnit), unitlessUnit ),
+        ( baseUnit, unitlessUnit, Unit(baseUnit) ),
+        ( unitlessBaseUnit, Unit(unitFactor), Unit(unitFactor) ),
+        ( unitlessBaseUnit, unitlessUnit, unitlessUnit ),
+
+        # factor1 is Unit, factor2 is BaseUnit
+        ( Unit(unitFactor), baseUnit, Unit([unitFactor, UnitFactor(baseUnit)]) ),
+        ( Unit(inverseBaseUnit), baseUnit, unitlessUnit ),
+        ( Unit(unitFactor), unitlessBaseUnit, Unit(unitFactor) ),
+        ( unitlessUnit, baseUnit, Unit(baseUnit) ),
+        ( unitlessUnit, unitlessBaseUnit, unitlessUnit )
+    ]
+    return examples
+end
+
+function BaseUnit_Unit_division_implemented()
+    examples = _getExamplesFor_BaseUnit_Unit_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_BaseUnit_Unit_division()
+        unitlessBaseUnit = Alicorn.unitlessBaseUnit
+        unitlessUnit = Alicorn.unitlessUnit
+
+        baseUnit = TestingTools.generateRandomBaseUnit()
+        inverseBaseUnit = inv(baseUnit)
+        unitFactor = TestingTools.generateRandomUnitFactor()
+        inverseUnitFactor = inv(unitFactor)
+
+        # format: dividend, divisor, correct result for dividend / divisor
+        # where dividend, divisor are instances of BaseUnit or Unit
+        examples = [
+            # dividend is BaseUnit, divisor is Unit
+            ( baseUnit, Unit(unitFactor), Unit([ UnitFactor(baseUnit), inverseUnitFactor ]) ),
+            ( baseUnit, Unit(baseUnit), unitlessUnit ),
+            ( baseUnit, unitlessUnit, Unit(baseUnit) ),
+            ( unitlessBaseUnit, Unit(unitFactor), Unit(inverseUnitFactor) ),
+            ( unitlessBaseUnit, unitlessUnit, unitlessUnit ),
+            # dividend is Unit, divisor is BaseUnit
+            ( Unit(unitFactor), baseUnit, Unit([unitFactor, inverseBaseUnit ]) ),
+            ( Unit(baseUnit), baseUnit, unitlessUnit ),
+            ( Unit(unitFactor), unitlessBaseUnit, Unit(unitFactor) ),
+            ( unitlessUnit, baseUnit, Unit(inverseBaseUnit) ),
+            ( unitlessUnit, unitlessBaseUnit, unitlessUnit )
+        ]
+        return examples
+end
+
+function UnitFactor_Unit_multiplication_implemented()
+    examples = _getExamplesFor_UnitFactor_Unit_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_UnitFactor_Unit_multiplication()
+    unitlessUnitFactor = Alicorn.unitlessUnitFactor
+    unitlessUnit = Alicorn.unitlessUnit
+
+    unitFactors = TestingTools.generateRandomUnitFactors(2)
+
+    unitFactor1 = unitFactors[1]
+    inverseUnitFactor1 = inv(unitFactor1)
+    unitFactor2 = unitFactors[2]
+    inverseUnitFactor2 = inv(unitFactor2)
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1, factor2 instances of UnitFactor or Unit
+    examples = [
+        # factor1 is UnitFactor, factor2 is Unit
+        ( unitFactor1, Unit(unitFactor2), Unit([unitFactor1, unitFactor2]) ),
+        ( unitFactor1, Unit(inverseUnitFactor1), unitlessUnit ),
+        ( unitFactor1, unitlessUnit, Unit(unitFactor1) ),
+        ( unitlessUnitFactor, Unit(unitFactor2), Unit(unitFactor2) ),
+        ( unitlessUnitFactor, unitlessUnit, unitlessUnit ),
+
+        # factor1 is UnitFactor, factor2 is Unit
+        # ( Unit(unitFactor), baseUnit, Unit([unitFactor, UnitFactor(baseUnit)]) ),
+        # ( Unit(inverseBaseUnit), baseUnit, unitlessUnit ),
+        # ( Unit(unitFactor), unitlessBaseUnit, Unit(unitFactor) ),
+        # ( unitlessUnit, baseUnit, Unit(baseUnit) ),
+        # ( unitlessUnit, unitlessBaseUnit, unitlessUnit )
+    ]
+    return examples
+end
+
+function UnitFactor_Unit_division_implemented()
+    examples = _getExamplesFor_UnitFactor_Unit_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_UnitFactor_Unit_division()
+        unitlessUnitFactor = Alicorn.unitlessUnitFactor
+        unitlessUnit = Alicorn.unitlessUnit
+
+        unitFactors = TestingTools.generateRandomUnitFactors(2)
+        unitFactor1 = unitFactors[1]
+        inverseUnitFactor1 = inv(unitFactor1)
+        unitFactor2 = unitFactors[2]
+        inverseUnitFactor2 = inv(unitFactor2)
+
+        # format: dividend, divisor, correct result for dividend / divisor
+        # where dividend, divisor are instances of UnitFactor or Unit
+        examples = [
+            # dividend is UnitFactor, divisor is Unit
+            ( unitFactor1, Unit(unitFactor2), Unit([ unitFactor1, inverseUnitFactor2 ]) ),
+            ( unitFactor1, Unit(unitFactor1), unitlessUnit ),
+            ( unitFactor1, unitlessUnit, Unit(unitFactor1) ),
+            ( unitlessUnitFactor, Unit(unitFactor2), Unit(inverseUnitFactor2) ),
+            ( unitlessUnitFactor, unitlessUnit, unitlessUnit ),
+            # dividend is Unit, divisor is UnitFactor
+            ( Unit(unitFactor1), unitFactor2, Unit([unitFactor1, inverseUnitFactor2 ]) ),
+            ( Unit(unitFactor1), unitFactor1, unitlessUnit ),
+            ( Unit(unitFactor1), unitlessUnitFactor, Unit(unitFactor1) ),
+            ( unitlessUnit, unitFactor1, Unit(inverseUnitFactor1) ),
+            ( unitlessUnit, unitlessUnitFactor, unitlessUnit )
+        ]
+        return examples
+end
+
+function UnitPrefix_Unit_multiplication_implemented()
+    prefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unit = Unit(baseUnit)
+    returnedUnit = prefix * unit
+    correctUnit = Unit(UnitFactor(prefix, baseUnit, 1))
+    return (returnedUnit == correctUnit)
+end
+
+function test_UnitPrefix_Unit_multiplication_ErrorsForMultipleFactorUnit()
+    prefix = TestingTools.generateRandomUnitPrefix()
+    unitFactors = TestingTools.generateRandomUnitFactors(2)
+    unit = Unit(unitFactors)
+    @test_throws Base.ArgumentError("unit needs to have single factor for multiplication of UnitPrefix with Unit") (prefix * unit)
+end
+
+function test_UnitPrefix_Unit_multiplication_ErrorsOnNonemptyPrefixInUnit()
+    prefix1 = TestingTools.generateRandomUnitPrefix()
+    prefix2 = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unit = Unit(UnitFactor(prefix2, baseUnit))
+    @test_throws Base.ArgumentError("prefix of single UnitFactor in Unit needs to be emptyUnitPrefix for multiplication of UnitPrefix with Unit") (prefix1 * unit)
+end
+
+function test_UnitPrefix_Unit_multiplication_ErrorsOnNontrivialExponentInUnit()
+    prefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    exponent = pi
+    unit = Unit(UnitFactor(baseUnit, exponent))
+    @test_throws Base.ArgumentError("exponent of single UnitFactor in Unit needs to be 1 for multiplication of UnitPrefix with Unit") (prefix * unit)
 end
 
 end # module

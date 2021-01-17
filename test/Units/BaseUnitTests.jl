@@ -14,6 +14,14 @@ function run()
 
         @test unitlessBaseUnitIsDefined()
         @test BaseUnit_actsAsScalarInBroadcast()
+
+        @test inv_implemented()
+        @test exponenciation_implemented()
+
+        @test multiplication_implemented()
+        @test division_implemented()
+
+        @test UnitPrefix_BaseUnit_multiplication_implemented()
     end
 end
 
@@ -103,7 +111,7 @@ function BaseUnit_actsAsScalarInBroadcast()
     pass = false
     try
         elementwiseComparison = (baseUnitArray .== baseUnit1)
-        pass = elementwiseComparison == [true, false]
+        pass = (elementwiseComparison == [true, false])
     catch
     end
     return pass
@@ -116,6 +124,100 @@ function _generateTwoDifferentBaseUnitsWithoutUsingBroadcasting()
         baseUnit2 = TestingTools.generateRandomBaseUnit()
     end
     return (baseUnit1, baseUnit2)
+end
+
+function inv_implemented()
+    examples = _getExamplesFor_inv_implemented()
+    return TestingTools.testMonadicFunction(Base.inv, examples)
+end
+
+function _getExamplesFor_inv_implemented()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnitFactor = Alicorn.unitlessUnitFactor
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+
+    # format: baseUnit, correct result for baseUnit^(-1)
+    examples = [
+        ( unitlessBaseUnit, unitlessUnitFactor ),
+        ( baseUnit, UnitFactor(baseUnit, -1) )
+    ]
+end
+
+function exponenciation_implemented()
+    examples =  _getExamplesFor_exponenciation()
+    return TestingTools.testDyadicFunction(Base.:^, examples)
+end
+
+function _getExamplesFor_exponenciation()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnitFactor = Alicorn.unitlessUnitFactor
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    exponent = TestingTools.generateRandomExponent()
+
+    # format: baseUnit, exponent, correct result for baseUnit^exponent
+    examples = [
+        ( unitlessBaseUnit, 1, unitlessUnitFactor ),
+        ( baseUnit, exponent, UnitFactor(baseUnit, exponent) )
+    ]
+end
+
+function multiplication_implemented()
+    examples = _getExamplesFor_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_multiplication()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnit = Alicorn.unitlessUnit
+
+    baseUnit1 = TestingTools.generateRandomBaseUnit()
+    baseUnit2 = TestingTools.generateRandomBaseUnit()
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1, factor2 are instances of BaseUnit
+    examples = [
+        ( baseUnit1, baseUnit2, Unit([UnitFactor(baseUnit1), UnitFactor(baseUnit2)]) ),
+        ( baseUnit1, unitlessBaseUnit, Unit(baseUnit1) ),
+        ( unitlessBaseUnit, baseUnit2, Unit(baseUnit2) ),
+        ( unitlessBaseUnit, unitlessBaseUnit, unitlessUnit )
+    ]
+    return examples
+end
+
+function division_implemented()
+    examples = _getExamplesFor_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_division()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnit = Alicorn.unitlessUnit
+
+    baseUnit1 = TestingTools.generateRandomBaseUnit()
+    invBaseUnit1 = inv(baseUnit1)
+    baseUnit2 = TestingTools.generateRandomBaseUnit()
+    invBaseUnit2 = inv(baseUnit2)
+
+    # format: dividend, divisor, correct result for dividend / divisor
+    # where dividend, divisor are instances of BaseUnit
+    examples = [
+        ( baseUnit1, baseUnit2, Unit([ UnitFactor(baseUnit1), invBaseUnit2 ]) ),
+        ( baseUnit1, baseUnit1, unitlessUnit),
+        ( baseUnit1, unitlessBaseUnit, Unit(baseUnit1) ),
+        ( unitlessBaseUnit, baseUnit2, Unit(invBaseUnit2) ),
+        ( unitlessBaseUnit, unitlessBaseUnit, unitlessUnit )
+    ]
+    return examples
+end
+
+function UnitPrefix_BaseUnit_multiplication_implemented()
+    prefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    returnedUnitFactor = prefix * baseUnit
+    correctUnitFactor = UnitFactor(prefix, baseUnit, 1)
+    return (returnedUnitFactor == correctUnitFactor)
 end
 
 end # module
