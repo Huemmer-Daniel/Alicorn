@@ -16,6 +16,7 @@ function run()
         @test equalPrefixesAreIdentical()
 
         @test emptyUnitPrefixIsDefined()
+        @test kiloIsDefined()
         @test UnitPrefix_actsAsScalarInBroadcast()
     end
 end
@@ -95,6 +96,15 @@ function emptyUnitPrefixIsDefined()
         value = 1
     )
     return Alicorn.emptyUnitPrefix == emptyPrefix
+end
+
+function kiloIsDefined()
+    kilo = UnitPrefix(
+        name = "kilo",
+        symbol = "k",
+        value = 1e3
+    )
+    return Alicorn.kilo == kilo
 end
 
 function UnitPrefix_actsAsScalarInBroadcast()

@@ -195,3 +195,24 @@ function _assertHasTrivialExponent(unit::Unit)
         throw(Base.ArgumentError("exponent of single UnitFactor in Unit needs to be 1 for multiplication of UnitPrefix with Unit"))
     end
 end
+
+function convertToBasicSI(unit::Unit)
+    (prefactor, basicSIAsExponents) = convertToBasicSIAsExponents(unit)
+    basicSIUnit = convertToUnit(basicSIAsExponents)
+    return (prefactor, basicSIUnit)
+end
+
+function convertToBasicSIAsExponents(unit::Unit)
+    unitFactors = unit.unitFactors
+
+    prefactor = 1
+    basicSIAsExponents = BaseUnitExponents()
+
+    for unitFactor in unitFactors
+        (unitFactorPrefactor, unitFactorInBasicSIExponents) = convertToBasicSIAsExponents(unitFactor)
+        prefactor *= unitFactorPrefactor
+        basicSIAsExponents += unitFactorInBasicSIExponents
+    end
+
+    return (prefactor, basicSIAsExponents)
+end

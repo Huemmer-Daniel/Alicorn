@@ -14,6 +14,11 @@ function run()
 
         equality_implemented()
         @test BaseUnitExponents_actsAsScalarInBroadcast()
+
+        @test convertToUnit_implemented()
+
+        @test Number_BaseUnitExponents_multiplication_implemented()
+        @test addition_implemented()
     end
 end
 
@@ -110,6 +115,57 @@ function _generateTwoDifferentBaseUnitExponentsWithoutUsingBroadcasting()
     return (baseUnitExponents1, baseUnitExponents2)
 end
 
-Base.broadcastable(baseUnitExponents::BaseUnitExponents) = Ref(baseUnitExponents)
+function convertToUnit_implemented()
+    examples = _getExamplesFor_convertToUnit()
+    return TestingTools.testMonadicFunction(convertToUnit, examples)
+end
+
+function _getExamplesFor_convertToUnit()
+    # format: BaseUnitExponents, the corresponding unit in terms of SI basic units
+    examples = [
+        ( BaseUnitExponents(kg=1) , Unit( Alicorn.kilogram ) ),
+        ( BaseUnitExponents(m=1, s=-2.5) , Unit( Alicorn.meter * Alicorn.second^(-2.5) ) ),
+        ( BaseUnitExponents(A=2) , Unit( Alicorn.ampere^2 ) ),
+        ( BaseUnitExponents(K=3) , Unit( Alicorn.kelvin^3 ) ),
+        ( BaseUnitExponents(mol=4) , Unit( Alicorn.mol^4 ) ),
+        ( BaseUnitExponents(cd=5) , Unit( Alicorn.candela^5 ) )
+    ]
+    return examples
+end
+
+function Number_BaseUnitExponents_multiplication_implemented()
+    examples = _getExamplesFor_Number_BaseUnitExponents_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_Number_BaseUnitExponents_multiplication()
+    examples = [
+        ( 3, BaseUnitExponents(kg=1), BaseUnitExponents(kg=3) ),
+        ( 3, BaseUnitExponents(m=2), BaseUnitExponents(m=6) ),
+        ( 3, BaseUnitExponents(s=-2), BaseUnitExponents(s=-6) ),
+        ( 3, BaseUnitExponents(A=2, s=-2), BaseUnitExponents(A=6, s=-6) ),
+        ( 3, BaseUnitExponents(K=5), BaseUnitExponents(K=15) ),
+        ( -1, BaseUnitExponents(mol=-1), BaseUnitExponents(mol=1) ),
+        ( BaseUnitExponents(cd=2), 2, BaseUnitExponents(cd=4) )
+    ]
+    return examples
+end
+
+function addition_implemented()
+    examples = _getExamplesFor_addition()
+    return TestingTools.testDyadicFunction(Base.:+, examples)
+end
+
+function _getExamplesFor_addition()
+    examples = [
+        ( BaseUnitExponents(kg=1), BaseUnitExponents(kg=1, m=2), BaseUnitExponents(kg=2, m=2) ),
+        ( BaseUnitExponents(m=2), BaseUnitExponents(m=-2), BaseUnitExponents(m=0) ),
+        ( BaseUnitExponents(s=-2), BaseUnitExponents(s=1), BaseUnitExponents(s=-1) ),
+        ( BaseUnitExponents(A=-2), BaseUnitExponents(A=7), BaseUnitExponents(A=5) ),
+        ( BaseUnitExponents(mol=-2), BaseUnitExponents(mol=7), BaseUnitExponents(mol=5) ),
+        ( BaseUnitExponents(cd=3, mol=-2), BaseUnitExponents(mol=7, cd=-1), BaseUnitExponents(mol=5, cd=2) )
+    ]
+    return examples
+end
 
 end # module

@@ -11,6 +11,7 @@ export AbstractUnitElement
 
 export AbstractUnit
 export convertToUnit
+export convertToBasicSI
 
 export UnitElement
 export UnitPrefix
@@ -34,6 +35,7 @@ include("Quantities/Quantities.jl")
 using .Quantities
 
 export SimpleQuantity
+export inUnitsOf
 
 include("PrettyPrinting/PrettyPrinting.jl")
 

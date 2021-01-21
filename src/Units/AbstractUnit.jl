@@ -41,3 +41,15 @@ function Base.:^(abstractUnit::AbstractUnit, exponent::Real)
    subtype = typeof(abstractUnit)
    error("subtype $subtype of AbstractUnit misses an implementation of the Base.^ function")
 end
+
+export convertToBasicSI
+function convertToBasicSI(abstractUnit::AbstractUnit)
+   subtype = typeof(abstractUnit)
+   error("subtype $subtype of AbstractUnit misses an implementation of the convertToBasicSI function")
+end
+
+export convertToBasicSIAsExponents
+function convertToBasicSIAsExponents(abstractUnit::AbstractUnit)
+   subtype = typeof(abstractUnit)
+   error("subtype $subtype of AbstractUnit misses an implementation of the convertToBasicSIAsExponents function")
+end

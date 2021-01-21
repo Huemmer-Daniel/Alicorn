@@ -38,6 +38,8 @@ function run()
         test_UnitPrefix_Unit_multiplication_ErrorsForMultipleFactorUnit()
         test_UnitPrefix_Unit_multiplication_ErrorsOnNonemptyPrefixInUnit()
         test_UnitPrefix_Unit_multiplication_ErrorsOnNontrivialExponentInUnit()
+
+        @test convertToBasicSI_implemented()
     end
 end
 
@@ -497,6 +499,22 @@ function test_UnitPrefix_Unit_multiplication_ErrorsOnNontrivialExponentInUnit()
     exponent = pi
     unit = Unit(UnitFactor(baseUnit, exponent))
     @test_throws Base.ArgumentError("exponent of single UnitFactor in Unit needs to be 1 for multiplication of UnitPrefix with Unit") (prefix * unit)
+end
+
+function convertToBasicSI_implemented()
+    examples = _getExamplesFor_convertToBasicSI()
+    return TestingTools.testMonadicFunction(convertToBasicSI, examples)
+end
+
+function _getExamplesFor_convertToBasicSI()
+    ucat = UnitCatalogue()
+
+    # format: Unit, (corresponding prefactor, corresponding SI unit)
+    examples = [
+        ( ucat.meter^2 * ucat.gram^3, (1e-9, Unit( (ucat.kilo * ucat.gram)^3 * ucat.meter^2 )) ),
+        ( (ucat.micro * ucat.candela)/(ucat.milli * ucat.joule), (1e-3, Unit( (ucat.kilo * ucat.gram)^-1 * ucat.meter^-2 * ucat.second^2 * ucat.candela )) )
+    ]
+    return examples
 end
 
 end # module

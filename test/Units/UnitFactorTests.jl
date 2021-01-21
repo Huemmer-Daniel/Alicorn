@@ -8,7 +8,7 @@ function run()
     @testset "UnitFactor" begin
         @test canInstanciateUnitFactor()
         test_UnitFactor_ErrorsOnInfiniteExponent()
-        test_UnitFactor_ErrorsOnZeroExponent()
+        @test UnitFactor_ReturnsUnitlessOnZeroExponent()
         test_UnitFactor_TriesCastingExponentsToInt()
         @test UnitFactor_actsAsScalarInBroadcast()
         @test UnitFactor_fieldsCorrectlyInitialized()
@@ -23,6 +23,7 @@ function run()
         @test canInstanciateUnitlessUnitFactor()
 
         @test unitlessUnitFactorIsDefined()
+        @test kilogramIsDefined()
 
         @test inv_implemented()
         @test exponenciation_implemented()
@@ -36,6 +37,8 @@ function run()
         @test UnitPrefix_UnitFactor_multiplication_implemented()
         test_UnitPrefix_UnitFactor_multiplication_ErrorsOnNonemptyPrefixInUnitFactor()
         test_UnitPrefix_UnitFactor_multiplication_ErrorsOnNontrivialExponentInUnitFactor()
+
+        @test convertToBasicSI_implemented()
     end
 end
 
@@ -69,11 +72,11 @@ function _verify_UnitFactor_ErrorsOnExponent(unitPrefix::UnitPrefix, baseUnit::B
     @test_throws DomainError(exponent,"argument must be finite") UnitFactor(unitPrefix, baseUnit, exponent)
 end
 
-function test_UnitFactor_ErrorsOnZeroExponent()
+function UnitFactor_ReturnsUnitlessOnZeroExponent()
     unitPrefix = TestingTools.generateRandomUnitPrefix()
     baseUnit = TestingTools.generateRandomBaseUnit()
     exponent = 0
-    @test_throws DomainError(exponent,"argument must be nonzero") UnitFactor(unitPrefix, baseUnit, exponent)
+    return ( UnitFactor(unitPrefix, baseUnit, exponent) == Alicorn.unitlessUnitFactor )
 end
 
 function test_UnitFactor_TriesCastingExponentsToInt()
@@ -188,6 +191,10 @@ function unitlessUnitFactorIsDefined()
     return (Alicorn.unitlessUnitFactor == unitless)
 end
 
+function kilogramIsDefined()
+    kilogram = Alicorn.kilo * Alicorn.gram
+    return (Alicorn.kilogram == kilogram)
+end
 
 function inv_implemented()
     examples = _getExamplesFor_inv()
@@ -371,6 +378,23 @@ function test_UnitPrefix_UnitFactor_multiplication_ErrorsOnNontrivialExponentInU
     exponent = pi
     unitFactor = UnitFactor(baseUnit, exponent)
     @test_throws Base.ArgumentError("exponent of UnitFactor needs to be 1 for multiplication of UnitPrefix with UnitFactor") (prefix * unitFactor)
+end
+
+function convertToBasicSI_implemented()
+    examples = _getExamplesFor_convertToBasicSI()
+    return TestingTools.testMonadicFunction(convertToBasicSI, examples)
+end
+
+function _getExamplesFor_convertToBasicSI()
+    ucat = UnitCatalogue()
+
+    # format: UnitFactor, (corresponding prefactor, corresponding SI unit)
+    examples = [
+        ( ucat.meter^2, (1, Unit(ucat.meter^2)) ),
+        ( ucat.gram^3, (1e-9, Unit((ucat.kilo * ucat.gram)^3)) ),
+        ( (ucat.milli*ucat.liter)^(-1), (1e6, Unit(ucat.meter^-3)) )
+    ]
+    return examples
 end
 
 end # module

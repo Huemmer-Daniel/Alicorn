@@ -15,3 +15,6 @@ end
 
 export emptyUnitPrefix
 emptyUnitPrefix = UnitPrefix(name = "empty", symbol = "<empty>", value = 1)
+
+export kilo
+kilo = UnitPrefix(name = "kilo", symbol = "k", value = 1e+3)

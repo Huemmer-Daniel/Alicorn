@@ -23,6 +23,8 @@ function run()
         test_UnitPrefix_AbstractUnit_multipliation_required()
         test_inv_required()
         test_exponenciation_required()
+        test_convertToBasicSI_required()
+        test_convertToBasicSIAsExponents_required()
     end
 
     # test generic functions that are pre-implemented for all AbstractUnits
@@ -61,6 +63,22 @@ function test_exponenciation_required()
     expectedError = Core.ErrorException("subtype Main.UnitsTests.AbstractUnitTests.MockUnitStub of AbstractUnit misses an implementation of the Base.^ function")
 
     @test_throws expectedError mockUnit^exponent
+end
+
+function test_convertToBasicSI_required()
+    mockUnit = MockUnitStub()
+
+    expectedError = Core.ErrorException("subtype Main.UnitsTests.AbstractUnitTests.MockUnitStub of AbstractUnit misses an implementation of the convertToBasicSI function")
+
+    @test_throws expectedError convertToBasicSI(mockUnit)
+end
+
+function test_convertToBasicSIAsExponents_required()
+    mockUnit = MockUnitStub()
+
+    expectedError = Core.ErrorException("subtype Main.UnitsTests.AbstractUnitTests.MockUnitStub of AbstractUnit misses an implementation of the convertToBasicSIAsExponents function")
+
+    @test_throws expectedError Alicorn.convertToBasicSIAsExponents(mockUnit)
 end
 
 function multiplication_implementedThrough_convertToUnit()

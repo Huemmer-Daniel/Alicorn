@@ -265,4 +265,22 @@ function generateRandomUnitWithFields()
     return (randomUnit, randomFields)
 end
 
+function generateRandomSimpleQuantity()
+    (randomSimpleQuantity,) = generateRandomSimpleQuantityWithFields()
+    return randomSimpleQuantity
+end
+
+function generateRandomSimpleQuantityWithFields()
+    randomValue = generateRandomReal()
+    randomUnit = generateRandomUnit()
+
+    randomFields = Dict{String,Any}()
+    randomFields["value"] = randomValue
+    randomFields["unit"] = randomUnit
+
+    randomSimpleQuantity = SimpleQuantity(randomValue, randomUnit)
+
+    return (randomSimpleQuantity, randomFields)
+end
+
 end # module

@@ -13,6 +13,14 @@ function run()
         @test equality_implemented()
 
         @test unitlessBaseUnitIsDefined()
+        @test gramIsDefined()
+        @test meterIsDefined()
+        @test secondIsDefined()
+        @test ampereIsDefined()
+        @test kelvinIsDefined()
+        @test molIsDefined()
+        @test candelaIsDefined()
+
         @test BaseUnit_actsAsScalarInBroadcast()
 
         @test inv_implemented()
@@ -22,6 +30,8 @@ function run()
         @test division_implemented()
 
         @test UnitPrefix_BaseUnit_multiplication_implemented()
+
+        @test convertToBasicSI_implemented()
     end
 end
 
@@ -103,6 +113,46 @@ function unitlessBaseUnitIsDefined()
         exponents = BaseUnitExponents()
     )
     return (Alicorn.unitlessBaseUnit == unitless)
+end
+
+function gramIsDefined()
+    gram = BaseUnit(
+        name = "gram",
+        symbol = "g",
+        prefactor = 1e-3,
+        exponents = BaseUnitExponents(kg=1)
+    )
+    return (Alicorn.gram == gram)
+end
+
+function meterIsDefined()
+    meter = BaseUnit( name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1) )
+    return (Alicorn.meter == meter)
+end
+
+function secondIsDefined()
+    second = BaseUnit( name="second", symbol="s", prefactor=1, exponents=BaseUnitExponents(s=1) )
+    return (Alicorn.second == second)
+end
+
+function ampereIsDefined()
+    ampere = BaseUnit( name="ampere", symbol="A", prefactor=1, exponents=BaseUnitExponents(A=1) )
+    return (Alicorn.ampere == ampere)
+end
+
+function kelvinIsDefined()
+    kelvin = BaseUnit(name="kelvin", symbol="K", prefactor=1, exponents=BaseUnitExponents(K=1))
+    return (Alicorn.kelvin == kelvin)
+end
+
+function molIsDefined()
+    mol = BaseUnit(name="mol", symbol="mol", prefactor=1, exponents=BaseUnitExponents(mol=1))
+    return (Alicorn.mol == mol)
+end
+
+function candelaIsDefined()
+    candela = BaseUnit(name="candela", symbol="cd", prefactor=1, exponents=BaseUnitExponents(cd=1))
+    return (Alicorn.candela == candela)
 end
 
 function BaseUnit_actsAsScalarInBroadcast()
@@ -218,6 +268,31 @@ function UnitPrefix_BaseUnit_multiplication_implemented()
     returnedUnitFactor = prefix * baseUnit
     correctUnitFactor = UnitFactor(prefix, baseUnit, 1)
     return (returnedUnitFactor == correctUnitFactor)
+end
+
+function convertToBasicSI_implemented()
+    examples = _getExamplesFor_convertToBasicSI()
+    return TestingTools.testMonadicFunction(convertToBasicSI, examples)
+end
+
+function _getExamplesFor_convertToBasicSI()
+    ucat = UnitCatalogue()
+
+    dalton = ucat.dalton
+    daltonPrefactor = dalton.prefactor
+
+    electronvolt = ucat.electronvolt
+    electronvoltPrefactor = electronvolt.prefactor
+
+    # format: baseUnit, (corresponding prefactor, corresponding SI unit)
+    examples = [
+        (ucat.meter, (1, Unit(ucat.meter)) ),
+        (ucat.gram, (1e-3, Unit(ucat.kilo * ucat.gram)) ),
+        (ucat.liter, (1e-3, Unit(ucat.meter^3)) ),
+        (dalton, (daltonPrefactor, Unit(ucat.kilo * ucat.gram)) ),
+        (electronvolt, (electronvoltPrefactor, Unit( ucat.kilo*ucat.gram * ucat.meter^2 * ucat.second^(-2) )) )
+    ]
+    return examples
 end
 
 end # module

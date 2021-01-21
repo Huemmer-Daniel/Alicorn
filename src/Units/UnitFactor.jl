@@ -7,13 +7,23 @@ struct UnitFactor <: AbstractUnit
     exponent::Real
 
     function UnitFactor(unitPrefix::UnitPrefix, baseUnit::BaseUnit, exponent::Real)
-        Utils.assertIsFinite(exponent)
-        Utils.assertIsNonzero(exponent)
-        _assertEmptyPrefixIfUnitless(baseUnit, unitPrefix)
-        _assertTrivialExponentIfUnitless(baseUnit, exponent)
+        _verifyInitializationArguments(unitPrefix, baseUnit, exponent)
         exponent = Utils.tryCastingToInt(exponent)
-        return new(unitPrefix, baseUnit, exponent)
+
+        if exponent == 0
+            unitFactor = unitlessUnitFactor
+        else
+            unitFactor = new(unitPrefix, baseUnit, exponent)
+        end
+
+        return unitFactor
     end
+end
+
+function _verifyInitializationArguments(unitPrefix::UnitPrefix, baseUnit::BaseUnit, exponent::Real)
+    Utils.assertIsFinite(exponent)
+    _assertEmptyPrefixIfUnitless(baseUnit, unitPrefix)
+    _assertTrivialExponentIfUnitless(baseUnit, exponent)
 end
 
 function _assertEmptyPrefixIfUnitless(baseUnit::BaseUnit, unitPrefix::UnitPrefix)
@@ -44,8 +54,13 @@ function UnitFactor()
     return UnitFactor(emptyUnitPrefix, unitlessBaseUnit, 1)
 end
 
+Base.broadcastable(baseUnitExponents::BaseUnitExponents) = Ref(baseUnitExponents)
+
 export unitlessUnitFactor
 unitlessUnitFactor = UnitFactor( emptyUnitPrefix, unitlessBaseUnit, 1)
+
+export kilogram
+kilogram = kilo * gram
 
 function Base.inv(unitFactor::UnitFactor)
     if unitFactor == UnitFactor(unitlessBaseUnit)
@@ -94,4 +109,27 @@ end
 
 function convertToUnit(unitFactor::UnitFactor)
     return Unit([unitFactor])
+end
+
+function convertToBasicSI(unitFactor::UnitFactor)
+    (prefactor, basicSIExponents) = convertToBasicSIAsExponents(unitFactor)
+    basicSIUnit = convertToUnit(basicSIExponents)
+
+    return (prefactor, basicSIUnit)
+end
+
+function convertToBasicSIAsExponents(unitFactor::UnitFactor)
+    unitPrefix = unitFactor.unitPrefix
+    baseUnit = unitFactor.baseUnit
+    exponent = unitFactor.exponent
+
+    prefixValue = unitPrefix.value
+
+    baseUnitPrefactor = baseUnit.prefactor
+    baseUnitExponents = baseUnit.exponents
+
+    prefactor = (prefixValue * baseUnitPrefactor)^exponent
+    basicSIExponents = exponent * baseUnitExponents
+
+    return (prefactor, basicSIExponents)
 end
