@@ -26,7 +26,7 @@ function generateRandomUnitPrefixFields()
     randomFields = Dict{String,Any}()
     randomFields["name"] = generateRandomName()
     randomFields["symbol"] = generateRandomSymbol()
-    randomFields["value"] = generateRandomReal()
+    randomFields["value"] = abs(generateRandomReal())
     return randomFields
 end
 
@@ -110,7 +110,7 @@ function generateRandomBaseUnitFields()
     randomFields = Dict{String,Any}()
     randomFields["name"] = generateRandomName()
     randomFields["symbol"] = generateRandomSymbol()
-    randomFields["prefactor"] = generateRandomReal()
+    randomFields["prefactor"] = abs(generateRandomReal())
     exponents = generateRandomBaseUnitExponents()
     randomFields["exponents"] = exponents
     return randomFields

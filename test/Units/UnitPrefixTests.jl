@@ -90,12 +90,18 @@ function equalPrefixesAreIdentical()
 end
 
 function emptyUnitPrefixIsDefined()
-    emptyPrefix = UnitPrefix(
-        name = "empty",
-        symbol = "<empty>",
-        value = 1
-    )
-    return Alicorn.emptyUnitPrefix == emptyPrefix
+    emptyPrefix = Alicorn.emptyUnitPrefix
+
+    expectedName = "empty"
+    expectedSymbol = "<empty>"
+    expectedValue = 1
+
+    nameCorrect = (emptyPrefix.name == expectedName)
+    symbolCorrect = (emptyPrefix.symbol == expectedSymbol)
+    valueCorrect = (emptyPrefix.value == expectedValue)
+    correct = (nameCorrect && symbolCorrect && valueCorrect)
+
+    return correct
 end
 
 function kiloIsDefined()

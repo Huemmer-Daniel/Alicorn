@@ -24,7 +24,8 @@ function run()
         @test BaseUnit_actsAsScalarInBroadcast()
 
         @test inv_implemented()
-        @test exponenciation_implemented()
+        @test exponentiation_implemented()
+        @test sqrt_implemented()
 
         @test multiplication_implemented()
         @test division_implemented()
@@ -106,13 +107,20 @@ function _initializeUnitFactorFromDict(fields::Dict)
 end
 
 function unitlessBaseUnitIsDefined()
-    unitless = BaseUnit(
-        name = "unitless",
-        symbol = "<unitless>",
-        prefactor = 1,
-        exponents = BaseUnitExponents()
-    )
-    return (Alicorn.unitlessBaseUnit == unitless)
+    unitless = Alicorn.unitlessBaseUnit
+
+    expectedName = "unitless"
+    expectedSymbol = "<unitless>"
+    expectedPrefactor = 1
+    expectedExponents = BaseUnitExponents()
+
+    correctName = (unitless.name == expectedName)
+    correctSymbol = (unitless.symbol == expectedSymbol)
+    correctPrefactor = (unitless.prefactor == expectedPrefactor)
+    correctExponents =  (unitless.exponents == expectedExponents)
+    correct = (correctName && correctSymbol && correctPrefactor && correctExponents)
+
+    return correct
 end
 
 function gramIsDefined()
@@ -194,12 +202,12 @@ function _getExamplesFor_inv_implemented()
     ]
 end
 
-function exponenciation_implemented()
-    examples =  _getExamplesFor_exponenciation()
+function exponentiation_implemented()
+    examples =  _getExamplesFor_exponentiation()
     return TestingTools.testDyadicFunction(Base.:^, examples)
 end
 
-function _getExamplesFor_exponenciation()
+function _getExamplesFor_exponentiation()
     unitlessBaseUnit = Alicorn.unitlessBaseUnit
     unitlessUnitFactor = Alicorn.unitlessUnitFactor
 
@@ -208,9 +216,33 @@ function _getExamplesFor_exponenciation()
 
     # format: baseUnit, exponent, correct result for baseUnit^exponent
     examples = [
+        ( unitlessBaseUnit, 0, unitlessUnitFactor ),
         ( unitlessBaseUnit, 1, unitlessUnitFactor ),
+        ( unitlessBaseUnit, -1, unitlessUnitFactor ),
+        ( unitlessBaseUnit, 2, unitlessUnitFactor ),
+        ( baseUnit, 0, unitlessUnitFactor ),
         ( baseUnit, exponent, UnitFactor(baseUnit, exponent) )
     ]
+end
+
+function sqrt_implemented()
+    examples = _getExamplesFor_sqrt()
+    return TestingTools.testMonadicFunction(Base.sqrt, examples)
+end
+
+function _getExamplesFor_sqrt()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnitFactor = Alicorn.unitlessUnitFactor
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    exponent = TestingTools.generateRandomExponent()
+
+    # format: baseUnit, exponent, correct result for baseUnit^exponent
+    examples = [
+        ( unitlessBaseUnit, unitlessUnitFactor ),
+        ( baseUnit, UnitFactor(baseUnit, 0.5) )
+    ]
+    return examples
 end
 
 function multiplication_implemented()

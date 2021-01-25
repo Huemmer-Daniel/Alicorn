@@ -46,6 +46,10 @@ function Base.:^(baseUnit::BaseUnit, exponent::Real)
     return UnitFactor(baseUnit)^exponent
 end
 
+function Base.sqrt(baseUnit::BaseUnit)
+    return UnitFactor(baseUnit)^0.5
+end
+
 function Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
     return UnitFactor(unitPrefix, baseUnit)
 end

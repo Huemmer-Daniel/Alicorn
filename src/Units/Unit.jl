@@ -141,6 +141,10 @@ function Base.:^(unit::Unit, exponent::Real)
     return newUnit
 end
 
+function Base.sqrt(unit::Unit)
+    return unit^(0.5)
+end
+
 function Base.:*(unit1::Unit, unit2::Unit)
     unitFactors1 = unit1.unitFactors
     unitFactors2 = unit2.unitFactors

@@ -7,34 +7,16 @@ struct UnitFactor <: AbstractUnit
     exponent::Real
 
     function UnitFactor(unitPrefix::UnitPrefix, baseUnit::BaseUnit, exponent::Real)
-        _verifyInitializationArguments(unitPrefix, baseUnit, exponent)
+        Utils.assertIsFinite(exponent)
         exponent = Utils.tryCastingToInt(exponent)
 
-        if exponent == 0
-            unitFactor = unitlessUnitFactor
+        if exponent == 0 || baseUnit == unitlessBaseUnit
+            unitFactor = new(emptyUnitPrefix, unitlessBaseUnit, 1)
         else
             unitFactor = new(unitPrefix, baseUnit, exponent)
         end
 
         return unitFactor
-    end
-end
-
-function _verifyInitializationArguments(unitPrefix::UnitPrefix, baseUnit::BaseUnit, exponent::Real)
-    Utils.assertIsFinite(exponent)
-    _assertEmptyPrefixIfUnitless(baseUnit, unitPrefix)
-    _assertTrivialExponentIfUnitless(baseUnit, exponent)
-end
-
-function _assertEmptyPrefixIfUnitless(baseUnit::BaseUnit, unitPrefix::UnitPrefix)
-    if baseUnit == unitlessBaseUnit && unitPrefix != emptyUnitPrefix
-        throw( Core.ArgumentError("unitless BaseUnit requires empty UnitPrefix") )
-    end
-end
-
-function _assertTrivialExponentIfUnitless(baseUnit::BaseUnit, exponent::Real)
-    if baseUnit == unitlessBaseUnit && exponent != 1
-        throw( Core.ArgumentError("unitless BaseUnit requires exponent 1") )
     end
 end
 
@@ -83,6 +65,10 @@ function Base.:^(unitFactor::UnitFactor, exponent::Real)
 
     newUnitFactor = UnitFactor(unitPrefix, baseUnit, newExponent)
     return newUnitFactor
+end
+
+function Base.sqrt(unitFactor::UnitFactor)
+    return unitFactor^(0.5)
 end
 
 function Base.:*(unitPrefix::UnitPrefix, unitFactor::UnitFactor)

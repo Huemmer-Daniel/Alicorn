@@ -36,6 +36,7 @@ using .Quantities
 
 export SimpleQuantity
 export inUnitsOf
+export inBasicSIUnits
 
 include("PrettyPrinting/PrettyPrinting.jl")
 

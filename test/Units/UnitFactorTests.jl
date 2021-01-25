@@ -12,8 +12,7 @@ function run()
         test_UnitFactor_TriesCastingExponentsToInt()
         @test UnitFactor_actsAsScalarInBroadcast()
         @test UnitFactor_fieldsCorrectlyInitialized()
-        test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNonemptyPrefix()
-        test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNontrivialExponent()
+        @test UnitFactor_RemovesPrefixAndExponentIfBaseUnitIsUnitless()
 
         @test equality_implemented()
 
@@ -26,7 +25,8 @@ function run()
         @test kilogramIsDefined()
 
         @test inv_implemented()
-        @test exponenciation_implemented()
+        @test exponentiation_implemented()
+        @test sqrt_implemented()
 
         @test multiplication_implemented()
         @test division_implemented()
@@ -137,13 +137,16 @@ function _initializeUnitFactorFromDict(fields::Dict)
     return unitFactor
 end
 
-function test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNonemptyPrefix()
-    unitPrefix = TestingTools.generateRandomUnitPrefix()
-    @test_throws Core.ArgumentError("unitless BaseUnit requires empty UnitPrefix") UnitFactor(unitPrefix, Alicorn.unitlessBaseUnit, 1)
-end
+function UnitFactor_RemovesPrefixAndExponentIfBaseUnitIsUnitless()
+    prefix = TestingTools.generateRandomUnitPrefix()
+    exponent = TestingTools.generateRandomExponent()
 
-function test_UnitFactor_ErrorsOnUnitlessBaseUnitWithNontrivialExponent()
-    @test_throws Core.ArgumentError("unitless BaseUnit requires exponent 1") UnitFactor(Alicorn.emptyUnitPrefix, Alicorn.unitlessBaseUnit, 2)
+    returnedFactor = UnitFactor(prefix, Alicorn.unitlessBaseUnit, exponent)
+    returnedPrefix = returnedFactor.unitPrefix
+    returnedExponent = returnedFactor.exponent
+
+    correct = ( returnedPrefix == Alicorn.emptyUnitPrefix && returnedExponent == 1 )
+    return correct
 end
 
 function canInstanciateUnitFactorWithoutPrefix()
@@ -187,8 +190,18 @@ function canInstanciateUnitlessUnitFactor()
 end
 
 function unitlessUnitFactorIsDefined()
-    unitless = UnitFactor( Alicorn.emptyUnitPrefix, Alicorn.unitlessBaseUnit, 1)
-    return (Alicorn.unitlessUnitFactor == unitless)
+    unitless = Alicorn.unitlessUnitFactor
+
+    expectedUnitPrefix = Alicorn.emptyUnitPrefix
+    expectedBaseUnit = Alicorn.unitlessBaseUnit
+    expectedExponent = 1
+
+    correctUnitPrefix = (unitless.unitPrefix == expectedUnitPrefix)
+    correctBaseUnit = (unitless.baseUnit == expectedBaseUnit)
+    correctExponent = (unitless.exponent == expectedExponent)
+    correct = (correctUnitPrefix && correctBaseUnit && correctExponent)
+
+    return correct
 end
 
 function kilogramIsDefined()
@@ -216,16 +229,21 @@ function _getExamplesFor_inv()
     return examples
 end
 
-function exponenciation_implemented()
-    examples = _getExamplesFor_exponenciation()
+function exponentiation_implemented()
+    examples = _getExamplesFor_exponentiation()
     return TestingTools.testDyadicFunction(Base.:^, examples)
 end
 
-function _getExamplesFor_exponenciation()
+function _getExamplesFor_exponentiation()
     unitPrefix = TestingTools.generateRandomUnitPrefix()
     baseUnit = TestingTools.generateRandomBaseUnit()
 
     examples = [
+        ( Alicorn.unitlessUnitFactor, 0, Alicorn.unitlessUnitFactor ),
+        ( Alicorn.unitlessUnitFactor, 1, Alicorn.unitlessUnitFactor ),
+        ( Alicorn.unitlessUnitFactor, -1, Alicorn.unitlessUnitFactor ),
+        ( Alicorn.unitlessUnitFactor, 2, Alicorn.unitlessUnitFactor ),
+        ( UnitFactor(unitPrefix, baseUnit, 2), 0, Alicorn.unitlessUnitFactor ),
         ( UnitFactor(unitPrefix, baseUnit, 2), 3, UnitFactor(unitPrefix, baseUnit, 6) ),
         ( UnitFactor(unitPrefix, baseUnit, 4.0), 2, UnitFactor(unitPrefix, baseUnit, 8) ),
         ( UnitFactor(unitPrefix, baseUnit, 2), 0.5, UnitFactor(unitPrefix, baseUnit, 1) ),
@@ -235,6 +253,23 @@ function _getExamplesFor_exponenciation()
     return examples
 end
 
+function sqrt_implemented()
+    examples = _getExamplesFor_sqrt()
+    return TestingTools.testMonadicFunction(Base.:sqrt, examples)
+end
+
+function _getExamplesFor_sqrt()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    exponent = TestingTools.generateRandomExponent()
+
+    # format: UnitFactor, correct result for sqrt(UnitFactor)
+    examples = [
+        ( Alicorn.unitlessUnitFactor, Alicorn.unitlessUnitFactor ),
+        ( UnitFactor(unitPrefix, baseUnit, exponent), UnitFactor(unitPrefix, baseUnit, exponent/2) )
+    ]
+    return examples
+end
 
 function multiplication_implemented()
     examples = _getExamplesFor_multiplication()

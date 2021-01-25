@@ -22,7 +22,8 @@ function run()
         test_convertToUnit_required()
         test_UnitPrefix_AbstractUnit_multipliation_required()
         test_inv_required()
-        test_exponenciation_required()
+        test_exponentiation_required()
+        test_sqrt_required()
         test_convertToBasicSI_required()
         test_convertToBasicSIAsExponents_required()
     end
@@ -56,7 +57,7 @@ function test_inv_required()
     @test_throws expectedError inv(mockUnit)
 end
 
-function test_exponenciation_required()
+function test_exponentiation_required()
     mockUnit = MockUnitStub()
     exponent = TestingTools.generateRandomExponent()
 
@@ -64,6 +65,16 @@ function test_exponenciation_required()
 
     @test_throws expectedError mockUnit^exponent
 end
+
+function test_sqrt_required()
+    mockUnit = MockUnitStub()
+    exponent = TestingTools.generateRandomExponent()
+
+    expectedError = Core.ErrorException("subtype Main.UnitsTests.AbstractUnitTests.MockUnitStub of AbstractUnit misses an implementation of the Base.sqrt function")
+
+    @test_throws expectedError sqrt(mockUnit)
+end
+
 
 function test_convertToBasicSI_required()
     mockUnit = MockUnitStub()
