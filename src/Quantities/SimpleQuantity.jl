@@ -66,6 +66,11 @@ function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitE
 end
 
 export inBasicSIUnits
+"""
+    inBasicSIUnits(simpleQuantity::SimpleQuantity)
+
+Express simpleQuantity using the 7 basic SI units.
+"""
 function inBasicSIUnits(simpleQuantity::SimpleQuantity)
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
