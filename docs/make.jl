@@ -1,4 +1,4 @@
-push!(LOAD_PATH,"../src/")
+# push!(LOAD_PATH,"../src/")
 
 using Documenter
 using Alicorn
@@ -11,8 +11,14 @@ const PAGES = [
     "Basic Usage" => "usage/usage.md"
 ]
 
+DocMeta.setdocmeta!(Alicorn, :DocTestSetup, :(using Alicorn); recursive=true)
+
 makedocs(
+    modules  = [Alicorn],
+    clean    = true,
+    doctest  = true,
+    strict   = true,
     sitename = "Alicorn.jl",
-    authors = "Daniel Hümmer",
-    pages = PAGES
+    authors  = "Daniel Hümmer",
+    pages    = PAGES
 )
