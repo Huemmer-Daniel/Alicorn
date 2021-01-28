@@ -26,7 +26,21 @@ struct UnitPrefix <: AbstractUnitElement
 end
 
 export emptyUnitPrefix
-emptyUnitPrefix = UnitPrefix(name="empty", symbol="<empty>", value=1)
+"""
+    emptyUnitPrefix = UnitPrefix(name="empty", symbol="<empty>", value=1)
+
+Constant that indicates the absence of a unit prefix.
+
+The unit prefix `Alicorn.emptyUnitPrefix` is used to construct UnitFactors without a unit prefix.
+"""
+const emptyUnitPrefix = UnitPrefix(name="empty", symbol="<empty>", value=1)
 
 export kilo
-kilo = UnitPrefix(name="kilo", symbol="k", value=1e+3)
+"""
+    kilo = UnitPrefix(name="kilo", symbol="k", value=1e+3)
+
+Constant that represents the SI prefix "kilo".
+
+The unit prefix `Alicorn.kilo` is used to define the basic SI unit `Alicorn.kilogram`.
+"""
+const kilo = UnitPrefix(name="kilo", symbol="k", value=1e+3)

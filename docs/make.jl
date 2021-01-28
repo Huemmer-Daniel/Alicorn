@@ -13,11 +13,14 @@ const PAGES = [
 
 DocMeta.setdocmeta!(Alicorn, :DocTestSetup, :(using Alicorn); recursive=true)
 
+const FORMAT = Documenter.HTML( sidebar_sitename = false, assets = ["assets/favicon.ico"] )
+
 makedocs(
     modules  = [Alicorn],
     clean    = true,
     doctest  = true,
     strict   = true,
+    format   = FORMAT,
     sitename = "Alicorn.jl",
     authors  = "Daniel Hümmer",
     pages    = PAGES
