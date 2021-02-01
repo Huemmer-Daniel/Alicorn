@@ -4,6 +4,6 @@ export AbstractUnitElement
 
 Abstract supertype for all types used in constructing a physical unit.
 
-All `AbstractUnit` types are subtypes of `AbstractUnitElement`. The only other subtype of `AbstractUnitElement` is `UnitPrefix`.
+All [`AbstractUnit`](@ref) types are subtypes of `AbstractUnitElement`. The only other subtype of `AbstractUnitElement` is [`UnitPrefix`](@ref).
 """
 abstract type AbstractUnitElement end

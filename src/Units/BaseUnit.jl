@@ -1,6 +1,53 @@
 using ..Utils
 
 export BaseUnit
+@doc raw"""
+    BaseUnit <: AbstractUnit
+
+A named unit derived from the seven basic SI units.
+
+# Fields
+
+- `name::String`: long form name of the unit
+- `symbol::String`: short symbol used to denote the named unit in a composite unit
+- `prefactor::Real`: numerical prefactor multiplying the polynomial of basic SI units corresponding to the named unit.
+- `exponents::BaseUnitExponents`: collection of the powers in the polynomial of basic SI units corresponding to the named unit.
+
+# Contructor
+```
+BaseUnit(; name::String, symbol::String, prefactor::Real, exponents::BaseUnitExponents)
+```
+
+# Examples
+1. The meter can be represented by
+   ```jldoctest
+   julia> BaseUnit( name="meter",
+                    symbol="m",
+                    prefactor=1,
+                    exponents=BaseUnitExponents(m=1) )
+   BaseUnit meter (1 m = 1 m)
+   ```
+2. The gram can be represented by
+   ```jldoctest
+   julia> BaseUnit( name="gram",
+                    symbol="g",
+                    prefactor=1e-3,
+                    exponents=BaseUnitExponents(kg=1) )
+   BaseUnit gram (1 g = 1e-3 kg)
+   ```
+3. The joule is defined as
+   ```math
+   1\,\mathrm{J} = 1\,\mathrm{kg}\,\mathrm{m^2}\,\mathrm{s^{-2}}.
+   ```
+   and can be represents by
+   ```jldoctest
+   julia> BaseUnit( name="joule",
+                    symbol="J",
+                    prefactor=1,
+                    exponents=BaseUnitExponents(kg=1, m=2, s=-2) )
+   BaseUnit joule (1 J = 1 kg m^2 s^-2)
+   ```
+"""
 struct BaseUnit <: AbstractUnit
     name::String
     symbol::String
@@ -15,28 +62,52 @@ struct BaseUnit <: AbstractUnit
 end
 
 export unitlessBaseUnit
-unitlessBaseUnit = BaseUnit( name = "unitless", symbol = "<unitless>", prefactor = 1, exponents = BaseUnitExponents() )
+"""
+Constant of type `BaseUnit` indicating the absence of a unit.
+"""
+const unitlessBaseUnit = BaseUnit( name="unitless", symbol="<unitless>", prefactor=1, exponents=BaseUnitExponents() )
 
 export gram
-gram = BaseUnit( name = "gram", symbol = "g", prefactor = 1e-3, exponents = BaseUnitExponents(kg=1) )
+"""
+Constant of type `BaseUnit` representing the gram.
+"""
+const gram = BaseUnit( name="gram", symbol="g", prefactor=1e-3, exponents=BaseUnitExponents(kg=1) )
 
 export meter
-meter = BaseUnit( name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1) )
+"""
+Constant of type `BaseUnit` representing the meter.
+"""
+const meter = BaseUnit( name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1) )
 
 export second
-second = BaseUnit( name="second", symbol="s", prefactor=1, exponents=BaseUnitExponents(s=1) )
+"""
+Constant of type `BaseUnit` representing the second.
+"""
+const second = BaseUnit( name="second", symbol="s", prefactor=1, exponents=BaseUnitExponents(s=1) )
 
 export ampere
-ampere = BaseUnit( name="ampere", symbol="A", prefactor=1, exponents=BaseUnitExponents(A=1) )
+"""
+Constant of type `BaseUnit` representing the ampere.
+"""
+const ampere = BaseUnit( name="ampere", symbol="A", prefactor=1, exponents=BaseUnitExponents(A=1) )
 
 export kelvin
-kelvin = BaseUnit( name="kelvin", symbol="K", prefactor=1, exponents=BaseUnitExponents(K=1) )
+"""
+Constant of type `BaseUnit` representing the kelvin.
+"""
+const kelvin = BaseUnit( name="kelvin", symbol="K", prefactor=1, exponents=BaseUnitExponents(K=1) )
 
 export mol
-mol = BaseUnit( name="mol", symbol="mol", prefactor=1, exponents=BaseUnitExponents(mol=1) )
+"""
+Constant of type `BaseUnit` representing the mol.
+"""
+const mol = BaseUnit( name="mol", symbol="mol", prefactor=1, exponents=BaseUnitExponents(mol=1) )
 
 export candela
-candela = BaseUnit( name="candela", symbol="cd", prefactor=1, exponents=BaseUnitExponents(cd=1) )
+"""
+Constant of type `BaseUnit` representing the candela.
+"""
+const candela = BaseUnit( name="candela", symbol="cd", prefactor=1, exponents=BaseUnitExponents(cd=1) )
 
 function Base.inv(baseUnit::BaseUnit)
     return inv( UnitFactor(baseUnit) )
@@ -50,6 +121,11 @@ function Base.sqrt(baseUnit::BaseUnit)
     return UnitFactor(baseUnit)^0.5
 end
 
+"""
+    Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
+
+Combines `unitPrefix` and `baseUnit` to form a unit of type `UnitFactor`.
+"""
 function Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
     return UnitFactor(unitPrefix, baseUnit)
 end

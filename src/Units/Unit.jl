@@ -1,4 +1,9 @@
 export Unit
+"""
+    Unit <: AbstractUnit
+
+TODO
+"""
 struct Unit <: AbstractUnit
     unitFactors::Vector{UnitFactor}
 

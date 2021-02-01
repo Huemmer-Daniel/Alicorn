@@ -1,14 +1,12 @@
-# push!(LOAD_PATH,"../src/")
-
 using Documenter
 using Alicorn
 
+const MANUAL = ["manual/basic_usage.md", "manual/advanced_usage.md"]
 const REFERENCE = ["reference/units.md", "reference/quantities.md"]
-
 const PAGES = [
     "Home" => "index.md",
-    "Reference" => REFERENCE,
-    "Basic Usage" => "usage/usage.md"
+    "Manual" => MANUAL,
+    "Reference" => REFERENCE
 ]
 
 DocMeta.setdocmeta!(Alicorn, :DocTestSetup, :(using Alicorn); recursive=true)

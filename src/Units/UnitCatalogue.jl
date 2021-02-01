@@ -2,6 +2,11 @@ using ..Utils
 using ..Exceptions
 
 export UnitCatalogue
+"""
+    UnitCatalogue
+
+TODO
+"""
 mutable struct UnitCatalogue
     prefixCatalogue::Dict{String, UnitPrefix}
     baseUnitCatalogue::Dict{String, BaseUnit}

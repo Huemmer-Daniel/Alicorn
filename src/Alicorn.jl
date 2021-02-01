@@ -12,6 +12,7 @@ export AbstractUnitElement
 export AbstractUnit
 export convertToUnit
 export convertToBasicSI
+export convertToBasicSIAsExponents
 
 export UnitElement
 export UnitPrefix

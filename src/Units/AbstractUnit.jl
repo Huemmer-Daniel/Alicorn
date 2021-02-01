@@ -4,7 +4,7 @@ export AbstractUnit
 
 Abstract supertype for all types that can represent a physical unit.
 
-The concrete subtypes of `AbstractUnit` are `BaseUnit`, `UnitFactor`, and `Unit`.
+The concrete subtypes of `AbstractUnit` are [`BaseUnit`](@ref), [`UnitFactor`](@ref), and [`Unit`](@ref).
 """
 abstract type AbstractUnit <: AbstractUnitElement end
 
@@ -18,7 +18,7 @@ abstract type AbstractUnit <: AbstractUnitElement end
 Multiply two objects of type `AbstractUnit` and return the result as a `Unit`.
 
 # Examples
-```@jldoctest
+```jldoctest
 julia> kilogram = Alicorn.kilogram
 UnitFactor kg
 julia> kilogram * kilogram
@@ -35,7 +35,7 @@ end
 Divide two objects of type `AbstractUnits` and return the result as a `Unit`.
 
 # Examples
-```@jldoctest
+```jldoctest
 julia> kilogram = Alicorn.kilogram
 UnitFactor kg
 julia> kilogram / kilogram
@@ -58,7 +58,7 @@ export convertToUnit
 """
     convertToUnit(abstractUnit::AbstractUnit)::Unit
 
-Convert any object of type `AbstractUnit` to the concrete `Unit` subtype.
+Convert any object of type `AbstractUnit` to the `Unit` subtype.
 """
 function convertToUnit(abstractUnit::AbstractUnit)::Unit
     subtype = typeof(abstractUnit)
