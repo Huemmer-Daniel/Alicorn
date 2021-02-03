@@ -18,11 +18,11 @@ UnitPrefix(;name::String, symbol::String, value::Real)
 The string `name` needs to be valid as an identifier. The number `value` needs to be finite.
 
 # Raises Exceptions
-- `ArgumentError`: if attempting to initialize the `name` field with a string that is not valid as an identifier
-- `DomainError`: if attempting to initialize the `value` field with an infinite number
+- `Core.ArgumentError`: if attempting to initialize the `name` field with a string that is not valid as an identifier
+- `Core.DomainError`: if attempting to initialize the `value` field with an infinite number
 
 # Examples
-The prefix "milli" for the International System of Units, for example, is by default defined in Alicorn as
+The prefix "milli" for the International System of Units is by default defined in Alicorn as
 ```jldoctest
 julia> UnitPrefix(name="milli", symbol="m", value=1e-3)
 UnitPrefix milli (m) of value 1e-3
@@ -40,6 +40,8 @@ struct UnitPrefix <: AbstractUnitElement
     end
 end
 
+## Constants of type UnitPrefix
+
 export emptyUnitPrefix
 """
 Constant of type `UnitPrefix` that indicates the absence of a unit prefix.
@@ -50,7 +52,7 @@ const emptyUnitPrefix = UnitPrefix(name="empty", symbol="<empty>", value=1)
 
 export kilo
 """
-Constant that represents the SI prefix "kilo".
+Constant of type `UnitPrefix` that represents the SI prefix "kilo".
 
 The prefix `kilo` is used to define the basic SI unit [`kilogram`](@ref). The constant is not exported by Alicorn but can be accessed as `Alicorn.kilo`
 """

@@ -139,12 +139,12 @@ function _assertHasTrivialExponent(unitFactor::UnitFactor)
     end
 end
 
-# function documented in as part of the AbstractUnit interface
+# documented as part of the interface of AbstractUnit
 function convertToUnit(unitFactor::UnitFactor)
     return Unit([unitFactor])
 end
 
-# function documented in as part of the AbstractUnit interface
+# documented as part of the interface of AbstractUnit
 function convertToBasicSI(unitFactor::UnitFactor)
     (prefactor, basicSIExponents) = convertToBasicSIAsExponents(unitFactor)
     basicSIUnit = convertToUnit(basicSIExponents)
@@ -152,7 +152,7 @@ function convertToBasicSI(unitFactor::UnitFactor)
     return (prefactor, basicSIUnit)
 end
 
-# function documented in as part of the AbstractUnit interface
+# documented as part of the interface of AbstractUnit
 function convertToBasicSIAsExponents(unitFactor::UnitFactor)
     unitPrefix = unitFactor.unitPrefix
     baseUnit = unitFactor.baseUnit

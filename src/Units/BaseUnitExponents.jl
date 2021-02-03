@@ -4,7 +4,7 @@ export BaseUnitExponents
 @doc raw"""
     BaseUnitExponents
 
-Collection of powers exponentiating each of the seven SI basic units. The `BaseUnit` type uses `BaseUnitExponents` to define named units in terms of the basic units.
+Collection of powers exponentiating each of the seven SI basic units. The [`BaseUnit`](@ref) type uses `BaseUnitExponents` to define named units in terms of the basic units.
 
 # Fields
 - `kilogramExponent::Real`
@@ -19,6 +19,12 @@ Collection of powers exponentiating each of the seven SI basic units. The `BaseU
 ```
 BaseUnitExponents(; kg::Real=0, m::Real=0, s::Real=0, A::Real=0, K::Real=0, mol::Real=0, cd::Real=0)
 ```
+
+# Raises Exceptions
+- `Core.DomainError`: if attempting to initialize any field with an infinite number
+
+# Remarks
+The constructor converts any exponent to `Int` if possible.
 
 # Examples
 The joule is defined as
@@ -64,13 +70,16 @@ function _tryCastingExponentsToInt(exponents::Tuple)
     return exponents
 end
 
+## Methods
+
+# objects of type BaseUnitExponents act as scalars in broadcasting
 Base.broadcastable(baseUnitExponents::BaseUnitExponents) = Ref(baseUnitExponents)
 
 export convertToUnit
 """
     convertToUnit(baseUnitExponents::BaseUnitExponents)
 
-Returns the `Unit` corresponding to a `BaseUnitExponents` object.
+Return the `Unit` corresponding to a `BaseUnitExponents` object.
 
 # Example
 ```jldoctest
@@ -114,7 +123,7 @@ end
     Base.:*(number::Number, baseUnitExponents::BaseUnitExponents)
     Base.:*(baseUnitExponents::BaseUnitExponents, number::Number)
 
-Multiplies each exponent in `baseUnitExponents` by `number`. This operation
+Multiply each exponent in `baseUnitExponents` by `number`. This operation
 corresponds to exponentiating the corresponding unit with `number`.
 
 # Example
@@ -142,6 +151,7 @@ function Base.:*(number::Number, baseUnitExponents::BaseUnitExponents)
     return resultingExponents
 end
 
+# documented together with Base.:*(number::Number, baseUnitExponents::BaseUnitExponents)
 function Base.:*(baseUnitExponents::BaseUnitExponents, number::Number)
     return number * baseUnitExponents
 end
@@ -149,7 +159,7 @@ end
 """
     Base.:+(baseUnitExponents1::BaseUnitExponents, baseUnitExponents2::BaseUnitExponents)
 
-Adds each exponent in `baseUnitExponents1` to its counterpart in `baseUnitExponents2`.
+Add each exponent in `baseUnitExponents1` to its counterpart in `baseUnitExponents2`.
 This operation corresponds to multiplying the two corresponding units.
 
 # Example

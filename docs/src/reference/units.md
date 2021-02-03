@@ -28,7 +28,7 @@ UnitFactorElement
 AbstractUnit
 ```
 
-### Interface of AbstractUnit
+#### Interface of AbstractUnit
 
 Alicorn extends the following functions from the Base module for `AbstractUnit` types:
 
@@ -53,6 +53,11 @@ Alicorn.convertToBasicSIAsExponents(::AbstractUnit)
 
 ```@docs
 UnitPrefix
+```
+
+#### Constants of type UnitPrefix
+
+```@docs
 Alicorn.emptyUnitPrefix
 Alicorn.kilo
 ```
@@ -61,6 +66,18 @@ Alicorn.kilo
 
 ```@docs
 BaseUnit
+```
+
+#### Methods implementing the AbstractUnit interface
+```@docs
+Base.:*(::UnitPrefix, ::BaseUnit)
+Base.inv(::BaseUnit)
+Base.:^(::BaseUnit, ::Real)
+Base.sqrt(::BaseUnit)
+```
+
+#### Constants of type BaseUnit
+```@docs
 Alicorn.unitlessBaseUnit
 Alicorn.gram
 Alicorn.meter
@@ -69,7 +86,6 @@ Alicorn.ampere
 Alicorn.kelvin
 Alicorn.mol
 Alicorn.candela
-Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
 ```
 
 ## BaseUnitExponents
@@ -79,12 +95,6 @@ BaseUnitExponents
 convertToUnit(::BaseUnitExponents)
 Base.:*(::Number, ::BaseUnitExponents)
 Base.:+(::BaseUnitExponents, ::BaseUnitExponents)
-```
-
-## UnitCatalogue
-
-```@docs
-UnitCatalogue
 ```
 
 ## UnitFactor
@@ -99,6 +109,12 @@ Alicorn.kilogram
 
 ```@docs
 Unit
+```
+
+## UnitCatalogue
+
+```@docs
+UnitCatalogue
 ```
 
 ```@meta
