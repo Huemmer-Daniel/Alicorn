@@ -33,6 +33,7 @@ function run()
         @test add!_forBaseUnit_implemented()
         test_add!_errorsOnDuplicates()
         @test remove!_implemented()
+        test_remove!_ErrorsOnUnknownName()
     end
 end
 
@@ -87,7 +88,7 @@ end
 
 function _testExamples_UnitCatalogue_errorsOnDuplicateUnitFactorElementNames(examples::Vector)
     for (unitPrefixes, baseUnits) in examples
-        @test_throws Exceptions.DublicationError("names of unit elements have to be unique") UnitCatalogue(unitPrefixes, baseUnits)
+        @test_throws Exceptions.DuplicationError("names of unit elements have to be unique") UnitCatalogue(unitPrefixes, baseUnits)
     end
 end
 
@@ -467,7 +468,7 @@ function _testExamplesFor_add!_errorsOnDuplicate(examples::Vector)
     for (el1, el2) in examples
         ucat = TestingTools.initializeTestUnitCatalogue()
         add!(ucat, el1)
-        @test_throws Exceptions.DublicationError("catalogue already contains an element \"$(el1.name)\"") add!(ucat, el2)
+        @test_throws Exceptions.DuplicationError("catalogue already contains an element \"$(el1.name)\"") add!(ucat, el2)
     end
 end
 
@@ -508,6 +509,13 @@ function _test_remove!_forBaseUnit(ucat::UnitCatalogue)
 
     success = removalSuccessful && noSideEffects
     return success
+end
+
+function test_remove!_ErrorsOnUnknownName()
+    ucat = TestingTools.initializeTestUnitCatalogue()
+    nonexistentElementName = "ThisElementDoesNotExist"
+    expectedError = KeyError(nonexistentElementName)
+    @test_throws expectedError remove!(ucat, nonexistentElementName)
 end
 
 end # module

@@ -1,11 +1,11 @@
 module Exceptions
 
-struct DublicationError <: Exception
+struct DuplicationError <: Exception
     message::String
 end
 
-function Base.show(io::IO, dublicationError::DublicationError)
-    print(io, dublicationError.message)
+function Base.show(io::IO, duplicationError::DuplicationError)
+    print(io, duplicationError.message)
 end
 
 struct DimensionMismatchError <: Exception

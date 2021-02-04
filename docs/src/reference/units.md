@@ -101,6 +101,20 @@ Base.:+(::BaseUnitExponents, ::BaseUnitExponents)
 
 ```@docs
 UnitFactor
+```
+
+#### Methods implementing the AbstractUnit interface
+
+```@docs
+Base.:*(::UnitPrefix, ::UnitFactor)
+Base.inv(::UnitFactor)
+Base.:^(::UnitFactor, ::Real)
+Base.sqrt(::UnitFactor)
+```
+
+#### Constants of type UnitFactor
+
+```@docs
 Alicorn.unitlessUnitFactor
 Alicorn.kilogram
 ```
@@ -111,10 +125,42 @@ Alicorn.kilogram
 Unit
 ```
 
+#### Methods implementing the AbstractUnit interface
+
+```@docs
+Base.:*(::Unit, ::Unit)
+Base.:/(::Unit, ::Unit)
+Base.:*(::UnitPrefix, ::Unit)
+Base.inv(::Unit)
+Base.:^(unit::Unit, exponent::Real)
+Base.sqrt(::Unit)
+```
+
+#### Constants of type Unit
+
+```@docs
+Alicorn.unitlessUnit
+```
+
 ## UnitCatalogue
 
 ```@docs
 UnitCatalogue
+```
+
+#### Methods
+
+```@docs
+Base.getproperty(::UnitCatalogue, ::Symbol)
+Base.propertynames(::UnitCatalogue)
+listUnitPrefixes(::UnitCatalogue)
+listBaseUnits(::UnitCatalogue)
+listUnitPrefixNames(::UnitCatalogue)
+listBaseUnitNames(::UnitCatalogue)
+providesUnitPrefix(::UnitCatalogue, ::String)
+providesBaseUnit(::UnitCatalogue, ::String)
+add!(::UnitCatalogue, ::UnitPrefix)
+remove!(::UnitCatalogue, ::String)
 ```
 
 ```@meta

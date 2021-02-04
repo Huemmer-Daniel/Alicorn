@@ -164,7 +164,7 @@ end
 function _getCorrectPrettyString(ucat::UnitCatalogue)
     nrOfUnitPrefixes = length(listUnitPrefixes(ucat))
     nrOfBaseUnits = length(listBaseUnits(ucat))
-    prettyString = "UnitCatalogue providing\n\t$nrOfUnitPrefixes unit prefixes\n\t$nrOfBaseUnits base units"
+    prettyString = "UnitCatalogue providing\n $nrOfUnitPrefixes unit prefixes\n $nrOfBaseUnits base units"
     return prettyString
 end
 

@@ -6,6 +6,6 @@ end
 function _generatePrettyPrintingOutput(ucat::UnitCatalogue)
     nrOfPrefixes = length(listUnitPrefixes(ucat))
     nrOfBaseUnits = length(listBaseUnits(ucat))
-    prettyString = "UnitCatalogue providing\n\t$nrOfPrefixes unit prefixes\n\t$nrOfBaseUnits base units"
+    prettyString = "UnitCatalogue providing\n $nrOfPrefixes unit prefixes\n $nrOfBaseUnits base units"
     return prettyString
 end

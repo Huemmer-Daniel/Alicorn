@@ -16,6 +16,8 @@ abstract type AbstractUnit <: AbstractUnitElement end
 
 Multiply two objects of type `AbstractUnit` and return the result as a `Unit`.
 
+The method ultimately calls [`Base.:*(::Unit, ::Unit)`](@ref).
+
 # Examples
 ```jldoctest
 julia> kilogram = Alicorn.kilogram
@@ -32,6 +34,8 @@ end
     Base.:/(abstractUnit1::AbstractUnit, abstractUnit2::AbstractUnit)
 
 Divide two objects of type `AbstractUnits` and return the result as a `Unit`.
+
+The method ultimately calls [`Base.:/(::Unit, ::Unit)`](@ref).
 
 # Examples
 ```jldoctest
@@ -111,7 +115,7 @@ end
 """
     Base.:inv(abstractUnit::AbstractUnit)
 
-Return the (multiplicative) inverse of a unit.
+Return the (multiplicative) inverse of a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
 """
 function Base.inv(abstractUnit::AbstractUnit)
     subtype = typeof(abstractUnit)
@@ -121,7 +125,7 @@ end
 """
     Base.:^(abstractUnit::AbstractUnit, exponent::Real)
 
-Exponenciate a unit.
+Exponentiate a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
 """
 function Base.:^(abstractUnit::AbstractUnit, exponent::Real)
    subtype = typeof(abstractUnit)
@@ -131,7 +135,7 @@ end
 """
     Base.:sqrt(abstractUnit::AbstractUnit)
 
-Take the square root of a unit.
+Take the square root of a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
 """
 function Base.:sqrt(abstractUnit::AbstractUnit)
    subtype = typeof(abstractUnit)

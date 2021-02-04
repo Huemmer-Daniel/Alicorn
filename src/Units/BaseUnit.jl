@@ -13,7 +13,7 @@ A named unit derived from the seven basic SI units.
 - `prefactor::Real`: numerical prefactor multiplying the polynomial of basic SI units corresponding to the named unit.
 - `exponents::BaseUnitExponents`: collection of the powers in the polynomial of basic SI units corresponding to the named unit.
 
-# Contructor
+# Constructor
 ```
 BaseUnit(; name::String, symbol::String, prefactor::Real, exponents::BaseUnitExponents)
 ```
@@ -64,6 +64,67 @@ struct BaseUnit <: AbstractUnit
         Utils.assertNameIsValidSymbol(name)
         new(name, symbol, prefactor, exponents)
     end
+end
+
+## Methods implementing the interface of AbstractUnit
+
+# documented as part of the interface of AbstractUnit
+function convertToUnit(baseUnit::BaseUnit)
+    return Unit( UnitFactor(baseUnit) )
+end
+
+# documented as part of the interface of AbstractUnit
+function convertToBasicSI(baseUnit::BaseUnit)
+    prefactor = baseUnit.prefactor
+    exponents = baseUnit.exponents
+
+    basicSIUnit = convertToUnit(exponents)
+
+    return (prefactor, basicSIUnit)
+end
+
+# documented as part of the interface of AbstractUnit
+function convertToBasicSIAsExponents(baseUnit::BaseUnit)
+    prefactor = baseUnit.prefactor
+    exponents = baseUnit.exponents
+
+    return (prefactor, exponents)
+end
+
+"""
+    Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
+
+Combine `unitPrefix` and `baseUnit` to form a unit of type `UnitFactor`.
+"""
+function Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
+    return UnitFactor(unitPrefix, baseUnit)
+end
+
+"""
+    Base.inv(baseUnit::BaseUnit)
+
+Return the (multiplicative) inverse of `baseUnit` as a unit of type `UnitFactor`.
+"""
+function Base.inv(baseUnit::BaseUnit)
+    return inv( UnitFactor(baseUnit) )
+end
+
+"""
+    Base.:^(baseUnit::BaseUnit, exponent::Real)
+
+Raise `baseUnit` to the power of `exponent` and return the result as a unit of type `UnitFactor`.
+"""
+function Base.:^(baseUnit::BaseUnit, exponent::Real)
+    return UnitFactor(baseUnit)^exponent
+end
+
+"""
+    Base.sqrt(baseUnit::BaseUnit)
+
+Take the square root of `baseUnit` and return it as unit of type `UnitFactor`.
+"""
+function Base.sqrt(baseUnit::BaseUnit)
+    return UnitFactor(baseUnit)^0.5
 end
 
 ## Constants of type BaseUnit
@@ -131,64 +192,3 @@ Constant of type `BaseUnit` representing the candela.
 The constant is not exported by Alicorn but can be accessed as `Alicorn.candela`.
 """
 const candela = BaseUnit( name="candela", symbol="cd", prefactor=1, exponents=BaseUnitExponents(cd=1) )
-
-## Methods implementing the interface of AbstractUnit
-
-# documented as part of the interface of AbstractUnit
-function convertToUnit(baseUnit::BaseUnit)
-    return Unit( UnitFactor(baseUnit) )
-end
-
-# documented as part of the interface of AbstractUnit
-function convertToBasicSI(baseUnit::BaseUnit)
-    prefactor = baseUnit.prefactor
-    exponents = baseUnit.exponents
-
-    basicSIUnit = convertToUnit(exponents)
-
-    return (prefactor, basicSIUnit)
-end
-
-# documented as part of the interface of AbstractUnit
-function convertToBasicSIAsExponents(baseUnit::BaseUnit)
-    prefactor = baseUnit.prefactor
-    exponents = baseUnit.exponents
-
-    return (prefactor, exponents)
-end
-
-"""
-    Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
-
-Combine `unitPrefix` and `baseUnit` to form a unit of type `UnitFactor`.
-"""
-function Base.:*(unitPrefix::UnitPrefix, baseUnit::BaseUnit)
-    return UnitFactor(unitPrefix, baseUnit)
-end
-
-"""
-    Base.inv(baseUnit::BaseUnit)
-
-Return the (multiplicative) inverse of `baseUnit` as a unit of type `UnitFactor`.
-"""
-function Base.inv(baseUnit::BaseUnit)
-    return inv( UnitFactor(baseUnit) )
-end
-
-"""
-    Base.:^(baseUnit::BaseUnit, exponent::Real)
-
-Raise `baseUnit` to the power of `exponent` and return the result as a unit of type `UnitFactor`.
-"""
-function Base.:^(baseUnit::BaseUnit, exponent::Real)
-    return UnitFactor(baseUnit)^exponent
-end
-
-"""
-    Base.sqrt(baseUnit::BaseUnit)
-
-Take the square root of `baseUnit` and return it as unit of type `UnitFactor`.
-"""
-function Base.sqrt(baseUnit::BaseUnit)
-    return UnitFactor(baseUnit)^0.5
-end

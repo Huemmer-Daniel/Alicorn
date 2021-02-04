@@ -1,8 +1,45 @@
 export Unit
-"""
+@doc raw"""
     Unit <: AbstractUnit
 
-TODO
+A composite unit formed by several [`UnitFactor`](@ref) objects.
+
+# Fields
+
+- `unitFactors::Vector{UnitFactor}`: ordered list of [`UnitFactor`](@ref) objects
+  that form the `Unit` through multiplication (concatenation).
+
+# Constructors
+```
+Unit(unitFactors::Vector{UnitFactor})
+Unit(abstractUnit::AbstractUnit)
+Unit()
+```
+
+# Remarks
+
+The constructor `Unit(abstractUnit::AbstractUnit)` is equivalent to [`convertToUnit(abstractUnit::AbstractUnit)`](@ref). The constructor `Unit()` returns the constant [`unitlessUnit`](@ref).
+
+# Examples
+1. The unit ``\sqrt{\mathrm{Hz}}/\mathrm{nm}`` (square root of hertz per nanometer)
+   can be constructed using the constructor method as follows:
+   ```jldoctest
+   julia> ucat = UnitCatalogue();
+
+   julia> sqrtHz = UnitFactor(ucat.hertz, 1/2)
+   UnitFactor Hz^5e-1
+   julia> per_nm = UnitFactor(ucat.nano, ucat.meter, -1)
+   UnitFactor nm^-1
+   julia> sqrtHz_per_nm = Unit([sqrtHz, per_nm])
+   Unit Hz^5e-1 nm^-1
+   ```
+2. Alternatively, ``\sqrt{\mathrm{Hz}}/\mathrm{nm}`` can also be constructed arithmetically:
+   ```jldoctest
+   julia> ucat = UnitCatalogue();
+
+   julia> sqrtHz_per_nm = sqrt(ucat.hertz) / ( ucat.nano * ucat.meter )
+   Unit Hz^5e-1 nm^-1
+   ```
 """
 struct Unit <: AbstractUnit
     unitFactors::Vector{UnitFactor}
@@ -109,47 +146,26 @@ function _replaceEmptyFactorListWithUnitlessFactor!(mergedFactors::Vector{UnitFa
     end
 end
 
-function convertToUnit(unit::Unit)
-    return unit
-end
+## Outer constructors
 
+# documented in the type definition
 function Unit(abstractUnit::AbstractUnit)
     return convertToUnit(abstractUnit)
 end
 
+# documented in the type definition
 function Unit()
     unitlessFactor = UnitFactor()
-    return Unit(unitlessFactor)
+    return unitlessUnit
 end
 
-function Base.:(==)(unit1::Unit, unit2::Unit)
-    return unit1.unitFactors == unit2.unitFactors
-end
+## Methods implementing the interface of AbstractUnit
 
-export unitlessUnit
-unitlessUnit = Unit( unitlessUnitFactor )
+"""
+    Base.:*(unit1::Unit, unit2::Unit)
 
-function Base.inv(unit::Unit)
-    unitFactors = unit.unitFactors
-    inverseUnitFactors = Vector{UnitFactor}()
-    for unitFactor in unitFactors
-        inverseUnitFactor = inv(unitFactor)
-        push!(inverseUnitFactors, inverseUnitFactor)
-    end
-    inverseUnit = Unit(inverseUnitFactors)
-    return inverseUnit
-end
-
-function Base.:^(unit::Unit, exponent::Real)
-    newUnitFactors = unit.unitFactors.^exponent
-    newUnit = Unit(newUnitFactors)
-    return newUnit
-end
-
-function Base.sqrt(unit::Unit)
-    return unit^(0.5)
-end
-
+Multiply `unit1` with `unit2` and return the result as a unit of type `Unit`.
+"""
 function Base.:*(unit1::Unit, unit2::Unit)
     unitFactors1 = unit1.unitFactors
     unitFactors2 = unit2.unitFactors
@@ -157,6 +173,11 @@ function Base.:*(unit1::Unit, unit2::Unit)
     return Unit(newUnitFactors)
 end
 
+"""
+    Base.:/(unit1::Unit, unit2::Unit)
+
+Divide `unit1` by `unit2` and return the result as a unit of type `Unit`.
+"""
 function Base.:/(unit1::Unit, unit2::Unit)
     unitFactors1 = unit1.unitFactors
     unitFactors2 = unit2.unitFactors
@@ -170,6 +191,49 @@ function _inv_unitFactors(unitFactors::Vector{UnitFactor})
     return inverseUnitFactors
 end
 
+# documented as part of the interface of AbstractUnit
+function convertToUnit(unit::Unit)
+    return unit
+end
+
+# documented as part of the interface of AbstractUnit
+function convertToBasicSI(unit::Unit)
+    (prefactor, basicSIAsExponents) = convertToBasicSIAsExponents(unit)
+    basicSIUnit = convertToUnit(basicSIAsExponents)
+    return (prefactor, basicSIUnit)
+end
+
+# documented as part of the interface of AbstractUnit
+function convertToBasicSIAsExponents(unit::Unit)
+    unitFactors = unit.unitFactors
+
+    prefactor = 1
+    basicSIAsExponents = BaseUnitExponents()
+
+    for unitFactor in unitFactors
+        (unitFactorPrefactor, unitFactorInBasicSIExponents) = convertToBasicSIAsExponents(unitFactor)
+        prefactor *= unitFactorPrefactor
+        basicSIAsExponents += unitFactorInBasicSIExponents
+    end
+
+    return (prefactor, basicSIAsExponents)
+end
+
+"""
+    Base.:*(unitPrefix::UnitPrefix, unit::Unit)
+
+Combine `unitPrefix` and `unit` to form a unit of type `Unit`.
+
+The operation is only permitted if
+1. `unit` contains a single unit factor `unitFactor::UnitFactor`,
+2. `unitFactor` does not already contain a unit prefix, and
+3. the exponent of `unitFactor` is 1.
+
+# Raises Exceptions
+- `Base.ArgumentError`: if `unit.unitFactors` contains more than one element `unitFactor::UnitFactor`
+- `Base.ArgumentError`: if `unitFactor.unitPrefix != Alicorn.emptyUnitPrefix`
+- `Base.ArgumentError`: if `unitFactor.exponent != 1`
+"""
 function Base.:*(unitPrefix::UnitPrefix, unit::Unit)
     _assertHasSingleUnitFactor(unit)
     unitFactor = unit.unitFactors[1]
@@ -205,23 +269,54 @@ function _assertHasTrivialExponent(unit::Unit)
     end
 end
 
-function convertToBasicSI(unit::Unit)
-    (prefactor, basicSIAsExponents) = convertToBasicSIAsExponents(unit)
-    basicSIUnit = convertToUnit(basicSIAsExponents)
-    return (prefactor, basicSIUnit)
-end
+"""
+    Base.inv(unit::Unit)
 
-function convertToBasicSIAsExponents(unit::Unit)
+Return the (multiplicative) inverse of `unit` as a unit of type `Unit`.
+"""
+function Base.inv(unit::Unit)
     unitFactors = unit.unitFactors
-
-    prefactor = 1
-    basicSIAsExponents = BaseUnitExponents()
-
+    inverseUnitFactors = Vector{UnitFactor}()
     for unitFactor in unitFactors
-        (unitFactorPrefactor, unitFactorInBasicSIExponents) = convertToBasicSIAsExponents(unitFactor)
-        prefactor *= unitFactorPrefactor
-        basicSIAsExponents += unitFactorInBasicSIExponents
+        inverseUnitFactor = inv(unitFactor)
+        push!(inverseUnitFactors, inverseUnitFactor)
     end
-
-    return (prefactor, basicSIAsExponents)
+    inverseUnit = Unit(inverseUnitFactors)
+    return inverseUnit
 end
+
+"""
+    Base.:^(unit::Unit, exponent::Real)
+
+Raise `unit` to the power of `exponent` and return the result as a unit of type `Unit`.
+"""
+function Base.:^(unit::Unit, exponent::Real)
+    newUnitFactors = unit.unitFactors.^exponent
+    newUnit = Unit(newUnitFactors)
+    return newUnit
+end
+
+"""
+    Base.sqrt(unit::Unit)
+
+Take the square root of `unit` and return it as unit of type `Unit`.
+"""
+function Base.sqrt(unit::Unit)
+    return unit^(0.5)
+end
+
+## Methods
+
+function Base.:(==)(unit1::Unit, unit2::Unit)
+    return unit1.unitFactors == unit2.unitFactors
+end
+
+## Constants of type UnitFactor
+
+export unitlessUnit
+"""
+Constant of type `Unit` indicating the absence of a unit.
+
+The constant is not exported by Alicorn but can be accessed as `Alicorn.unitlessUnit`.
+"""
+const unitlessUnit = Unit( unitlessUnitFactor )
