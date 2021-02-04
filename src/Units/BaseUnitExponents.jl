@@ -42,7 +42,7 @@ julia> BaseUnitExponents()
 BaseUnitExponents kg^0 m^0 s^0 A^0 K^0 mol^0 cd^0
 ```
 """
-struct BaseUnitExponents
+struct BaseUnitExponents <: AbstractUnitElement
     kilogramExponent::Real
     meterExponent::Real
     secondExponent::Real

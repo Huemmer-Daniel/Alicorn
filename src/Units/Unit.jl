@@ -20,6 +20,10 @@ Unit()
 
 The constructor `Unit(abstractUnit::AbstractUnit)` is equivalent to [`convertToUnit(abstractUnit::AbstractUnit)`](@ref). The constructor `Unit()` returns the constant [`unitlessUnit`](@ref).
 
+When a `Unit` is initialized, `UnitFactor` objects are added to the
+`unitFactors` field in order of appearance. `UnitFactor` objects with the same
+base (`UnitPrefix` and `BaseUnit`) are merged.
+
 # Examples
 1. The unit ``\sqrt{\mathrm{Hz}}/\mathrm{nm}`` (square root of hertz per nanometer)
    can be constructed using the constructor method as follows:
