@@ -1,5 +1,10 @@
 export SimpleQuantity
-mutable struct SimpleQuantity{T}
+@doc raw"""
+    SimpleQuantity{T}
+
+TODO
+"""
+mutable struct SimpleQuantity{T} <: AbstractQuantity
     value::T
     unit::Unit
 
@@ -10,40 +15,38 @@ mutable struct SimpleQuantity{T}
     end
 end
 
+## Methods implementing the interface of AbstractQuantity
+
+"""
+    Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+
+Compare two `SimpleQuantity` objects.
+
+The two quantities are equal if both their values and their units are equal.
+Note that the units are not converted during the comparison.
+
+# Examples
+```@jldoctest
+julia> ucat = UnitCatalogue() ;
+
+julia> q1 = 7 * ucat.meter
+7 m
+julia> q2 = 700 * (ucat.centi * ucat.meter)
+700 cm
+julia> q1 == q1
+true
+julia> q1 == q2
+false
+```
+"""
 function Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     valuesEqual = ( simpleQuantity1.value == simpleQuantity2.value )
     unitsEqual = ( simpleQuantity1.unit == simpleQuantity2.unit )
     return valuesEqual && unitsEqual
 end
 
-function Base.:*(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
-    return SimpleQuantity(value, abstractUnit)
-end
-
-function Base.:/(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
-    inverseAbstractUnit = inv(abstractUnit)
-    return SimpleQuantity(value, inverseAbstractUnit)
-end
-
-function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::SimpleQuantity
-    value = simpleQuantity.value
-    unit = simpleQuantity.unit
-
-    unitProduct = unit * abstractUnit
-
-    return SimpleQuantity(value, unitProduct)
-end
-
-function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::SimpleQuantity
-    value = simpleQuantity.value
-    unit = simpleQuantity.unit
-
-    unitQuotient = unit / abstractUnit
-
-    return SimpleQuantity(value, unitQuotient)
-end
-
 export inUnitsOf
+# method documented as part of the AbstractQuantity interface
 function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)::SimpleQuantity
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
@@ -66,12 +69,8 @@ function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitE
 end
 
 export inBasicSIUnits
-"""
-    inBasicSIUnits(simpleQuantity::SimpleQuantity)
-
-Express simpleQuantity using the 7 basic SI units.
-"""
-function inBasicSIUnits(simpleQuantity::SimpleQuantity)
+# method documented as part of the AbstractQuantity interface
+function inBasicSIUnits(simpleQuantity::SimpleQuantity)::SimpleQuantity
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
 
@@ -82,6 +81,27 @@ function inBasicSIUnits(simpleQuantity::SimpleQuantity)
     return resultingQuantity
 end
 
+# method documented as part of the AbstractQuantity interface
+function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::SimpleQuantity
+    value = simpleQuantity.value
+    unit = simpleQuantity.unit
+
+    unitProduct = unit * abstractUnit
+
+    return SimpleQuantity(value, unitProduct)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::SimpleQuantity
+    value = simpleQuantity.value
+    unit = simpleQuantity.unit
+
+    unitQuotient = unit / abstractUnit
+
+    return SimpleQuantity(value, unitQuotient)
+end
+
+# method documented as part of the AbstractQuantity interface
 function Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     targetUnit = simpleQuantity1.unit
     simpleQuantity2 = _addition_ConvertQuantityToTargetUnit(simpleQuantity2, targetUnit)
@@ -108,6 +128,7 @@ function _handleExceptionInAddition(exception::Exception)
     end
 end
 
+# method documented as part of the AbstractQuantity interface
 function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     targetUnit = simpleQuantity1.unit
     simpleQuantity2 = _addition_ConvertQuantityToTargetUnit(simpleQuantity2, targetUnit)
@@ -116,6 +137,7 @@ function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
     return differenceQuantity
 end
 
+# method documented as part of the AbstractQuantity interface
 function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     productValue = simpleQuantity1.value * simpleQuantity2.value
     productUnit = simpleQuantity1.unit * simpleQuantity2.unit
@@ -123,6 +145,7 @@ function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
     return productQuantity
 end
 
+# method documented as part of the AbstractQuantity interface
 function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     quotientValue = simpleQuantity1.value / simpleQuantity2.value
     quotientUnit = Unit = simpleQuantity1.unit / simpleQuantity2.unit
@@ -130,6 +153,7 @@ function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
     return quotientQuantity
 end
 
+# method documented as part of the AbstractQuantity interface
 function Base.inv(simpleQuantity::SimpleQuantity)
     inverseValue = inv(simpleQuantity.value)
     inverseUnit = inv(simpleQuantity.unit)
@@ -137,16 +161,55 @@ function Base.inv(simpleQuantity::SimpleQuantity)
     return inverseQuantity
 end
 
-function Base.:^(simpleQuantity::SimpleQuantity, exponent::Number)
+# method documented as part of the AbstractQuantity interface
+function Base.:^(simpleQuantity::SimpleQuantity, exponent::Real)
     exponentiatedValue = (simpleQuantity.value)^exponent
     exponentiatedUnit = (simpleQuantity.unit)^exponent
     exponentiatedQuantity = SimpleQuantity(exponentiatedValue, exponentiatedUnit)
     return exponentiatedQuantity
 end
 
+# method documented as part of the AbstractQuantity interface
 function Base.:sqrt(simpleQuantity::SimpleQuantity)
     rootOfValue = sqrt(simpleQuantity.value)
     rootOfUnit = sqrt(simpleQuantity.unit)
     rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
     return rootOfQuantity
+end
+
+## Methods
+
+"""
+    Base.:*(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+
+Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
+
+# Example
+```@jldoctest
+julia> ucat = UnitCatalogue() ;
+
+julia> 3.5 * ucat.tesla
+3.5 T
+```
+"""
+function Base.:*(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+    return SimpleQuantity(value, abstractUnit)
+end
+
+"""
+    Base.:/(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+
+Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
+
+# Example
+```@jldoctest
+julia> ucat = UnitCatalogue() ;
+
+julia> 3.5 / ucat.second
+3.5 s^-1
+```
+"""
+function Base.:/(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+    inverseAbstractUnit = inv(abstractUnit)
+    return SimpleQuantity(value, inverseAbstractUnit)
 end

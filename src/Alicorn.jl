@@ -35,6 +35,7 @@ export add!
 include("Quantities/Quantities.jl")
 using .Quantities
 
+export AbstractQuantity
 export SimpleQuantity
 export inUnitsOf
 export inBasicSIUnits
