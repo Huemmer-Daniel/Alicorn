@@ -49,7 +49,7 @@ julia> energy = force * height
 julia> inUnitsOf(energy, ucat.joule)
 46.0 J
 ```
-Now, while we are holding the rock up there, we wonder what would happen if we were to accidentally drop it on our nose. Assuming our olfactory organ resides at an elevation of ``h_n = 1.7\,\mathrm{m}`` above the ground, we can calculate the energy transferred to our poor nose as a result of the stone's drop by ``h - h_n`` as follows:
+Now, while we are holding the rock up there, we wonder what would happen if we were to accidentally drop it on our nose. Assuming that our nose is ``h_n = 1.7\,\mathrm{m}`` above the ground, we can calculate the energy transferred after a drop of height ``h - h_n`` as follows:
 ```@jldoctest
 julia> noseHeight = 1.7 * ucat.meter
 1.7 m
@@ -60,12 +60,13 @@ julia> energyToNose = force * dropDistance
 julia> inUnitsOf(energyToNose, ucat.joule)
 12.0 J
 ```
-Note that Alicorn used the unit of `height` to express the quantity `dropDistance` resulting from taking the difference. To distract ourselves from mental images of nasal mishaps, we quickly decide to check if the energy transfer is sufficient to create an electron-positron pair. We recall that the rest energy of an electron-positron pair is around ``E_p = 1022\,\mathrm{MeV}`` and express our results in the according unit:
+Note that Alicorn used the unit of `height` to express the quantity `dropDistance` resulting from taking the difference.
+
+Finally, let us check how the transferred energy compares to the rest energy of an electron-positron pair. We recall that the rest energy of an electron-positron pair is around ``E_p = 1022\,\mathrm{MeV}`` and express our results in the according unit:
 ```@jldoctest
 julia> inUnitsOf(energyToNose, ucat.mega * ucat.electronvolt)
 7.489810889352916e13 MeV
 ```
-We are amazed at how cheap antimatter is and quickly put down the stone to prevent any injuries.
 
 ```@meta
 DocTestSetup = nothing

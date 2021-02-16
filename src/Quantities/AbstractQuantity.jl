@@ -4,7 +4,7 @@ export AbstractQuantity
 
 Abstract supertype for all types that represent a physical quantity.
 
-The concrete subtype of `AbstractQuantity` is [`SimpleQuantity`](@ref).
+Currently the only concrete subtype of `AbstractQuantity` is [`SimpleQuantity`](@ref).
 """
 abstract type AbstractQuantity end
 
@@ -137,4 +137,14 @@ Take the square root of `quantity`.
 function Base.sqrt(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of the sqrt function")
+end
+
+"""
+    Base.transpose(quantity::AbstractQuantity)
+
+Transpose `quantity`.
+"""
+function Base.transpose(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the transpose function")
 end

@@ -1,8 +1,72 @@
 export SimpleQuantity
 @doc raw"""
-    SimpleQuantity{T}
+    SimpleQuantity{T} <: AbstractQuantity
 
-TODO
+A physical quantity consisting of a value and a physical unit.
+
+`SimpleQuantity` is a parametric type, where `T` is the type of the
+quantity's value. While the value can be of any type, `SimpleQuantity`
+implements the `AbstractQuantity` interface and hence assumes that the type
+`T` supports arithmetic operations.
+
+# Fields
+- `value::T`: value of the quantity
+- `unit::Unit`: unit of the quantity
+
+# Constructor
+```
+SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T
+```
+
+# Examples
+1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
+   the constructor method as follows:
+   ```@jldoctest
+   julia> ucat = UnitCatalogue() ;
+
+   julia> nanometer = ucat.nano * ucat.meter
+   UnitFactor nm
+   julia> quantity = SimpleQuantity(7, nanometer)
+   7 nm
+   ```
+2. Alternatively, ``7\,\mathrm{nm}`` can be constructed arithmetically:
+   ```@jldoctest
+   julia> ucat = UnitCatalogue() ;
+
+   julia> nanometer = ucat.nano * ucat.meter
+   UnitFactor nm
+   julia> quantity = 7 * nanometer
+   7 nm
+   ```
+3. The value can be of any type. Any mathematical operation included in the
+   interface of [`AbstractQuantity`](@ref) is applied to the value field, and
+   the unit is modified accordingly.
+   ```@jldoctest
+   julia> ucat = UnitCatalogue() ;
+
+   julia> nanometer = ucat.nano * ucat.meter
+   UnitFactor nm
+   julia> quantity1 = [4; 5] * nanometer
+   SimpleQuantity{Array{Int64,1}} of unit nm
+   julia> quantity1 * transpose(quantity1)
+   41 nm^2
+   ```
+   The responsibility to check that the resulting quantity is meaningful and
+   supports arithemtic operations lies with the user. For example, Alicorn
+   allows to assign a unit to a string. String concatenation with * or ^ results
+   in a corresponding change of the unit, while multiplication with a number
+   raises an exception since there is no corresponding method for strings.
+   ```@jldoctest; setup = :( ucat = UnitCatalogue(); nanometer = ucat.nano * ucat.meter )
+   julia> quantity2 = "this is nonsense" * nanometer
+   SimpleQuantity{String} of unit nm
+   julia> quantity2sqrd = quantity2^2
+   SimpleQuantity{String} of unit nm^2
+   julia> quantity2sqrd.value
+   "this is nonsensethis is nonsense"
+   julia> 2 * quantity2
+   MethodError: no method matching *(::Int64, ::SimpleQuantity{String})
+   [...]
+   ```
 """
 mutable struct SimpleQuantity{T} <: AbstractQuantity
     value::T
@@ -170,11 +234,19 @@ function Base.:^(simpleQuantity::SimpleQuantity, exponent::Real)
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:sqrt(simpleQuantity::SimpleQuantity)
+function Base.sqrt(simpleQuantity::SimpleQuantity)
     rootOfValue = sqrt(simpleQuantity.value)
     rootOfUnit = sqrt(simpleQuantity.unit)
     rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
     return rootOfQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.transpose(simpleQuantity::SimpleQuantity)
+    transposeOfValue = transpose(simpleQuantity.value)
+    unit = simpleQuantity.unit
+    transposeOfQuantity = SimpleQuantity(transposeOfValue, unit)
+    return transposeOfQuantity
 end
 
 ## Methods

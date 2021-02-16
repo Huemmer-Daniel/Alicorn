@@ -6,13 +6,15 @@ end
 
 # Quantities
 
+This section describes the Quantities submodule of Alicorn. The module is concerned with defining and manipulating physical quantities.
+
+Unless stated otherwise, all types, functions, and constants defined in the submodule are exported by Alicorn.
+
 #### Contents
 
 ```@contents
 Pages = ["quantities.md"]
 ```
-
-## Overview
 
 ## Abstract Supertypes
 
@@ -37,6 +39,7 @@ Base.:/(::AbstractQuantity, ::AbstractQuantity)
 Base.inv(::AbstractQuantity)
 Base.:^(::AbstractQuantity, ::Real)
 Base.sqrt(::AbstractQuantity)
+Base.transpose(::AbstractQuantity)
 ```
 
 ## SimpleQuantity

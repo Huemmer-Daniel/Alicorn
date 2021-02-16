@@ -234,6 +234,119 @@ add!(::UnitCatalogue, ::UnitPrefix)
 remove!(::UnitCatalogue, ::String)
 ```
 
+
+#### Default UnitCatalogue
+
+Calling the [`UnitCatalogue`](@ref) constructor without arguments returns a catalogue
+that contains a default set of common units and prefixes used with the SI system:
+```@jldoctest
+julia> ucat = UnitCatalogue()
+UnitCatalogue providing
+ 21 unit prefixes
+ 43 base units
+```
+
+#### Default unit prefixes
+
+The default prefixes are listed in the following table. The corresponding
+[`UnitPrefix`](@ref) objects are constructed as
+```@jldoctest
+julia> yotta = UnitPrefix( name="yotta", symbol="Y", value=1e+24 )
+UnitPrefix yotta (Y) of value 1e+24
+```
+and can be selected from the default [`UnitCatalogue`](@ref) by
+```@jldoctest, setup = :( ucat = UnitCatalogue() )
+julia> ucat.yotta
+UnitPrefix yotta (Y) of value 1e+24
+```
+and so on.
+
+| name      | symbol    | value |
+| :---      | :---:     | :---  |
+| "yotta"   | "Y"       | 1e+24 |
+| "zetta"   | "Z"       | 1e+21 |
+| "exa"     | "E"       | 1e+18 |
+| "peta"    | "P"       | 1e+15 |
+| "tera"    | "T"       | 1e+12 |
+| "giga"    | "G"       | 1e+9  |
+| "mega"    | "M"       | 1e+6  |
+| "kilo"    | "k"       | 1e+3  |
+| "hecto"   | "h"       | 1e+2  |
+| "deca"    | "da"      | 1e+1  |
+| "deci"    | "d"       | 1e-1  |
+| "centi"   | "c"       | 1e-2  |
+| "milli"   | "m"       | 1e-3  |
+| "micro"   | "μ"       | 1e-6  |
+| "nano"    | "n"       | 1e-9  |
+| "pico"    | "p"       | 1e-12 |
+| "femto"   | "f"       | 1e-15 |
+| "atto"    | "a"       | 1e-18 |
+| "zepto"   | "z"       | 1e-21 |
+| "yocto"   | "y"       | 1e-24 |
+| "empty"   | "<empty>" | 1     |
+
+#### Default named units
+
+The default named units are listed in the following table. The corresponding
+[`BaseUnit`](@ref) objects are constructed as
+```@jldoctest
+julia> gram = BaseUnit( name="gram", symbol="g", prefactor=1e-3, exponents=BaseUnitExponents(kg=1) )
+BaseUnit gram (1 g = 1e-3 kg)
+```
+and can be selected from the default [`UnitCatalogue`](@ref) by
+```@jldoctest, setup = :( ucat = UnitCatalogue() )
+julia> ucat.gram
+BaseUnit gram (1 g = 1e-3 kg)
+```
+and so on.
+
+| name               | symbol       | prefactor          | exponents                                  | corresponding basic unit                                                    |
+| :---               | :---:        | :---               | :---                                       | :---                                                                        |
+| "gram"             | "g"          | 1e-3               | `BaseUnitExponents(kg=1)`                  | ``10^{-3}\,\mathrm{kg}``                                                    |
+| "meter"            | "m"          | 1                  | `BaseUnitExponents(m=1)`                   | ``1\,\mathrm{m}``                                                           |
+| "second"           | "s"          | 1                  | `BaseUnitExponents(s=1)`                   | ``1\,\mathrm{s}``                                                           |
+| "ampere"           | "A"          | 1                  | `BaseUnitExponents(A=1)`                   | ``1\,\mathrm{A}``                                                           |
+| "kelvin"           | "K"          | 1                  | `BaseUnitExponents(K=1)`                   | ``1\,\mathrm{K}``                                                           |
+| "mol"              | "mol"        | 1                  | `BaseUnitExponents(mol=1)`                 | ``1\,\mathrm{mol}``                                                         |
+| "candela"          | "cd"         | 1                  | `BaseUnitExponents(cd=1)`                  | ``1\,\mathrm{cd}``                                                          |
+| "hertz"            | "Hz"         | 1                  | `BaseUnitExponents(s=-1)`                  | ``1\,\mathrm{s}^{-1}``                                                      |
+| "radian"           | "rad"        | 1                  | `BaseUnitExponents()`                      | ``1``                                                                       |
+| "steradian"        | "sr"         | 1                  | `BaseUnitExponents()`                      | ``1``                                                                       |
+| "newton"           | "N"          | 1                  | `BaseUnitExponents(kg=1, m=1, s=-2)`       | ``1\,\mathrm{kg}\,\mathrm{m}\,\mathrm{s}^{-2}``                             |
+| "pascal"           | "Pa"         | 1                  | `BaseUnitExponents(kg=1, m=-1, s=-2)`      | ``1\,\mathrm{kg}\,\mathrm{m}^{-1}\,\mathrm{s}^{-2}``                        |
+| "joule"            | "J"          | 1                  | `BaseUnitExponents(kg=1, m=2, s=-2)`       | ``1\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-2}``                           |
+| "watt"             | "W"          | 1                  | `BaseUnitExponents(kg=1, m=2, s=-3)`       | ``1\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-3}``                           |
+| "coulomb"          | "C"          | 1                  | `BaseUnitExponents(s=1, A=1)`              | ``1\,\mathrm{s}\,\mathrm{A}``                                               |
+| "volt"             | "V"          | 1                  | `BaseUnitExponents(kg=1, m=2, s=-3, A=-1)` | ``1\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-3}\,\mathrm{A}^{-1}``          |
+| "farad"            | "F"          | 1                  | `BaseUnitExponents(kg=-1, m=-2, s=4, A=2)` | ``1\,\mathrm{kg}^{-1}\,\mathrm{m}^{-2}\,\mathrm{s}^4\,\mathrm{A}^2``        |
+| "ohm"              | "Ω"          | 1                  | `BaseUnitExponents(kg=1, m=2, s=-3, A=-2)` | ``1\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-3}\,\mathrm{A}^{-2}``          |
+| "siemens"          | "S"          | 1                  | `BaseUnitExponents(kg=-1, m=-2, s=3, A=2)` | ``1\,\mathrm{kg}^{-1}\,\mathrm{m}^{-2}\,\mathrm{s}^3\,\mathrm{A}^2``        |
+| "weber"            | "W"          | 1                  | `BaseUnitExponents(kg=1, m=2, s=-2, A=-1)` | ``1\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-2}\,\mathrm{A}^{-1}``          |
+| "tesla"            | "T"          | 1                  | `BaseUnitExponents(kg=1, s=-2, A=-1)`      | ``1\,\mathrm{kg}\,\mathrm{s}^{-2}\,\mathrm{A}^{-1}``                        |
+| "henry"            | "H"          | 1                  | `BaseUnitExponents(kg=1, m=2, s=-2, A=-2)` | ``1\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-2}\,\mathrm{A}^{-2}``          |
+| "degreeCelsius"    | "°C"         | 1                  | `BaseUnitExponents(K=1)`                   | ``1\,\mathrm{K}``                                                           |
+| "lumen"            | "lm"         | 1                  | `BaseUnitExponents(cd=1)`                  | ``1\,\mathrm{cd}``                                                          |
+| "lux"              | "lx"         | 1                  | `BaseUnitExponents(m=-2, cd=1)`            | ``1\,\mathrm{m}^{-2}\,\mathrm{cd}``                                         |
+| "becquerel"        | "Bq"         | 1                  | `BaseUnitExponents(s=-1)`                  | ``1\,\mathrm{s}^{-1}``                                                      |
+| "gray"             | "Gy"         | 1                  | `BaseUnitExponents(m=2, s=-2)`             | ``1\,\mathrm{m}^2\,\mathrm{s}^{-2}``                                        |
+| "sievert"          | "Sv"         | 1                  | `BaseUnitExponents(m=2, s=-2)`             | ``1\,\mathrm{m}^2\,\mathrm{s}^{-2}``                                        |
+| "katal"            | "kat"        | 1                  | `BaseUnitExponents(s=-1, mol=1)`           | ``1\,\mathrm{s}^{-1}\,\mathrm{mol}``                                        |
+| "minute"           | "min"        | 60                 | `BaseUnitExponents(s=1)`                   | ``60\,\mathrm{s}``                                                          |
+| "hour"             | "h"          | 3600               | `BaseUnitExponents(s=1)`                   | ``3600\,\mathrm{s}``                                                        |
+| "day"              | "d"          | 86400              | `BaseUnitExponents(s=1)`                   | ``86400\,\mathrm{s}``                                                       |
+| "astronomicalUnit" | "au"         | 149597870700       | `BaseUnitExponents(m=1)`                   | ``149597870700\,\mathrm{m}``                                                |
+| "degree"           | "°"          | pi/180             | `BaseUnitExponents()`                      | ``\pi/180``                                                                 |
+| "arcminute"        | "'"          | pi/10800           | `BaseUnitExponents()`                      | ``\pi/10800``                                                               |
+| "arcsecond"        | "\""         | pi/648000          | `BaseUnitExponents()`                      | ``\pi/648000``                                                              |
+| "hectare"          | "ha"         | 1e4                | `BaseUnitExponents(m=2)`                   | ``10^4\,\mathrm{m}^2``                                                      |
+| "liter"            | "l"          | 1e-3               | `BaseUnitExponents(m=3)`                   | ``10^{-3}\,\mathrm{m}^3``                                                   |
+| "tonne"            | "t"          | 1e3                | `BaseUnitExponents(kg=1)`                  | ``10^3\,\mathrm{kg}``                                                       |
+| "dalton"           | "Da"         | 1.66053906660e-27  | `BaseUnitExponents(kg=1)`                  | ``1.66053906660 \times 10^{-27}\,\mathrm{kg}``                              |
+| "electronvolt"     | "eV"         | 1.602176634e-19    | `BaseUnitExponents(kg=1, m=2, s=-2)`       | ``1.602176634 \times 10^{-19}\,\mathrm{kg}\,\mathrm{m}^2\,\mathrm{s}^{-2}`` |
+| "angstrom"         | "Å"          | 1e-10              | `BaseUnitExponents(m=1)`                   | ``10^{-10}\,\mathrm{m}``                                                    |
+| "unitless"         | "<unitless>" | 1                  | `BaseUnitExponents()`                      | ``1``                                                                       |
+
+
 ```@meta
 DocTestSetup = nothing
 ```
