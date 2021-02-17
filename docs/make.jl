@@ -23,3 +23,7 @@ makedocs(
     authors  = "Daniel Hümmer",
     pages    = PAGES
 )
+
+deploydocs(
+    repo = "github.com/Huemmer-Daniel/Alicorn.jl.git",
+)
