@@ -21,48 +21,61 @@ SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
    the constructor method as follows:
-   ```@jldoctest
+   ```jldoctest
    julia> ucat = UnitCatalogue() ;
 
    julia> nanometer = ucat.nano * ucat.meter
    UnitFactor nm
+
    julia> quantity = SimpleQuantity(7, nanometer)
    7 nm
    ```
 2. Alternatively, ``7\,\mathrm{nm}`` can be constructed arithmetically:
-   ```@jldoctest
+   ```jldoctest
    julia> ucat = UnitCatalogue() ;
 
    julia> nanometer = ucat.nano * ucat.meter
    UnitFactor nm
+
    julia> quantity = 7 * nanometer
    7 nm
    ```
 3. The value can be of any type. Any mathematical operation included in the
    interface of [`AbstractQuantity`](@ref) is applied to the value field, and
    the unit is modified accordingly.
-   ```@jldoctest
+   ```jldoctest
    julia> ucat = UnitCatalogue() ;
 
    julia> nanometer = ucat.nano * ucat.meter
    UnitFactor nm
-   julia> quantity1 = [4; 5] * nanometer
-   SimpleQuantity{Array{Int64,1}} of unit nm
-   julia> quantity1 * transpose(quantity1)
-   41 nm^2
+
+   julia> quantity1 = [4 5] * nanometer
+   SimpleQuantity{Array{Int64,2}} of unit nm
+
+   julia> quantity1sqrd = quantity1 * transpose(quantity1)
+   SimpleQuantity{Array{Int64,2}} of unit nm^2
+
+   julia> quantity1sqrd.value
+   1×1 Array{Int64,2}:
+    41
    ```
    The responsibility to check that the resulting quantity is meaningful and
    supports arithemtic operations lies with the user. For example, Alicorn
    allows to assign a unit to a string. String concatenation with * or ^ results
-   in a corresponding change of the unit, while multiplication with a number
-   raises an exception since there is no corresponding method for strings.
-   ```@jldoctest; setup = :( ucat = UnitCatalogue(); nanometer = ucat.nano * ucat.meter )
+   in a corresponding change of the unit:
+   ```jldoctest; setup = :( ucat = UnitCatalogue(); nanometer = ucat.nano * ucat.meter )
    julia> quantity2 = "this is nonsense" * nanometer
    SimpleQuantity{String} of unit nm
+
    julia> quantity2sqrd = quantity2^2
    SimpleQuantity{String} of unit nm^2
+
    julia> quantity2sqrd.value
    "this is nonsensethis is nonsense"
+   ```
+   On the other hand, multiplication with a number
+   raises an exception since there is no corresponding method for strings.
+   ```
    julia> 2 * quantity2
    MethodError: no method matching *(::Int64, ::SimpleQuantity{String})
    [...]
@@ -90,15 +103,18 @@ The two quantities are equal if both their values and their units are equal.
 Note that the units are not converted during the comparison.
 
 # Examples
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue() ;
 
 julia> q1 = 7 * ucat.meter
 7 m
+
 julia> q2 = 700 * (ucat.centi * ucat.meter)
 700 cm
+
 julia> q1 == q1
 true
+
 julia> q1 == q2
 false
 ```
@@ -257,7 +273,7 @@ end
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
 # Example
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue() ;
 
 julia> 3.5 * ucat.tesla
@@ -274,7 +290,7 @@ end
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
 # Example
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue() ;
 
 julia> 3.5 / ucat.second

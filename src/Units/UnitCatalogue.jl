@@ -63,6 +63,7 @@ and base unit definitions is added to the `UnitCatalogue`.
    UnitCatalogue providing
     21 unit prefixes
     43 base units
+
    julia> nm = ucat.nano * ucat.meter
    UnitFactor nm
    ```
@@ -73,12 +74,15 @@ and base unit definitions is added to the `UnitCatalogue`.
    UnitCatalogue providing
     0 unit prefixes
     0 base units
+
    julia> nano = UnitPrefix(name="nano", symbol="n", value=1e-9)
    UnitPrefix nano (n) of value 1e-9
+
    julia> add!(ucat, nano)
    UnitCatalogue providing
     1 unit prefixes
     0 base units
+
    julia> ucat.nano
    UnitPrefix nano (n) of value 1e-9
    ```
@@ -155,11 +159,12 @@ its name using the dot notation.
 - `Base.KeyError`: if attempting to access a non-existent element
 
 # Examples
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue() ;
 
 julia> ucat.peta
 UnitPrefix peta (P) of value 1e+15
+
 julia> ucat.ohm
 BaseUnit ohm (1 Ω = 1 kg m^2 s^-3 A^-2)
 ```
@@ -214,7 +219,7 @@ their name.
 
 # Example
 
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue() ;
 
 julia> prefixes = listUnitPrefixes(ucat) ;
@@ -236,7 +241,7 @@ their name.
 
 # Example
 
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue() ;
 
 julia> baseUnits = listBaseUnits(ucat) ;

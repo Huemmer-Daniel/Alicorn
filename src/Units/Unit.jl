@@ -32,8 +32,10 @@ base (`UnitPrefix` and `BaseUnit`) are merged.
 
    julia> sqrtHz = UnitFactor(ucat.hertz, 1/2)
    UnitFactor Hz^5e-1
+
    julia> per_nm = UnitFactor(ucat.nano, ucat.meter, -1)
    UnitFactor nm^-1
+
    julia> sqrtHz_per_nm = Unit([sqrtHz, per_nm])
    Unit Hz^5e-1 nm^-1
    ```

@@ -85,6 +85,7 @@ Return the `Unit` corresponding to a `BaseUnitExponents` object.
 ```jldoctest
 julia> jouleExponents = BaseUnitExponents(kg=1, m=2, s=-2)
 BaseUnitExponents kg^1 m^2 s^-2 A^0 K^0 mol^0 cd^0
+
 julia> convertToUnit(jouleExponents)
 Unit kg m^2 s^-2
 ```
@@ -130,10 +131,13 @@ corresponds to exponentiating the corresponding unit with `number`.
 ```jldoctest
 julia> meterExps = BaseUnitExponents(m=1)
 BaseUnitExponents kg^0 m^1 s^0 A^0 K^0 mol^0 cd^0
+
 julia> convertToUnit(meterExps)
 Unit m
+
 julia> meterSqrdExps = 2 * meterExps
 BaseUnitExponents kg^0 m^2 s^0 A^0 K^0 mol^0 cd^0
+
 julia> convertToUnit(meterSqrdExps)
 Unit m^2
 ```
@@ -166,14 +170,19 @@ This operation corresponds to multiplying the two corresponding units.
 ```jldoctest
 julia> newtonExps = BaseUnitExponents(kg=1, m=1, s=-2)
 BaseUnitExponents kg^1 m^1 s^-2 A^0 K^0 mol^0 cd^0
+
 julia> convertToUnit(newtonExps)
 Unit kg m s^-2
+
 julia> meterExps = BaseUnitExponents(m=1)
 BaseUnitExponents kg^0 m^1 s^0 A^0 K^0 mol^0 cd^0
+
 julia> convertToUnit(meterExps)
 Unit m
+
 julia> jouleExps = newtonExps + meterExps
 BaseUnitExponents kg^1 m^2 s^-2 A^0 K^0 mol^0 cd^0
+
 julia> convertToUnit(jouleExps)
 Unit kg m^2 s^-2
 ```

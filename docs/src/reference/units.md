@@ -82,10 +82,13 @@ julia> ucat = UnitCatalogue() ;
 
 julia> kg = ucat.kilo * ucat.gram
 UnitFactor kg
+
 julia> nm2 = (ucat.nano * ucat.meter)^2
 UnitFactor nm^2
+
 julia> ps_2 = (ucat.pico * ucat.second)^-2
 UnitFactor ps^-2
+
 julia> kg * nm2 * ps_2
 Unit kg nm^2 ps^-2
 ```
@@ -239,7 +242,7 @@ remove!(::UnitCatalogue, ::String)
 
 Calling the [`UnitCatalogue`](@ref) constructor without arguments returns a catalogue
 that contains a default set of common units and prefixes used with the SI system:
-```@jldoctest
+```jldoctest
 julia> ucat = UnitCatalogue()
 UnitCatalogue providing
  21 unit prefixes
@@ -250,12 +253,12 @@ UnitCatalogue providing
 
 The default prefixes are listed in the following table. The corresponding
 [`UnitPrefix`](@ref) objects are constructed as
-```@jldoctest
+```jldoctest
 julia> yotta = UnitPrefix( name="yotta", symbol="Y", value=1e+24 )
 UnitPrefix yotta (Y) of value 1e+24
 ```
 and can be selected from the default [`UnitCatalogue`](@ref) by
-```@jldoctest, setup = :( ucat = UnitCatalogue() )
+```jldoctest; setup = :( ucat = UnitCatalogue() )
 julia> ucat.yotta
 UnitPrefix yotta (Y) of value 1e+24
 ```
@@ -289,12 +292,12 @@ and so on.
 
 The default named units are listed in the following table. The corresponding
 [`BaseUnit`](@ref) objects are constructed as
-```@jldoctest
+```jldoctest
 julia> gram = BaseUnit( name="gram", symbol="g", prefactor=1e-3, exponents=BaseUnitExponents(kg=1) )
 BaseUnit gram (1 g = 1e-3 kg)
 ```
 and can be selected from the default [`UnitCatalogue`](@ref) by
-```@jldoctest, setup = :( ucat = UnitCatalogue() )
+```jldoctest; setup = :( ucat = UnitCatalogue() )
 julia> ucat.gram
 BaseUnit gram (1 g = 1e-3 kg)
 ```

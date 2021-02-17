@@ -22,6 +22,7 @@ The method ultimately calls [`Base.:*(::Unit, ::Unit)`](@ref).
 ```jldoctest
 julia> kilogram = Alicorn.kilogram
 UnitFactor kg
+
 julia> kilogram * kilogram
 Unit kg^2
 ```
@@ -41,6 +42,7 @@ The method ultimately calls [`Base.:/(::Unit, ::Unit)`](@ref).
 ```jldoctest
 julia> kilogram = Alicorn.kilogram
 UnitFactor kg
+
 julia> kilogram / kilogram
 Unit <unitless>
 ```
