@@ -18,6 +18,11 @@ The Alicorn package serves a dual purpose:
 2. Handle physical quantities and correctly treat their units. This
    functionality is provided by the `Quantities` submodule.
 
+
+## Installation
+
+will follow shortly...
+
 ## Quick Start
 
 The listing below shows a minimal example of how to use Alicorn. Refer to the [Basic Usage](@ref) section for more details.
