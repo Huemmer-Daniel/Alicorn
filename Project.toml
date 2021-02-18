@@ -1,7 +1,7 @@
 name = "Alicorn"
 uuid = "80a53053-bcf5-42c0-89b5-2140b4d6711b"
 authors = ["Daniel Hümmer <daniel.huemmer@gmx.com> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [compat]
 julia = "1.5"
