@@ -11,13 +11,12 @@
 [![Documentation stable][docs-stable-badge]][docs-stable-url]
 [![Documentation development][docs-dev-badge]][docs-dev-url]
 
-The Alicorn package serves a dual purpose:
+The `Alicorn.jl` package serves a dual purpose:
 1. Dynamically define and combine physical units based on the
    [International System of Units (SI)](https://www.bipm.org/en/publications/si-brochure/).
    This functionality is provided by the `Units` submodule.
 2. Handle physical quantities and correctly treat their units. This
    functionality is provided by the `Quantities` submodule.
-
 
 ## Installation
 
@@ -45,6 +44,9 @@ julia> inUnitsOf(force, ucat.kilo * ucat.newton)
 0.02 kN
 ```
 
+## Alternative
+
+If you are interested in Alicorn, also have a look at the mature [`Unitful.jl`](https://github.com/PainterQubits/Unitful.jl) package. `Unitful.jl` offers functionalities similar to `Alicorn.jl`, and more.
 
 [build-status-badge]: https://github.com/Huemmer-Daniel/Alicorn/workflows/build/badge.svg
 [build-status-url]: https://github.com/Huemmer-Daniel/Alicorn/actions
