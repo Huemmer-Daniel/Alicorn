@@ -40,6 +40,8 @@ export SimpleQuantity
 export inUnitsOf
 export inBasicSIUnits
 
+export InternalUnits
+
 include("PrettyPrinting/PrettyPrinting.jl")
 
 end # module
