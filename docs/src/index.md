@@ -26,6 +26,15 @@ all types, methods, and constants that form the public API of Alicorn.
 * New units can be **dynamically defined during runtime**, no manipulation of
   source files or configuration files is required
 
+## Installation
+
+The `Alicorn.jl` package is registered in the [General Julia registry](https://github.com/JuliaRegistries/General) and can be installed using Julia's package manager [`Pkg.jl`](https://julialang.github.io/Pkg.jl/): In the Julia REPL, add Alicorn to your default Julia environment by running
+```
+julia> ]
+
+pkg> add Alicorn
+```
+
 ## Quick Start
 
 The listing below shows a minimal example of how to use Alicorn. Refer to the [Basic Usage](@ref) section for more details.

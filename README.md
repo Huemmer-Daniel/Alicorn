@@ -20,7 +20,12 @@ The `Alicorn.jl` package serves a dual purpose:
 
 ## Installation
 
-will follow shortly...
+The `Alicorn.jl` package is registered in the [General Julia registry](https://github.com/JuliaRegistries/General) and can be installed using Julia's package manager [`Pkg.jl`](https://julialang.github.io/Pkg.jl/): In the Julia REPL, add Alicorn to your default Julia environment by running
+```
+julia> ]
+
+pkg> add Alicorn
+```
 
 ## Quick Start
 
