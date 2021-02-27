@@ -49,8 +49,8 @@ end
 
 function generateRandomNonzeroReal(; dim = 1)
     randomReal = 0
-    while randomReal == 0
-        randomReal = generateRandomReal()
+    while prod(randomReal) == 0
+        randomReal = generateRandomReal(dim=dim)
     end
     return randomReal
 end
@@ -281,6 +281,65 @@ function generateRandomSimpleQuantityWithFields()
     randomSimpleQuantity = SimpleQuantity(randomValue, randomUnit)
 
     return (randomSimpleQuantity, randomFields)
+end
+
+function generateRandomInternalUnits()
+    (randomInternalUnits,) = generateRandomInternalUnitsWithFields()
+    return randomInternalUnits
+end
+
+function generateRandomInternalUnitsWithFields()
+    ucat = UnitCatalogue()
+    randomMassUnit = generateRandomNonzeroReal() * (ucat.nano * ucat.gram)
+    randomLengthUnit = generateRandomNonzeroReal() * (ucat.deci * ucat.meter)
+    randomTimeUnit = generateRandomNonzeroReal() * (ucat.milli * ucat.second)
+    randomCurrentUnit = generateRandomNonzeroReal() * (ucat.tera * ucat.ampere)
+    randomTemperatureUnit = generateRandomNonzeroReal() * (ucat.deca * ucat.kelvin)
+    randomAmountUnit = generateRandomNonzeroReal() * (ucat.kilo * ucat.mol)
+    randomLuminousIntensityUnit = generateRandomNonzeroReal() * (ucat.micro * ucat.candela)
+
+    randomFields = Dict([
+        ("massUnit", randomMassUnit),
+        ("lengthUnit", randomLengthUnit),
+        ("timeUnit", randomTimeUnit),
+        ("currentUnit", randomCurrentUnit),
+        ("temperatureUnit", randomTemperatureUnit),
+        ("amountUnit", randomAmountUnit),
+        ("luminousIntensityUnit", randomLuminousIntensityUnit)
+    ])
+
+    randomInternalUnits = InternalUnits(randomMassUnit, randomLengthUnit, randomTimeUnit, randomCurrentUnit, randomTemperatureUnit, randomAmountUnit, randomLuminousIntensityUnit)
+
+    return (randomInternalUnits, randomFields)
+end
+
+function generateRandomDimension()
+    (randomDimension,) = generateRandomDimenionWithFields()
+    return randomDimension
+end
+
+function generateRandomDimenionWithFields()
+    randomFields = generateRandomDimensionFields()
+    randomDimension = Dimension(
+        length = randomFields["length"],
+        mass = randomFields["mass"],
+        time = randomFields["time"],
+        current = randomFields["current"],
+        temperature = randomFields["temperature"],
+        amount = randomFields["amount"],
+        luminousIntensity = randomFields["luminousIntensity"]
+    )
+    return (randomDimension, randomFields)
+end
+
+function generateRandomDimensionFields()
+    coreDimensions = _getCoreDimensions()
+    randExponents = generateRandomExponent(dim = 7)
+    return Dict( zip(coreDimensions, randExponents) )
+end
+
+function _getCoreDimensions()
+    return ["mass", "length", "time", "current", "temperature", "amount", "luminousIntensity"]
 end
 
 end # module

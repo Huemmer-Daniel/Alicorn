@@ -50,6 +50,20 @@ Base.:(==)(::SimpleQuantity, ::SimpleQuantity)
 Base.:*(::Any, ::AbstractUnit)
 Base.:/(::Any, ::AbstractUnit)
 ```
+## Dimension
+
+```@docs
+Dimension
+Base.:*(::Number, ::Dimension)
+Base.:+(::Dimension, ::Dimension)
+```
+
+## InternalUnits
+
+```@docs
+InternalUnits
+```
+
 
 ```@meta
 DocTestSetup = nothing

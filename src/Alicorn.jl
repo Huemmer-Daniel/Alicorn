@@ -40,7 +40,10 @@ export SimpleQuantity
 export inUnitsOf
 export inBasicSIUnits
 
+export Dimension
 export InternalUnits
+
+export Dimens # TODO
 
 include("PrettyPrinting/PrettyPrinting.jl")
 

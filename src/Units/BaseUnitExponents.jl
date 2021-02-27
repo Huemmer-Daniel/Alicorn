@@ -195,7 +195,7 @@ function Base.:+(baseUnitExponents1::BaseUnitExponents, baseUnitExponents2::Base
         A = baseUnitExponents1.ampereExponent + baseUnitExponents2.ampereExponent,
         K = baseUnitExponents1.kelvinExponent + baseUnitExponents2.kelvinExponent,
         mol = baseUnitExponents1.molExponent + baseUnitExponents2.molExponent,
-        cd = baseUnitExponents1.candelaExponent + baseUnitExponents2.candelaExponent,
+        cd = baseUnitExponents1.candelaExponent + baseUnitExponents2.candelaExponent
     )
     return resultingExponents
 end
