@@ -4,16 +4,22 @@ export BaseUnitExponents
 @doc raw"""
     BaseUnitExponents
 
-Collection of powers exponentiating each of the seven SI basic units. The [`BaseUnit`](@ref) type uses `BaseUnitExponents` to define named units in terms of the basic units.
+Collection of powers exponentiating each of the seven SI basic units.
+
+The exponents ``(a, b, c, d, e, f, g)`` are interpreted as the powers to which the seven SI basic units are raised:
+```math
+\mathrm{kg}^a \, \mathrm{m}^b \, \mathrm{s}^c \, \mathrm{A}^d \, \mathrm{K}^e \, \mathrm{mol}^f \, \mathrm{cd}^g.
+```
+The [`BaseUnit`](@ref) type uses `BaseUnitExponents` to define named units in terms of the basic units.
 
 # Fields
-- `kilogramExponent::Real`
-- `meterExponent::Real`
-- `secondExponent::Real`
-- `ampereExponent::Real`
-- `kelvinExponent::Real`
-- `molExponent::Real`
-- `candelaExponent::Real`
+- `kilogramExponent::Real`: power ``a`` of kilogram
+- `meterExponent::Real`: power ``b`` of meter
+- `secondExponent::Real`: power ``c`` of second
+- `ampereExponent::Real`: power ``d`` of ampere
+- `kelvinExponent::Real`: power ``e`` of kelvin
+- `molExponent::Real`: power ``f`` of mol
+- `candelaExponent::Real`: power ``g`` of candela
 
 # Constructor
 ```

@@ -41,9 +41,9 @@ export inUnitsOf
 export inBasicSIUnits
 
 export Dimension
-export InternalUnits
+export dimensionOf
 
-export Dimens # TODO
+export InternalUnits
 
 include("PrettyPrinting/PrettyPrinting.jl")
 

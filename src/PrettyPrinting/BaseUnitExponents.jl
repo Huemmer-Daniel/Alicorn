@@ -12,7 +12,7 @@ function _generateLongStringRepresentation(baseUnitExp::BaseUnitExponents)
     exponents = _getExponentsAsArray(baseUnitExp)
     prettyString = ""
     for exp in exponents
-        prettyString = _addLongPrettyFactor(prettyString, exp)
+        prettyString = _addLongPrettyFactor_BaseUnitExponents(prettyString, exp)
     end
     return prettyString
 end
@@ -30,7 +30,7 @@ function _getExponentsAsArray(baseUnitExp::BaseUnitExponents)
     return exponents
 end
 
-function _addLongPrettyFactor(prettyString::String, exp::Tuple)
+function _addLongPrettyFactor_BaseUnitExponents(prettyString::String, exp::Tuple)
     (symbol, exponent) = exp
 
     expString = prettyPrintScientificNumber(exponent, sigdigits=2)

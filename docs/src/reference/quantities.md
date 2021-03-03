@@ -56,6 +56,8 @@ Base.:/(::Any, ::AbstractUnit)
 Dimension
 Base.:*(::Number, ::Dimension)
 Base.:+(::Dimension, ::Dimension)
+dimensionOf(::AbstractUnit)
+dimensionOf(::AbstractQuantity)
 ```
 
 ## InternalUnits

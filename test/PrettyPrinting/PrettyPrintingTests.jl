@@ -16,7 +16,8 @@ function run()
         @test unitPrettyPrinting()
 
         @test simpleQuantityPrettyPrinting()
-        end
+        @test dimensionPrettyPrinting()
+    end
 end
 
 ## Numbers
@@ -213,6 +214,27 @@ function _getSimpleQuantityExamples()
         # array
         ( SimpleQuantity( array, unit ), "SimpleQuantity{$typeofArray} of unit kg^3.1 TH^-2" )
     ]
+end
+
+## Dimension
+
+function dimensionPrettyPrinting()
+    examples = _getDimensionExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getDimensionExamples()
+    examples = [
+    ( Dimension(), "Dimension M^0 L^0 T^0 I^0 θ^0 N^0 J^0"),
+    ( Dimension(M=1), "Dimension M^1 L^0 T^0 I^0 θ^0 N^0 J^0"),
+    ( Dimension(L=2), "Dimension M^0 L^2 T^0 I^0 θ^0 N^0 J^0"),
+    ( Dimension(L=2, T=1.554), "Dimension M^0 L^2 T^1.6 I^0 θ^0 N^0 J^0"),
+    ( Dimension(T=1.554, I=pi), "Dimension M^0 L^0 T^1.6 I^3.1 θ^0 N^0 J^0"),
+    ( Dimension(T=1.554, I=pi, θ=-1), "Dimension M^0 L^0 T^1.6 I^3.1 θ^-1 N^0 J^0"),
+    ( Dimension(T=1.554, N=pi, θ=-1), "Dimension M^0 L^0 T^1.6 I^0 θ^-1 N^3.1 J^0"),
+    ( Dimension(J=-70), "Dimension M^0 L^0 T^0 I^0 θ^0 N^0 J^-7e+1")
+    ]
+    return examples
 end
 
 end # module

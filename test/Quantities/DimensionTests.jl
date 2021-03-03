@@ -16,13 +16,16 @@ function run()
 
         @test Number_Dimension_multiplication_implemented()
         @test addition_implemented()
+
+        @test dimensionOf_implementedForUnits()
+        @test dimensionOf_implementedForQuantities()
     end
 end
 
 function canInstanciateDimension()
     pass = false
     try
-        Dimension(length=1, mass=2, time=3, current=4, temperature=5, amount=6, luminousIntensity=7)
+        Dimension(L=1, M=2, T=3, I=4, θ=5, N=6, J=7)
         pass = true
     catch
     end
@@ -48,13 +51,13 @@ function _getExamplesFor_Dimension_ErrorsOnInfiniteArguments()
 end
 
 function _testExamplesFor_Dimension_ErrorsOnInfiniteArguments(invalidExponents::Dict{String,Real})
-    @test_throws DomainError(invalidExponents["mass"], "argument must be finite") Dimension(mass=invalidExponents["mass"])
-    @test_throws DomainError(invalidExponents["length"], "argument must be finite") Dimension(mass=invalidExponents["length"])
-    @test_throws DomainError(invalidExponents["time"], "argument must be finite") Dimension(mass=invalidExponents["time"])
-    @test_throws DomainError(invalidExponents["current"], "argument must be finite") Dimension(mass=invalidExponents["current"])
-    @test_throws DomainError(invalidExponents["temperature"], "argument must be finite") Dimension(mass=invalidExponents["temperature"])
-    @test_throws DomainError(invalidExponents["amount"], "argument must be finite") Dimension(mass=invalidExponents["amount"])
-    @test_throws DomainError(invalidExponents["luminousIntensity"], "argument must be finite") Dimension(mass=invalidExponents["luminousIntensity"])
+    @test_throws DomainError(invalidExponents["mass"], "argument must be finite") Dimension(M=invalidExponents["mass"])
+    @test_throws DomainError(invalidExponents["length"], "argument must be finite") Dimension(M=invalidExponents["length"])
+    @test_throws DomainError(invalidExponents["time"], "argument must be finite") Dimension(M=invalidExponents["time"])
+    @test_throws DomainError(invalidExponents["current"], "argument must be finite") Dimension(M=invalidExponents["current"])
+    @test_throws DomainError(invalidExponents["temperature"], "argument must be finite") Dimension(M=invalidExponents["temperature"])
+    @test_throws DomainError(invalidExponents["amount"], "argument must be finite") Dimension(M=invalidExponents["amount"])
+    @test_throws DomainError(invalidExponents["luminousIntensity"], "argument must be finite") Dimension(M=invalidExponents["luminousIntensity"])
 end
 
 function Dimension_FieldsCorrectlyInitialized()
@@ -74,7 +77,7 @@ function _verifyHasCorrectFields(dimension::Dimension, randFields::Dict)
 end
 
 function Dimension_TriesCastingExponentsToInt()
-    dimension = Dimension(length=1.0, mass=2.0, time=3.0, current=4.0, temperature=5.0, amount=6.0, luminousIntensity=7.0)
+    dimension = Dimension(L=1.0, M=2.0, T=3.0, I=4.0, θ=5.0, N=6.0, J=7.0)
 
     pass = isa(dimension.lengthExponent, Int)
     pass &= isa(dimension.massExponent, Int)
@@ -96,13 +99,13 @@ end
 
 function _initializeDimensionFromDict(fields::Dict)
     dimension = Dimension(
-        length = fields["length"],
-        mass = fields["mass"],
-        time = fields["time"],
-        current = fields["current"],
-        temperature = fields["temperature"],
-        amount = fields["amount"],
-        luminousIntensity = fields["luminousIntensity"]
+        L = fields["length"],
+        M = fields["mass"],
+        T = fields["time"],
+        I = fields["current"],
+        θ = fields["temperature"],
+        N = fields["amount"],
+        J = fields["luminousIntensity"]
     )
     return dimension
 end
@@ -135,13 +138,13 @@ end
 
 function _getExamplesFor_Number_Dimension_multiplication()
     examples = [
-        ( 3, Dimension(mass=1), Dimension(mass=3) ),
-        ( 3, Dimension(length=2), Dimension(length=6) ),
-        ( 3, Dimension(time=-2), Dimension(time=-6) ),
-        ( 3, Dimension(current=2, time=-2), Dimension(current=6, time=-6) ),
-        ( 3, Dimension(temperature=5), Dimension(temperature=15) ),
-        ( -1, Dimension(amount=-1), Dimension(amount=1) ),
-        ( Dimension(luminousIntensity=2), 2, Dimension(luminousIntensity=4) )
+        ( 3, Dimension(M=1), Dimension(M=3) ),
+        ( 3, Dimension(L=2), Dimension(L=6) ),
+        ( 3, Dimension(T=-2), Dimension(T=-6) ),
+        ( 3, Dimension(I=2, T=-2), Dimension(I=6, T=-6) ),
+        ( 3, Dimension(θ=5), Dimension(θ=15) ),
+        ( -1, Dimension(N=-1), Dimension(N=1) ),
+        ( Dimension(J=2), 2, Dimension(J=4) )
     ]
     return examples
 end
@@ -152,15 +155,76 @@ function addition_implemented()
 end
 
 function _getExamplesFor_addition()
-examples = [
-    ( Dimension(mass=1), Dimension(mass=1, length=2), Dimension(mass=2, length=2) ),
-    ( Dimension(length=2), Dimension(length=-2), Dimension(length=0) ),
-    ( Dimension(time=-2), Dimension(time=1), Dimension(time=-1) ),
-    ( Dimension(current=-2), Dimension(current=7), Dimension(current=5) ),
-    ( Dimension(amount=-2), Dimension(amount=7), Dimension(amount=5) ),
-    ( Dimension(luminousIntensity=3, amount=-2), Dimension(amount=7, luminousIntensity=-1), Dimension(amount=5, luminousIntensity=2) )
-]
-return examples
+    examples = [
+        ( Dimension(M=1), Dimension(M=1, L=2), Dimension(M=2, L=2) ),
+        ( Dimension(L=2), Dimension(L=-2), Dimension(L=0) ),
+        ( Dimension(T=-2), Dimension(T=1), Dimension(T=-1) ),
+        ( Dimension(I=-2), Dimension(I=7), Dimension(I=5) ),
+        ( Dimension(N=-2), Dimension(N=7), Dimension(N=5) ),
+        ( Dimension(J=3, N=-2), Dimension(N=7, J=-1), Dimension(N=5, J=2) )
+    ]
+    return examples
+end
+
+function dimensionOf_implementedForUnits()
+    examples = _getExamplesFor_dimensionOf_forUnits()
+    return TestingTools.testMonadicFunction(dimensionOf, examples)
+end
+
+struct MockUnitForDimension <: AbstractUnit
+    unitFactor::UnitFactor
+end
+
+function Alicorn.Units.convertToUnit(mockUnit::MockUnitForDimension)
+    return convertToUnit(mockUnit.unitFactor)
+end
+
+function _getExamplesFor_dimensionOf_forUnits()
+    ucat = UnitCatalogue()
+
+    # format: object of type AbstractUnit, corresponding Dimension
+    examples = [
+        # BaseUnit
+        ( Alicorn.unitlessBaseUnit, Dimension( ) ),
+        ( ucat.joule, Dimension( M=1, L=2, T=-2 ) ),
+        # UnitFactor
+        ( Alicorn.unitlessUnitFactor, Dimension( ) ),
+        ( ucat.tera * ucat.farad, Dimension( M=-1, L=-2, T=4, I=2 ) ),
+        # Unit
+        ( Alicorn.unitlessUnit, Dimension( ) ),
+        ( (ucat.nano * ucat.siemens) / ucat.mol * ucat.candela^2 * ucat.kelvin^-3, Dimension( M=-1, L=-2, T=3, I=2, N=-1, J=2, θ=-3 ) ),
+        # AbstractUnit
+        ( MockUnitForDimension( (ucat.nano * ucat.siemens) ), Dimension( M=-1, L=-2, T=3, I=2 ) ),
+    ]
+    return examples
+end
+
+function dimensionOf_implementedForQuantities()
+    examples = _getExamplesFor_dimensionOf_forQuantities()
+    return TestingTools.testMonadicFunction(dimensionOf, examples)
+end
+
+struct MockQuantityForDimension <: AbstractQuantity
+    unit::Unit
+end
+
+function Alicorn.Quantities.inBasicSIUnits(mockQuantity::MockQuantityForDimension)
+    mockUnit = mockQuantity.unit
+    return 1 * mockUnit
+end
+
+function _getExamplesFor_dimensionOf_forQuantities()
+    ucat = UnitCatalogue()
+
+    # format: object of type AbstractQuantity, corresponding Dimension
+    examples = [
+        # SimpleQuantity
+        ( 1 * Alicorn.unitlessUnit, Dimension() ),
+        ( 1 * ucat.henry, Dimension(M=1, L=2, T=-2, I=-2) ),
+        # AbstractQuantity
+        ( MockQuantityForDimension( Unit(ucat.henry) ), Dimension(M=1, L=2, T=-2, I=-2)  )
+    ]
+    return examples
 end
 
 end # module

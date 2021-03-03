@@ -321,13 +321,13 @@ end
 function generateRandomDimenionWithFields()
     randomFields = generateRandomDimensionFields()
     randomDimension = Dimension(
-        length = randomFields["length"],
-        mass = randomFields["mass"],
-        time = randomFields["time"],
-        current = randomFields["current"],
-        temperature = randomFields["temperature"],
-        amount = randomFields["amount"],
-        luminousIntensity = randomFields["luminousIntensity"]
+        L = randomFields["length"],
+        M = randomFields["mass"],
+        T = randomFields["time"],
+        I = randomFields["current"],
+        θ = randomFields["temperature"],
+        N = randomFields["amount"],
+        J = randomFields["luminousIntensity"]
     )
     return (randomDimension, randomFields)
 end
