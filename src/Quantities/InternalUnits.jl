@@ -1,3 +1,5 @@
+using ..Exceptions
+
 export InternalUnits
 @doc raw"""
 TODO
@@ -30,10 +32,7 @@ function _verifyArguments(internalUnits::Tuple)
     _assertQuantitiesAreReals(internalUnits)
     _assertQuantitiesAreFinite(internalUnits)
     _assertQuantitiesAreNonzero(internalUnits)
-end
-
-function _assertValidNrOfArgs(internalUnits::Tuple)
-    # TODO
+    _assertQuantitiesHaveCorrectDimension(internalUnits)
 end
 
 function _assertQuantitiesAreReals(internalUnits::Tuple)
@@ -74,6 +73,34 @@ function _assertQuantityIsNonzero(quantity::SimpleQuantity)
     value = quantity.value
     if value == 0
         error = Core.DomainError("the values of internal units need to be nonzero")
+        throw(error)
+    end
+end
+
+function _assertQuantitiesHaveCorrectDimension(internalUnits::Tuple)
+    correctDimensions = _getCorrectDimensions()
+    for (internalUnit, correctDimension) in zip(internalUnits, correctDimensions)
+        _assertQuantityHasCorrectDimension(internalUnit, correctDimension)
+    end
+end
+
+function _getCorrectDimensions()
+    correctDimensions = (
+        Dimension(M=1),
+        Dimension(L=1),
+        Dimension(T=1),
+        Dimension(I=1),
+        Dimension(θ=1),
+        Dimension(N=1),
+        Dimension(J=1)
+    )
+    return correctDimensions
+end
+
+function _assertQuantityHasCorrectDimension(quantity::SimpleQuantity, correctDimension::Dimension)
+    actualDimension = dimensionOf(quantity)
+    if actualDimension != correctDimension
+        error = Exceptions.DimensionMismatchError("the specified internal unit has the wrong physical dimension")
         throw(error)
     end
 end

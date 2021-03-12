@@ -66,6 +66,11 @@ dimensionOf(::AbstractQuantity)
 InternalUnits
 ```
 
+## Quantity
+
+```@docs
+Quantity
+```
 
 ```@meta
 DocTestSetup = nothing

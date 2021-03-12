@@ -45,6 +45,8 @@ export dimensionOf
 
 export InternalUnits
 
+export Quantity
+
 include("PrettyPrinting/PrettyPrinting.jl")
 
 end # module

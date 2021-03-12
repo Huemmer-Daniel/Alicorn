@@ -17,6 +17,7 @@ function run()
 
         @test simpleQuantityPrettyPrinting()
         @test dimensionPrettyPrinting()
+        @test InternalUnits_PrettyPrinting()
     end
 end
 
@@ -235,6 +236,21 @@ function _getDimensionExamples()
     ( Dimension(J=-70), "Dimension M^0 L^0 T^0 I^0 θ^0 N^0 J^-7e+1")
     ]
     return examples
+end
+
+## Internal Units
+
+function InternalUnits_PrettyPrinting()
+    examples = _getInternalUnitsExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getInternalUnitsExamples()
+    ucat = UnitCatalogue()
+    examples = [
+    ( InternalUnits(mass=1*ucat.gram, length=2*ucat.meter, time=3*ucat.second, current=4*ucat.ampere, temperature=5*ucat.kelvin, amount=6*ucat.mol, luminousIntensity=7*ucat.candela ),
+     "InternalUnits\n mass unit:               1 g\n length unit:             2 m\n time unit:               3 s\n current unit:            4 A\n temperature unit:        5 K\n amount unit:             6 mol\n luminous intensity unit: 7 cd" )
+    ]
 end
 
 end # module

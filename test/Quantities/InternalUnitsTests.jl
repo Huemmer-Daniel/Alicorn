@@ -133,7 +133,21 @@ function _getExamplesFor_InternalUnits_ErrorsIfInternalUnitsZero()
 end
 
 function InternalUnits_ErrorsIfInternalUnitsWrongDimension()
-    @test_skip false
+    invalidUnits = _getExamplesFor_InternalUnits_ErrorsIfInternalUnitsWrongDimension()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("the specified internal unit has the wrong physical dimension")
+    _testExamplesFor_InternalUnits_Errors(invalidUnits, expectedError)
+end
+
+function _getExamplesFor_InternalUnits_ErrorsIfInternalUnitsWrongDimension()
+    invalidUnits = Dict{String, SimpleQuantity}()
+    invalidUnits["mass"] = 1 * Alicorn.candela
+    invalidUnits["length"] = 1 * Alicorn.gram
+    invalidUnits["time"] = 1 * Alicorn.meter
+    invalidUnits["current"] = 1 * Alicorn.second
+    invalidUnits["temperature"] = 1 * Alicorn.ampere
+    invalidUnits["amount"] = 1 * Alicorn.kelvin
+    invalidUnits["luminousIntensity"] = 1 * Alicorn.mol
+    return invalidUnits
 end
 
 end # module

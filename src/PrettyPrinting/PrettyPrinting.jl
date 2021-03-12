@@ -21,5 +21,6 @@ include("Unit.jl")
 
 include("SimpleQuantity.jl")
 include("Dimension.jl")
+include("InternalUnits.jl")
 
 end # module

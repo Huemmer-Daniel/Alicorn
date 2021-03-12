@@ -9,5 +9,6 @@ include("SimpleQuantity.jl")
 
 include("Dimension.jl")
 include("InternalUnits.jl")
+include("Quantity.jl")
 
 end
