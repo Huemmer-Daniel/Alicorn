@@ -37,6 +37,7 @@ using .Quantities
 
 export AbstractQuantity
 export SimpleQuantity
+export valueOfUnitless
 export inUnitsOf
 export inBasicSIUnits
 

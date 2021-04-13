@@ -46,6 +46,7 @@ Base.transpose(::AbstractQuantity)
 
 ```@docs
 SimpleQuantity
+valueOfUnitless(::SimpleQuantity)
 Base.:(==)(::SimpleQuantity, ::SimpleQuantity)
 Base.:*(::Any, ::AbstractUnit)
 Base.:/(::Any, ::AbstractUnit)

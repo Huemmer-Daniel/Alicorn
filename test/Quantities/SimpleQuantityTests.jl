@@ -10,9 +10,12 @@ function run()
     @testset "SimpleQuantity" begin
         # initialization
         @test canInstanciateSimpleQuantityWithRealValue()
+        @test canInstanciateSimpleQuantityWithComplexValue()
         @test canInstanciateSimpleQuantityWithRealValuedArray()
+        @test canInstanciateSimpleQuantityWithComplexValuedArray()
         @test canInstanciateSimpleQuantityWithBaseUnit()
         @test canInstanciateSimpleQuantityWithUnitFactor()
+        @test canInstanciateSimpleQuantityWithoutUnit()
 
         @test fieldsCorrectlyInitialized()
 
@@ -27,6 +30,7 @@ function run()
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
         @test inBasicSIUnits_implemented()
+        @test valueOfUnitless_implemented()
 
         # arithmetics
         @test equality_implemented()
@@ -61,11 +65,24 @@ function _testInstanciation(value, unit::AbstractUnit)
     return pass
 end
 
+function canInstanciateSimpleQuantityWithComplexValue()
+    value = TestingTools.generateRandomComplex()
+    unit = TestingTools.generateRandomUnit()
+    return _testInstanciation(value, unit)
+end
+
 function canInstanciateSimpleQuantityWithRealValuedArray()
     value = TestingTools.generateRandomReal(dim=(2,3))
     unit = TestingTools.generateRandomUnit()
     return _testInstanciation(value, unit)
 end
+
+function canInstanciateSimpleQuantityWithComplexValuedArray()
+    value = TestingTools.generateRandomComplex(dim=(2,3))
+    unit = TestingTools.generateRandomUnit()
+    return _testInstanciation(value, unit)
+end
+
 
 function canInstanciateSimpleQuantityWithBaseUnit()
     value = TestingTools.generateRandomReal()
@@ -79,6 +96,14 @@ function canInstanciateSimpleQuantityWithUnitFactor()
     return _testInstanciation(value, unitFactor)
 end
 
+function canInstanciateSimpleQuantityWithoutUnit()
+    value = TestingTools.generateRandomReal()
+    returnedSimpleQuantity = SimpleQuantity(value)
+    correctSimpleQuantity = SimpleQuantity(value, Alicorn.unitlessUnit)
+    pass = (returnedSimpleQuantity == correctSimpleQuantity)
+    return pass
+end
+
 function fieldsCorrectlyInitialized()
     (randomSimpleQuantity, randomSimpleQuantityFields) = TestingTools.generateRandomSimpleQuantityWithFields()
     return _verifyHasCorrectFields(randomSimpleQuantity, randomSimpleQuantityFields)
@@ -89,6 +114,19 @@ function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, randomFields::D
     correctUnit = (simpleQuantity.unit == randomFields["unit"])
     correct = correctValue && correctUnit
     return correct
+end
+
+function valueOfUnitless_implemented()
+    simpleQuantity = SimpleQuantity(7)
+    returnedValue = valueOfUnitless(simpleQuantity)
+    pass = (returnedValue == 7)
+    return pass
+end
+
+function valueOfUnitless_ErrorsIfNotUnitless()
+    simpleQuantity = 7 * Alicorn.meter
+    expectedError = Alicorn.Exceptions.UnitMismatchError("quantity is not unitless")
+    @test_throws expectedError valueOfUnitless(simpleQuantity)
 end
 
 function equality_implemented()
@@ -235,7 +273,8 @@ end
 function test_inUnitsOf_ErrorsForMismatchedUnits()
     simpleQuantity = 7 * Alicorn.meter
     mismatchedUnit = Alicorn.second
-    @test_throws Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree") inUnitsOf(simpleQuantity, mismatchedUnit)
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError inUnitsOf(simpleQuantity, mismatchedUnit)
 end
 
 function inBasicSIUnits_implemented()

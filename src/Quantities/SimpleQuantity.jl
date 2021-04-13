@@ -16,7 +16,10 @@ implements the `AbstractQuantity` interface and hence assumes that the type
 # Constructor
 ```
 SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T
+SimpleQuantity(value::T) where T
 ```
+
+If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is used by default.
 
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
@@ -90,6 +93,14 @@ mutable struct SimpleQuantity{T} <: AbstractQuantity
         simpleQuantity = new{typeof(value)}(value, unit)
         return simpleQuantity
     end
+end
+
+## External constructors
+
+function SimpleQuantity(value::T) where T
+    unit = unitlessUnit
+    simpleQuantity = SimpleQuantity(value, unit)
+    return simpleQuantity
 end
 
 ## Methods implementing the interface of AbstractQuantity
@@ -266,6 +277,28 @@ function Base.transpose(simpleQuantity::SimpleQuantity)
 end
 
 ## Methods
+
+export valueOfUnitless
+"""
+    valueOfUnitless(simpleQuantity::SimpleQuantity)
+
+Strips `Alicorn.unitlessUnit` from the quantity and returns the bare value `simpleQuantity.value`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.UnitMismatchError`: if the unit of `simpleQuantity` is not `Alicorn.unitlessUnit`
+"""
+function valueOfUnitless(simpleQuantity::SimpleQuantity)
+    _assertIsUnitless(simpleQuantity)
+    value = simpleQuantity.value
+    return value
+end
+
+function _assertIsUnitless(simpleQuantity)
+    unit = simpleQuantity.unit
+    if !(unit == unitlessUnit)
+        throw(Exceptions.UnitMismatchError("quantity is not unitless"))
+    end
+end
 
 """
     Base.:*(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity

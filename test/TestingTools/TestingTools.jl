@@ -55,6 +55,12 @@ function generateRandomNonzeroReal(; dim = 1)
     return randomReal
 end
 
+function generateRandomComplex(; dim = 1)
+    realPart = generateRandomReal(dim = dim)
+    imagPart = generateRandomReal(dim = dim)
+    return realPart + im .* imagPart
+end
+
 function generateRandomExponent(; dim = 1)
     randomExponent = generateRandomReal(dim=dim)
     randomExponent = Alicorn.Utils.tryCastingToInt(randomExponent)
@@ -340,6 +346,29 @@ end
 
 function _getCoreDimensions()
     return ["mass", "length", "time", "current", "temperature", "amount", "luminousIntensity"]
+end
+
+function generateRandomQuantityWithFields()
+    randomFields = generateRandomQuantityFields()
+    randomQuantity = Quantity(
+        randomFields["value"],
+        randomFields["dimension"],
+        randomFields["internalUnits"]
+    )
+    return (randomQuantity, randomFields)
+end
+
+function generateRandomQuantityFields()
+    randomValue = generateRandomReal()
+    randomDimension = generateRandomDimension()
+    randomInternalUnits = generateRandomInternalUnits()
+
+    randomFields = Dict([
+        ("value", randomValue),
+        ("dimension", randomDimension),
+        ("internalUnits", randomInternalUnits)
+    ])
+    return randomFields
 end
 
 end # module
