@@ -229,6 +229,20 @@ function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
 end
 
 # method documented as part of the AbstractQuantity interface
+function Base.:*(simpleQuantity::SimpleQuantity, object::Any)
+    productValue = simpleQuantity.value * object
+    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
+    return productQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(object::Any, simpleQuantity::SimpleQuantity)
+    productValue = object * simpleQuantity.value
+    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
+    return productQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
 function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     productValue = simpleQuantity1.value * simpleQuantity2.value
     productUnit = simpleQuantity1.unit * simpleQuantity2.unit
@@ -239,7 +253,23 @@ end
 # method documented as part of the AbstractQuantity interface
 function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     quotientValue = simpleQuantity1.value / simpleQuantity2.value
-    quotientUnit = Unit = simpleQuantity1.unit / simpleQuantity2.unit
+    quotientUnit = simpleQuantity1.unit / simpleQuantity2.unit
+    quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
+    return quotientQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(simpleQuantity::SimpleQuantity, object::Any)
+    quotientValue = simpleQuantity.value / object
+    quotientUnit = simpleQuantity.unit
+    quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
+    return quotientQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(object::Any, simpleQuantity::SimpleQuantity)
+    quotientValue = object / simpleQuantity.value
+    quotientUnit = inv(simpleQuantity.unit)
     quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
     return quotientQuantity
 end

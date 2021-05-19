@@ -19,7 +19,9 @@ function run()
         test_addition_required()
         test_subtraction_required()
         test_multiplication_required()
+        test_multiplicationWithDimensionless_required()
         test_division_required()
+        test_divisionByDimensionless_required()
         test_inv_required()
         test_exponentiation_required()
         test_sqrt_required()
@@ -77,10 +79,24 @@ function test_multiplication_required()
     @test_throws expectedError mockQuantity * mockQuantity
 end
 
+function test_multiplicationWithDimensionless_required()
+    mockQuantity = MockQuantityStub()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub of AbstractQuantity misses an implementation of multiplication")
+    @test_throws expectedError 2 * mockQuantity
+    @test_throws expectedError mockQuantity * 2
+end
+
 function test_division_required()
     mockQuantity = MockQuantityStub()
     expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub of AbstractQuantity misses an implementation of division")
     @test_throws expectedError mockQuantity / mockQuantity
+end
+
+function test_divisionByDimensionless_required()
+    mockQuantity = MockQuantityStub()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub of AbstractQuantity misses an implementation of division")
+    @test_throws expectedError mockQuantity / 2
+    @test_throws expectedError 2 / mockQuantity
 end
 
 function test_inv_required()

@@ -30,7 +30,9 @@ The following functions are considered part of the interface of `AbstractQuantit
 Base.:(==)(::AbstractQuantity, ::AbstractQuantity)
 inUnitsOf(::AbstractQuantity, ::AbstractUnit)
 inBasicSIUnits(::AbstractQuantity)
+Base.:*(::AbstractQuantity, ::Any)
 Base.:*(::AbstractQuantity, ::AbstractUnit)
+Base.:/(::AbstractQuantity, ::Any)
 Base.:/(::AbstractQuantity, ::AbstractUnit)
 Base.:+(::AbstractQuantity, ::AbstractQuantity)
 Base.:-(::AbstractQuantity, ::AbstractQuantity)
@@ -65,12 +67,14 @@ dimensionOf(::AbstractQuantity)
 
 ```@docs
 InternalUnits
+Base.:(==)(::InternalUnits, ::InternalUnits)
 ```
 
 ## Quantity
 
 ```@docs
 Quantity
+Base.:(==)(::Quantity, ::Quantity)
 ```
 
 ```@meta

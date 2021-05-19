@@ -100,12 +100,45 @@ function Base.:*(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 end
 
 """
+    Base.:*(quantity::AbstractQuantity, object::Any)
+    Base.:*(object::Any, quantity::AbstractQuantity)
+
+Multiply a physical quantity with a dimensionless object. It is assumed that multipliation of `quantity.value` with `object` is implemented.
+"""
+function Base.:*(quantity::AbstractQuantity, object::Any)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
+end
+
+function Base.:*(object::Any, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
+end
+
+
+"""
     Base.:/(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
 Divide `quantity1` by `quantity2`.
 """
 function Base.:/(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
+    error("subtype $subtype of AbstractQuantity misses an implementation of division")
+end
+
+"""
+    Base.:/(quantity::AbstractQuantity, object::Any)
+    Base.:/(object::Any, quantity::AbstractQuantity)
+
+Divide a physical quantity by a dimensionless object (or vice versa). It is assumed that division of `quantity.value` by `object` (and vice versa) is implemented.
+"""
+function Base.:/(quantity::AbstractQuantity, object::Any)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of division")
+end
+
+function Base.:/(object::Any, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of division")
 end
 

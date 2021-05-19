@@ -14,6 +14,8 @@ function run()
         InternalUnits_ErrorsIfInternalUnitsInfinite()
         InternalUnits_ErrorsIfInternalUnitsZero()
         InternalUnits_ErrorsIfInternalUnitsWrongDimension()
+
+        @test equality_implemented()
     end
 end
 
@@ -148,6 +150,34 @@ function _getExamplesFor_InternalUnits_ErrorsIfInternalUnitsWrongDimension()
     invalidUnits["amount"] = 1 * Alicorn.kelvin
     invalidUnits["luminousIntensity"] = 1 * Alicorn.mol
     return invalidUnits
+end
+
+
+function equality_implemented()
+    examples = _getExamplesFor_equality()
+    return TestingTools.testDyadicFunction(Base.:(==), examples)
+end
+
+function _getExamplesFor_equality()
+    internalUnits1 = TestingTools.generateRandomInternalUnits()
+    internalUnits2 = TestingTools.generateRandomInternalUnits()
+    internalUnits1Copy = InternalUnits(
+        mass=internalUnits1.mass,
+        length=internalUnits1.length,
+        time=internalUnits1.time,
+        current=internalUnits1.current,
+        temperature=internalUnits1.temperature,
+        amount=internalUnits1.amount,
+        luminousIntensity=internalUnits1.luminousIntensity
+    )
+
+    # format: internalUnits1, internalUnits2, correct result for internalUnits1 == internalUnits2
+    examples = [
+        ( internalUnits1, internalUnits1, true ),
+        ( internalUnits1, internalUnits2, false ),
+        ( internalUnits1, internalUnits1Copy, true )
+    ]
+    return examples
 end
 
 end # module

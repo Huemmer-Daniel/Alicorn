@@ -105,6 +105,8 @@ function _assertQuantityHasCorrectDimension(quantity::SimpleQuantity, correctDim
     end
 end
 
+# External Constructors
+
 function InternalUnits(;
         mass::SimpleQuantity = 1 * kilogram,
         length::SimpleQuantity = 1 * meter,
@@ -116,4 +118,25 @@ function InternalUnits(;
     )
     internalUnits = (mass, length, time, current, temperature, amount, luminousIntensity)
     return InternalUnits(internalUnits...)
+end
+
+# Arithmetics
+
+"""
+    Base.:(==)(internalUnits1::InternalUnits, internalUnits2::InternalUnits)
+
+Compare two `InternalUnits` objects.
+TODO
+"""
+function Base.:(==)(internalUnits1::InternalUnits, internalUnits2::InternalUnits)
+    massUnitEqual = ( internalUnits1.mass == internalUnits2.mass )
+    lengthUnitEqual = ( internalUnits1.length == internalUnits2.length )
+    timeUnitEqual = ( internalUnits1.time == internalUnits2.time )
+    currentUnitEqual = ( internalUnits1.current == internalUnits2.current )
+    temperatureUnitEqual = ( internalUnits1.temperature == internalUnits2.temperature )
+    amountUnitEqual = ( internalUnits1.amount == internalUnits2.amount )
+    luminousIntensityUnitEqual = ( internalUnits1.luminousIntensity == internalUnits2.luminousIntensity )
+
+    isEqual = massUnitEqual && lengthUnitEqual && timeUnitEqual && currentUnitEqual && temperatureUnitEqual && amountUnitEqual && luminousIntensityUnitEqual
+    return isEqual
 end

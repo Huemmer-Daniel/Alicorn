@@ -19,6 +19,8 @@ function run()
 
         @test fieldsCorrectlyInitialized()
 
+        @test_skip canInstanciateSimpleQuantityFromAbstractUnit()
+
         # initialization by multiplication and division
         @test Any_AbstractUnit_multiplication()
         @test Any_AbstractUnit_division()
@@ -41,7 +43,9 @@ function run()
         test_subtraction_ErrorsForMismatchedDimensions()
 
         @test multiplication_implemented()
+        @test multiplicationWithDimensionless_implemented()
         @test division_implemented()
+        @test divisionByDimensionless_implemented()
 
         @test inv_implemented()
         @test exponentiation_implemented()
@@ -429,6 +433,56 @@ function _getMixedExamplesFor_multiplication()
     return examples
 end
 
+function multiplicationWithDimensionless_implemented()
+    scalarExamples = _getScalarExamplesFor_multiplicationWithDimensionless()
+    worksForScalars = TestingTools.testDyadicFunction(Base.:*, scalarExamples)
+
+    matrixExamples = _getMatrixExamplesFor_multiplicationWithDimensionless()
+    worksForMatrices = TestingTools.testDyadicFunction(Base.:*, matrixExamples)
+
+    mixedExamples = _getMixedExamplesFor_multiplicationWithDimensionless()
+    worksForMixed = TestingTools.testDyadicFunction(Base.:*, mixedExamples)
+
+    return (worksForScalars && worksForMatrices && worksForMixed)
+end
+
+function _getScalarExamplesFor_multiplicationWithDimensionless()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 1, 1 * Alicorn.unitlessUnit ),
+        ( 1, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 2 * ucat.second, 2.5, 5 * ucat.second ),
+        ( 2.5, 2 * ucat.second, 5 * ucat.second ),
+        ( -7 * ucat.lumen * (ucat.nano * ucat.second),  2.5 , -17.5 * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( 2 * (ucat.milli * ucat.candela)^-4, 4, 8 * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function _getMatrixExamplesFor_multiplicationWithDimensionless()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( [1 1] * Alicorn.unitlessUnit, [1; 1], [2] * Alicorn.unitlessUnit ),
+        ( [1 1], [1; 1] * Alicorn.unitlessUnit, [2] * Alicorn.unitlessUnit ),
+        ( [1 0; 2 0] * ucat.second, [2 3; 4 5] , [2 3; 4 6] * ucat.second ),
+        ( [2 3; 4 5], [1 0; 2 0] * ucat.second, [8 0; 14 0] * ucat.second )
+    ]
+    return examples
+end
+
+function _getMixedExamplesFor_multiplicationWithDimensionless()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( [1 1] * Alicorn.unitlessUnit, 2, [2 2] * Alicorn.unitlessUnit ),
+        ( 2, [1 1] * Alicorn.unitlessUnit, [2 2] * Alicorn.unitlessUnit ),
+        ( [1 0; 2 0] * ucat.second, 3, [3 0; 6 0] * ucat.second ),
+        ( 3, [1 0; 2 0] * ucat.second, [3 0; 6 0] * ucat.second ),
+        ( 2.5 * ucat.meter, [2 3] , [5 7.5] * ucat.meter  ),
+        ( [2 3], 2.5 * ucat.meter, [5 7.5] * ucat.meter  )
+    ]
+    return examples
+end
+
 function division_implemented()
     scalarExamples = _getScalarExamplesFor_division()
     worksForScalars = TestingTools.testDyadicFunction(Base.:/, scalarExamples)
@@ -463,6 +517,41 @@ function _getMixedExamplesFor_division()
         ( [4 4] * ucat.second, 2 * ucat.meter, [2 2] * ucat.second / ucat.meter ),
         ( [-7 -7] * ucat.lumen * (ucat.nano * ucat.second),  2 * (ucat.pico * ucat.second) , [-3.5 -3.5] * ucat.lumen * (ucat.nano * ucat.second) / (ucat.pico * ucat.second) ),
         ( [2 2; 2 2] * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, [0.5 0.5; 0.5 0.5] * (ucat.milli * ucat.candela)^-6 )
+    ]
+    return examples
+end
+
+function divisionByDimensionless_implemented()
+    scalarExamples = _getScalarExamplesFor_divisionByDimensionless()
+    worksForScalars = TestingTools.testDyadicFunction(Base.:/, scalarExamples)
+
+    mixedExamples = _getMixedExamplesFor_divisionByDimensionless()
+    worksForMixed = TestingTools.testDyadicFunction(Base.:/, mixedExamples)
+
+    return (worksForScalars && worksForMixed)
+end
+
+
+function _getScalarExamplesFor_divisionByDimensionless()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 2 , 1/2 * Alicorn.unitlessUnit ),
+        ( 2, 1 * Alicorn.unitlessUnit , 2 * Alicorn.unitlessUnit ),
+        ( 4, 2 * ucat.second, 2 / ucat.second ),
+        ( 2 * ucat.second, 4, 1/2 * ucat.second ),
+        ( -7 * ucat.lumen * (ucat.nano * ucat.second), 2, -3.5 * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( 2, -4 * (ucat.milli * ucat.candela)^2, -0.5 * (ucat.milli * ucat.candela)^-2 )
+    ]
+    return examples
+end
+
+function _getMixedExamplesFor_divisionByDimensionless()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( [1 1] * Alicorn.unitlessUnit, 1, [1 1] * Alicorn.unitlessUnit ),
+        ( [1 1], 1 * Alicorn.unitlessUnit, [1 1] * Alicorn.unitlessUnit ),
+        ( [2, 3] * ucat.second, 2 , [1, 1.5] * ucat.second ),
+        ( [2, 3] , 2 * ucat.second , [1, 1.5] / ucat.second ),
     ]
     return examples
 end
