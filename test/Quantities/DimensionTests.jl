@@ -204,8 +204,8 @@ function dimensionOf_implementedForQuantities()
     return TestingTools.testMonadicFunction(dimensionOf, examples)
 end
 
-struct MockQuantityForDimension <: AbstractQuantity
-    unit::Unit
+struct MockQuantityForDimension{T} <: AbstractQuantity{T}
+    unit::T
 end
 
 function Alicorn.Quantities.inBasicSIUnits(mockQuantity::MockQuantityForDimension)

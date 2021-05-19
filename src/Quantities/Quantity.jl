@@ -1,10 +1,10 @@
 export Quantity
 @doc raw"""
-    Quantity{T} <: AbstractQuantity
+    Quantity{T} <: AbstractQuantity{T}
 
 A physical quantity consisting of... TODO
 """
-mutable struct Quantity{T} <: AbstractQuantity
+mutable struct Quantity{T} <: AbstractQuantity{T}
     value::T
     dimension::Dimension
     internalUnits::InternalUnits

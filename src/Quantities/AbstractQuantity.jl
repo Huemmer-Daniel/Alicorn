@@ -6,7 +6,7 @@ Abstract supertype for all types that represent a physical quantity.
 
 Currently the only concrete subtype of `AbstractQuantity` is [`SimpleQuantity`](@ref).
 """
-abstract type AbstractQuantity end
+abstract type AbstractQuantity{T} end
 
 ## 1. Generic functions
 # these functions need to work for all implementations of AbstractQuantity
@@ -180,4 +180,46 @@ Transpose `quantity`.
 function Base.transpose(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of the transpose function")
+end
+
+"""
+    Base.length(quantity::AbstractQuantity)
+
+Returns `length(quantity.value)`.
+"""
+function Base.length(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the length function")
+end
+
+"""
+    Base.size(quantity::AbstractQuantity)
+
+Returns `size(quantity.value)`.
+"""
+function Base.size(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the size function")
+end
+
+"""
+    Base.getindex(abstractQuantity::AbstractQuantity, key...)
+
+Returns an element from a collection `abstractQuantity` wrapped by AbstractQuantity as an AbstractQuantity object with the corresponding unit.
+"""
+function Base.getindex(collection::AbstractQuantity, key...)
+    subtype = typeof(collection)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the getindex function")
+end
+
+"""
+    Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, key...) where A <: AbstractArray
+
+Sets an element in an array wrapped by AbstractQuantity.
+
+The `element` needs to have a unit compatible with the unit of `array`, and `element.value` has to be of a type that can be converted to the type of `array.value`.
+"""
+function Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, key...) where A <: AbstractArray
+    subtype = typeof(array)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the setindex! function")
 end

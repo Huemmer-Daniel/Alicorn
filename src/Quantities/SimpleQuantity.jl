@@ -1,6 +1,6 @@
 export SimpleQuantity
 @doc raw"""
-    SimpleQuantity{T} <: AbstractQuantity
+    SimpleQuantity{T} <: AbstractQuantity{T}
 
 A physical quantity consisting of a value and a physical unit.
 
@@ -84,7 +84,7 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    [...]
    ```
 """
-mutable struct SimpleQuantity{T} <: AbstractQuantity
+mutable struct SimpleQuantity{T} <: AbstractQuantity{T}
     value::T
     unit::Unit
 
@@ -304,6 +304,37 @@ function Base.transpose(simpleQuantity::SimpleQuantity)
     unit = simpleQuantity.unit
     transposeOfQuantity = SimpleQuantity(transposeOfValue, unit)
     return transposeOfQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.length(simpleQuantity::SimpleQuantity)
+    return length(simpleQuantity.value)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.size(simpleQuantity::SimpleQuantity)
+    return size(simpleQuantity.value)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.getindex(simpleQuantity::SimpleQuantity, key...)
+    value = getindex(simpleQuantity.value, key...)
+    unit = simpleQuantity.unit
+    simpleQuantity = SimpleQuantity(value, unit)
+    return simpleQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.setindex!(simpleQuantity::SimpleQuantity{A}, element::SimpleQuantity, key...) where A <: AbstractArray
+    element = _convertElementToTypeAndUnitOfArray(simpleQuantity, element)
+    setindex!(simpleQuantity.value, element.value, key...)
+    return simpleQuantity
+end
+
+function _convertElementToTypeAndUnitOfArray(simpleQuantity::SimpleQuantity{A}, element::SimpleQuantity) where A <: AbstractArray
+    element.value = convert(typeof(simpleQuantity.value[1]), element.value)
+    element = inUnitsOf(element, simpleQuantity.unit)
+    return element
 end
 
 ## Methods

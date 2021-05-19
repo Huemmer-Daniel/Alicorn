@@ -42,6 +42,10 @@ Base.inv(::AbstractQuantity)
 Base.:^(::AbstractQuantity, ::Real)
 Base.sqrt(::AbstractQuantity)
 Base.transpose(::AbstractQuantity)
+Base.length(::AbstractQuantity)
+Base.size(::AbstractQuantity)
+Base.getindex(::AbstractQuantity, key...)
+Base.setindex!(::AbstractQuantity{A}, ::AbstractQuantity, key...) where A <: AbstractArray
 ```
 
 ## SimpleQuantity

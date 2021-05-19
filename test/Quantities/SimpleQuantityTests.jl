@@ -50,6 +50,14 @@ function run()
         @test inv_implemented()
         @test exponentiation_implemented()
         @test sqrt_implemented()
+
+        # other methods
+        @test length_implemented()
+        @test size_implemented()
+        @test getindex_implemented()
+        @test setindex!_implemented()
+        test_setindex!_errorsForIncompatibleTypes()
+        test_setindex!_errorsForIncompatibleUnits()
     end
 end
 
@@ -644,6 +652,137 @@ function _getMatrixExamplesFor_sqrt()
         ( [4 0; 0 4] * (ucat.pico * ucat.meter)^-3, [2 0; 0 2] * (ucat.pico * ucat.meter)^-1.5 )
     ]
     return examples
+end
+
+# other methods
+function length_implemented()
+    scalarExamples = _getScalarExamplesFor_length()
+    worksForScalars = TestingTools.testMonadicFunction(Base.length, scalarExamples)
+
+    matrixExamples = _getMatrixExamplesFor_length()
+    worksForMatrices = TestingTools.testMonadicFunction(Base.length, matrixExamples)
+
+    works = (worksForScalars && worksForMatrices)
+    return works
+end
+
+function _getScalarExamplesFor_length()
+    # format: SimpleQuantity, correct result for length(SimpleQuantity)
+    examples = [
+        ( 1123 * ucat.meter, 1 )
+    ]
+    return examples
+end
+
+function _getMatrixExamplesFor_length()
+    # format: SimpleQuantity, correct result for sqrt(SimpleQuantity)
+    examples = [
+        ( [1 0; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 6)
+    ]
+    return examples
+end
+
+function size_implemented()
+    scalarExamples = _getScalarExamplesFor_size()
+    worksForScalars = TestingTools.testMonadicFunction(Base.size, scalarExamples)
+
+    matrixExamples = _getMatrixExamplesFor_size()
+    worksForMatrices = TestingTools.testMonadicFunction(Base.size, matrixExamples)
+
+    works = (worksForScalars && worksForMatrices)
+    return works
+end
+
+function _getScalarExamplesFor_size()
+    # format: SimpleQuantity, correct result for size(SimpleQuantity)
+    examples = [
+        ( 1123 * ucat.meter, () )
+    ]
+    return examples
+end
+
+function _getMatrixExamplesFor_size()
+    # format: SimpleQuantity, correct result for size(SimpleQuantity)
+    examples = [
+        ( [1 0; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, (3, 2) ),
+        ( [1 0 2; 0 1 3] * (ucat.pico * ucat.meter)^-3, (2, 3) )
+    ]
+    return examples
+end
+
+function getindex_implemented()
+    scalarExamples = _getScalarExamplesFor_getindex()
+    worksForScalars = true
+    for (simpleQuantity, index, correctOutput) in scalarExamples
+        returnedOutput = Base.getindex(simpleQuantity, index...)
+        worksForScalars &= (returnedOutput == correctOutput)
+    end
+
+    matrixExamples = _getMatrixExamplesFor_getindex()
+    worksForMatrices = true
+    for (simpleQuantity, index, correctOutput) in matrixExamples
+        returnedOutput = Base.getindex(simpleQuantity, index...)
+        worksForMatrices &= (returnedOutput == correctOutput)
+    end
+
+    works = (worksForScalars && worksForMatrices)
+    return works
+end
+
+function _getScalarExamplesFor_getindex()
+    # format: SimpleQuantity, index, correct result for getindex(SimpleQuantity, index)
+    examples = [
+        ( 1123 * ucat.meter, 1, 1123 * ucat.meter )
+    ]
+    return examples
+end
+
+function _getMatrixExamplesFor_getindex()
+    # format: SimpleQuantity, index, correct result for getindex(SimpleQuantity, index)
+    examples = [
+        ( [1 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, (3,1), 2 * (ucat.pico * ucat.meter)^-3 ),
+        ( [1 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 4, 7 * (ucat.pico * ucat.meter)^-3 ),
+        ( [1 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 6, 3 * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function setindex!_implemented()
+    matrixExamples = _getMatrixExamplesFor_setindex!()
+    worksForMatrices = true
+    for (simpleQuantityArray, simpleQuantity, index, correctOutput) in matrixExamples
+        returnedOutput = Base.setindex!(simpleQuantityArray, simpleQuantity, index...)
+        worksForMatrices &= (returnedOutput == correctOutput)
+    end
+
+    return worksForMatrices
+end
+
+function _getMatrixExamplesFor_setindex!()
+    # format: SimpleQuantityArray, SimpleQuantity, index, correct result for getindex(SimpleQuantity, index)
+    examples = [
+        (
+            [1.0 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3,
+            2.3 * (ucat.pico * ucat.meter)^-3,
+            (3,1),
+            [1 7; 0 1; 2.3 3] * (ucat.pico * ucat.meter)^-3
+        )
+    ]
+    return examples
+end
+
+function test_setindex!_errorsForIncompatibleTypes()
+    array = Array{Int64}([1 2; 3 4]) * ucat.meter
+    element = Float64(2.5) * ucat.meter
+    expectedError = InexactError(:Int64, Int64, 2.5)
+    @test_throws expectedError (array[1] = element)
+end
+
+function test_setindex!_errorsForIncompatibleUnits()
+    array = Array{Float64}([1 2; 3 4]) * ucat.meter
+    element = Float64(2.5) * ucat.second
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError (array[1] = element)
 end
 
 end # module
