@@ -52,7 +52,7 @@ Base.setindex!(::AbstractQuantity{A}, ::AbstractQuantity, key...) where A <: Abs
 
 ```@docs
 SimpleQuantity
-valueOfUnitless(::SimpleQuantity)
+valueOfDimensionless(::SimpleQuantity)
 Base.:(==)(::SimpleQuantity, ::SimpleQuantity)
 Base.:*(::Any, ::AbstractUnit)
 Base.:/(::Any, ::AbstractUnit)

@@ -339,17 +339,26 @@ end
 
 ## Methods
 
-export valueOfUnitless
+export valueOfDimensionless
 """
-    valueOfUnitless(simpleQuantity::SimpleQuantity)
+    valueOfDimensionless(simpleQuantity::SimpleQuantity)
 
-Strips `Alicorn.unitlessUnit` from the quantity and returns the bare value `simpleQuantity.value`.
+Strips the unit from a dimensionless quantity and returns its bare value.
 
 # Raises Exceptions
-- `Alicorn.Exceptions.UnitMismatchError`: if the unit of `simpleQuantity` is not `Alicorn.unitlessUnit`
+- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity` is not dimensionless
 """
-function valueOfUnitless(simpleQuantity::SimpleQuantity)
-    _assertIsUnitless(simpleQuantity)
+function valueOfDimensionless(simpleQuantity::SimpleQuantity)
+    try
+        simpleQuantity = inUnitsOf(simpleQuantity, unitlessUnit)
+    catch exception
+    println(typeof(exception))
+        if typeof(exception) == Exceptions.DimensionMismatchError
+            throw(Exceptions.DimensionMismatchError("quantity is not dimensionless"))
+        else
+            rethrow()
+        end
+    end
     value = simpleQuantity.value
     return value
 end
@@ -357,7 +366,7 @@ end
 function _assertIsUnitless(simpleQuantity)
     unit = simpleQuantity.unit
     if !(unit == unitlessUnit)
-        throw(Exceptions.UnitMismatchError("quantity is not unitless"))
+        throw(Exceptions.UnitMismatchError("quantity is not dimensionless"))
     end
 end
 

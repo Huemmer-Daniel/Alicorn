@@ -16,7 +16,7 @@ function Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
     dimension = dimensionOf(simpleQuantity)
     internalUnit = _internalUnitForDimension(dimension, internalUnits)
     unitlessQuantity = inBasicSIUnits(simpleQuantity / internalUnit)
-    internalValue = valueOfUnitless(unitlessQuantity)
+    internalValue = valueOfDimensionless(unitlessQuantity)
     return Quantity(internalValue, dimension, internalUnits)
 end
 

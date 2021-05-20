@@ -32,7 +32,8 @@ function run()
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
         @test inBasicSIUnits_implemented()
-        @test valueOfUnitless_implemented()
+        @test valueOfDimensionless_implemented()
+        test_valueOfDimensionless_ErrorsIfNotUnitless()
 
         # arithmetics
         @test equality_implemented()
@@ -128,17 +129,24 @@ function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, randomFields::D
     return correct
 end
 
-function valueOfUnitless_implemented()
-    simpleQuantity = SimpleQuantity(7)
-    returnedValue = valueOfUnitless(simpleQuantity)
-    pass = (returnedValue == 7)
-    return pass
+function valueOfDimensionless_implemented()
+    examples = _getExamplesFor_valueOfDimensionless()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
 end
 
-function valueOfUnitless_ErrorsIfNotUnitless()
+function _getExamplesFor_valueOfDimensionless()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantity(7), 7),
+        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless()
     simpleQuantity = 7 * Alicorn.meter
-    expectedError = Alicorn.Exceptions.UnitMismatchError("quantity is not unitless")
-    @test_throws expectedError valueOfUnitless(simpleQuantity)
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(simpleQuantity)
 end
 
 function equality_implemented()
