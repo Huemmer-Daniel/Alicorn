@@ -203,23 +203,61 @@ function Base.size(quantity::AbstractQuantity)
 end
 
 """
-    Base.getindex(abstractQuantity::AbstractQuantity, key...)
+    Base.getindex(abstractQuantity::AbstractQuantity, index...)
 
 Returns an element from a collection `abstractQuantity` wrapped by AbstractQuantity as an AbstractQuantity object with the corresponding unit.
 """
-function Base.getindex(collection::AbstractQuantity, key...)
+function Base.getindex(collection::AbstractQuantity, index...)
     subtype = typeof(collection)
     error("subtype $subtype of AbstractQuantity misses an implementation of the getindex function")
 end
 
 """
-    Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, key...) where A <: AbstractArray
+    Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, index...) where A <: AbstractArray
 
 Sets an element in an array wrapped by AbstractQuantity.
 
 The `element` needs to have a unit compatible with the unit of `array`, and `element.value` has to be of a type that can be converted to the type of `array.value`.
 """
-function Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, key...) where A <: AbstractArray
+function Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, index...) where A <: AbstractArray
     subtype = typeof(array)
     error("subtype $subtype of AbstractQuantity misses an implementation of the setindex! function")
 end
+
+"""
+    Base.repeat(array::AbstractQuantity{A}, counts::Vararg{Integer, N}) where {A <: AbstractArray, N}
+
+Construct an array with the same unit as `array` by repeating `array` a given number of times in each dimension, specified by `counts`.
+"""
+function Base.repeat(array::AbstractQuantity{A}, counts::Vararg{Integer, N}) where {A <: AbstractArray, N}
+    subtype = typeof(array)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the repeat function")
+end
+
+## AbstractArray interface
+
+"""
+    Base.ndims(abstractQuantity::AbstractQuantity{T}) where {T <: Union{Number, AbstractArray}
+
+Return the number of dimensions of the array wrapped by the AbstractQuantity.
+"""
+function Base.ndims(abstractQuantity::AbstractQuantity{T}) where {T <: Union{Number, AbstractArray}}
+    subtype = typeof(abstractQuantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the ndims function")
+end
+
+## Broadcasting
+#
+# function Base.BroadcastStyle(::Type{<:AbstractQuantity{<:Number}})
+#     return Base.Broadcast.DefaultArrayStyle{0}()
+# end
+#
+# struct AbstractQuantityArrayStyle <: Broadcast.AbstractArrayStyle{Any} end
+#
+# function Base.BroadcastStyle(::Type{<:AbstractQuantity{<:Number}})
+#     return AbstractQuantityArrayStyle()
+# end
+#
+# function Base.BroadcastStyle(::Type{<:AbstractQuantity{<: AbstractArray}})
+#     return AbstractQuantityArrayStyle()
+# end

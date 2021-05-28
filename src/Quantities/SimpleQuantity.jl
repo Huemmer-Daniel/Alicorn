@@ -142,14 +142,19 @@ function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)::Si
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
 
-    (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
-    (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
+    if originalUnit == targetUnit
+        resultingQuantity = simpleQuantity
+    else
 
-    _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
-    conversionFactor = originalUnitPrefactor / targetUnitPrefactor
+        (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
+        (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
 
-    resultingValue = originalValue .* conversionFactor
-    resultingQuantity = SimpleQuantity( resultingValue, targetUnit )
+        _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
+        conversionFactor = originalUnitPrefactor / targetUnitPrefactor
+
+        resultingValue = originalValue .* conversionFactor
+        resultingQuantity = SimpleQuantity( resultingValue, targetUnit )
+    end
     return resultingQuantity
 end
 
@@ -317,17 +322,17 @@ function Base.size(simpleQuantity::SimpleQuantity)
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.getindex(simpleQuantity::SimpleQuantity, key...)
-    value = getindex(simpleQuantity.value, key...)
+function Base.getindex(simpleQuantity::SimpleQuantity, index...)
+    value = getindex(simpleQuantity.value, index...)
     unit = simpleQuantity.unit
     simpleQuantity = SimpleQuantity(value, unit)
     return simpleQuantity
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.setindex!(simpleQuantity::SimpleQuantity{A}, element::SimpleQuantity, key...) where A <: AbstractArray
+function Base.setindex!(simpleQuantity::SimpleQuantity{A}, element::SimpleQuantity, index...) where A <: AbstractArray
     element = _convertElementToTypeAndUnitOfArray(simpleQuantity, element)
-    setindex!(simpleQuantity.value, element.value, key...)
+    setindex!(simpleQuantity.value, element.value, index...)
     return simpleQuantity
 end
 
@@ -335,6 +340,21 @@ function _convertElementToTypeAndUnitOfArray(simpleQuantity::SimpleQuantity{A}, 
     element.value = convert(typeof(simpleQuantity.value[1]), element.value)
     element = inUnitsOf(element, simpleQuantity.unit)
     return element
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.repeat(simpleQuantity::SimpleQuantity{A}, counts::Vararg{Integer, N}) where {A <: AbstractArray, N}
+    abstractArray = simpleQuantity.value
+    repeatedAbstractArray = repeat(abstractArray, counts...)
+    unit = simpleQuantity.unit
+    repeatedSimpleQuantity = SimpleQuantity(repeatedAbstractArray, unit)
+    return repeatedSimpleQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.ndims(simpleQuantity::SimpleQuantity{T}) where {T <: Union{Number, AbstractArray{<:Any}}}
+    ndims = Base.ndims(simpleQuantity.value)
+    return ndims
 end
 
 ## Methods
@@ -352,7 +372,6 @@ function valueOfDimensionless(simpleQuantity::SimpleQuantity)
     try
         simpleQuantity = inUnitsOf(simpleQuantity, unitlessUnit)
     catch exception
-    println(typeof(exception))
         if typeof(exception) == Exceptions.DimensionMismatchError
             throw(Exceptions.DimensionMismatchError("quantity is not dimensionless"))
         else
@@ -404,3 +423,158 @@ function Base.:/(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantity(value, inverseAbstractUnit)
 end
+
+
+
+## AbstractArray interface
+
+
+
+## Broadcasting TODO
+#
+# function Base.similar(bc::Broadcast.Broadcasted{AbstractQuantityArrayStyle}, ::Type{ElType}) where ElType
+#     # Scan the inputs for the ArrayAndChar:
+#     simpleQuantityArray = find_quantity(bc)
+#     # Use the char field of A to create the output
+#     println(bc)
+#     SimpleQuantity( similar(Array{ElType}, axes(bc)), simpleQuantityArray.unit )
+# end
+#
+# "`A = find_quantity(As)` returns the first SimpleQuantity among the arguments."
+# find_quantity(bc::Base.Broadcast.Broadcasted) = find_quantity(bc.args)
+# find_quantity(args::Tuple) = find_quantity(find_aac(args[1]), Base.tail(args))
+# find_quantity(x) = x
+# find_quantity(::Tuple{}) = nothing
+# find_quantity(a::SimpleQuantity, rest) = a
+# find_quantity(::Any, rest) = find_quantity(rest)
+#
+
+#
+
+#
+# function Base.axes(simpleQuantityArray::SimpleQuantity{<:AbstractArray})
+#     println("gotcha")
+# end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(*), sqArray1::SimpleQuantity{<:AbstractArray}, sqArray2::SimpleQuantity{<:AbstractArray})
+    productUnit = sqArray1.unit * sqArray2.unit
+    productValue = sqArray1.value .* sqArray2.value
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(*), sqArray::SimpleQuantity{<:AbstractArray}, array::AbstractArray)
+    productUnit = sqArray.unit
+    productValue = sqArray.value .* array
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(*), array::AbstractArray, sqArray::SimpleQuantity{<:AbstractArray})
+    productUnit = sqArray.unit
+    productValue = array .* sqArray.value
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(abs), sqArray::SimpleQuantity{<:AbstractArray})
+    unit = sqArray.unit
+    absValue = abs.(sqArray.value)
+    return SimpleQuantity(absValue, unit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(*), simpleQuantity::SimpleQuantity{<:Number}, array::AbstractArray)
+    productUnit = simpleQuantity.unit
+    productValue = simpleQuantity.value .* array
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(*), simpleQuantity::SimpleQuantity{<:Number}, sqArray::SimpleQuantity{<:AbstractArray})
+    productUnit = simpleQuantity.unit * sqArray.unit
+    productValue = simpleQuantity.value .* sqArray.value
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(Base.literal_pow), ::typeof(^), sqArray::SimpleQuantity{<:AbstractArray}, exponent::Val{exp}) where exp
+    productUnit = sqArray.unit^exp
+    productValue = sqArray.value.^exp
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO: generalize to allow fusing
+function Base.broadcasted(::typeof(/), array::AbstractArray, sqArray::SimpleQuantity{<:AbstractArray})
+    productUnit = inv(sqArray.unit)
+    productValue = array ./ sqArray.value
+    return SimpleQuantity(productValue, productUnit)
+end
+
+# TODO:
+function Base.iterate(sqArray::SimpleQuantity{<:Union{Number, AbstractArray}}, state=(eachindex(sqArray),))
+    y = iterate(state...)
+    y === nothing && return nothing
+    sqArray[y[1]], (state[1], Base.tail(y)...)
+end
+
+# TODO:
+function Base.eachindex(sqArray::SimpleQuantity{<:Union{Number, AbstractArray}})
+    return eachindex(sqArray.value)
+end
+
+# TODO:
+function Base.:-(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    inverseValue = -simpleQuantity.value
+    return SimpleQuantity(inverseValue, unit)
+end
+
+# TODO:
+function Base.minimum(simpleQuantity::SimpleQuantity{<:Union{Number, AbstractArray}})
+    unit = simpleQuantity.unit
+    min = minimum(simpleQuantity.value)
+    return SimpleQuantity(min, unit)
+end
+
+# TODO:
+function Base.maximum(simpleQuantity::SimpleQuantity{<:Union{Number, AbstractArray}})
+    unit = simpleQuantity.unit
+    max = maximum(simpleQuantity.value)
+    return SimpleQuantity(max, unit)
+end
+
+# function Base.broadcasted(::typeof(sqrt), sqArray1::SimpleQuantity{<:AbstractArray})
+#     sqrtUnit = sqArray1.unit^(0.5)
+#     sqrtValue = sqrt.(sqArray1.value)
+#     println("gotcha2")
+#     return SimpleQuantity(sqrtValue, sqrtUnit)
+# end
+#
+export ArrayAndChar
+struct ArrayAndChar{T,N} <: AbstractArray{T,N}
+    data::Array{T,N}
+    char::Char
+end
+Base.size(A::ArrayAndChar) = size(A.data)
+Base.getindex(A::ArrayAndChar{T,N}, inds::Vararg{Int,N}) where {T,N} = A.data[inds...]
+Base.setindex!(A::ArrayAndChar{T,N}, val, inds::Vararg{Int,N}) where {T,N} = A.data[inds...] = val
+Base.showarg(io::IO, A::ArrayAndChar, toplevel) = print(io, typeof(A), " with char '", A.char, "'")
+
+Base.BroadcastStyle(::Type{<:ArrayAndChar}) = Broadcast.ArrayStyle{ArrayAndChar}()
+
+function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{ArrayAndChar}}, ::Type{ElType}) where ElType
+    # Scan the inputs for the ArrayAndChar:
+    A = find_aac(bc)
+    # Use the char field of A to create the output
+    ArrayAndChar(similar(Array{ElType}, axes(bc)), A.char)
+end
+
+# "`A = find_aac(As)` returns the first ArrayAndChar among the arguments."
+find_aac(bc::Base.Broadcast.Broadcasted) = find_aac(bc.args)
+find_aac(args::Tuple) = find_aac(find_aac(args[1]), Base.tail(args))
+find_aac(x) = x
+find_aac(::Tuple{}) = nothing
+find_aac(a::ArrayAndChar, rest) = a
+find_aac(::Any, rest) = find_aac(rest)

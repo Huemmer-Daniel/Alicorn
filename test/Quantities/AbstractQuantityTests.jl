@@ -26,9 +26,13 @@ function run()
         test_exponentiation_required()
         test_sqrt_required()
 
+        # array methods
         test_length_required()
         test_size_required()
         test_getindex_required()
+        test_setindex!_required()
+        test_repeat_required()
+        test_ndims_required()
     end
 end
 
@@ -122,6 +126,8 @@ function test_sqrt_required()
     @test_throws expectedError sqrt(mockQuantity)
 end
 
+# Array methods
+
 function test_length_required()
     mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the length function")
@@ -141,9 +147,23 @@ function test_getindex_required()
 end
 
 function test_setindex!_required()
+    mockQuantityArray = MockQuantityStub{Matrix{Any}}()
     mockQuantity = MockQuantityStub{Any}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the setindex! function")
-    @test_throws expectedError setindex(mockQuantity, "value", 1)
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Matrix{Any}} of AbstractQuantity misses an implementation of the setindex! function")
+    @test_throws expectedError setindex!(mockQuantityArray, mockQuantity, 1)
 end
+
+function test_repeat_required()
+    mockQuantityArray = MockQuantityStub{Matrix{Any}}()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Matrix{Any}} of AbstractQuantity misses an implementation of the repeat function")
+    @test_throws expectedError repeat(mockQuantityArray, 2, 3)
+end
+
+function test_ndims_required()
+    mockQuantityArray = MockQuantityStub{Matrix{Any}}()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Matrix{Any}} of AbstractQuantity misses an implementation of the ndims function")
+    @test_throws expectedError ndims(mockQuantityArray)
+end
+
 
 end # module

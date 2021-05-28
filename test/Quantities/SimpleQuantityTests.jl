@@ -52,13 +52,15 @@ function run()
         @test exponentiation_implemented()
         @test sqrt_implemented()
 
-        # other methods
+        # array methods
         @test length_implemented()
         @test size_implemented()
         @test getindex_implemented()
         @test setindex!_implemented()
         test_setindex!_errorsForIncompatibleTypes()
         test_setindex!_errorsForIncompatibleUnits()
+        @test repeat_implemented()
+        @test ndims_implemented()
     end
 end
 
@@ -791,6 +793,55 @@ function test_setindex!_errorsForIncompatibleUnits()
     element = Float64(2.5) * ucat.second
     expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
     @test_throws expectedError (array[1] = element)
+end
+
+function repeat_implemented()
+    matrixExamples = _getMatrixExamplesFor_repeat()
+
+    worksForMatrices = true
+    for (simpleQuantityArray, counts, correctOutput) in matrixExamples
+        returnedOutput = Base.repeat(simpleQuantityArray, counts...)
+        worksForMatrices &= (returnedOutput == correctOutput)
+    end
+
+    return worksForMatrices
+end
+
+function _getMatrixExamplesFor_repeat()
+    # format: A::SimpleQuantity{A} where A <: AbstractArray, counts, correct output for repeat(A, counts...)
+    array = [1 2; 3 4]
+    examples = [
+        ( array * ucat.meter, (2, 3), repeat(array, 2, 3) * ucat.meter )
+    ]
+    return examples
+end
+
+function ndims_implemented()
+    scalarExamples = _getScalarExamplesFor_ndims()
+    worksForScalars = TestingTools.testMonadicFunction(Base.ndims, scalarExamples)
+
+    matrixExamples = _getMatrixExamplesFor_ndims()
+    worksForMatrices = TestingTools.testMonadicFunction(Base.ndims, matrixExamples)
+
+    works = (worksForScalars && worksForMatrices)
+    return works
+end
+
+function _getScalarExamplesFor_ndims()
+    # format: SimpleQuantity{<:Number}, correct result for ndims(SimpleQuantity{<:Number})
+    examples = [
+        ( SimpleQuantity(7, ucat.meter), 0 ),
+        ( SimpleQuantity(7.5im, ucat.second), 0 )
+    ]
+end
+
+function _getMatrixExamplesFor_ndims()
+    # format: SimpleQuantity{<:AbstractArray}, correct result for ndims(SimpleQuantity{<:AbstractArray})
+    examples = [
+        ( SimpleQuantity([1 2; 3 4; 5 6], ucat.meter), 2 ),
+        ( SimpleQuantity([1 2 3], ucat.second), 2 ),
+        ( SimpleQuantity([1, 2, 3], ucat.second), 1 )
+    ]
 end
 
 end # module
