@@ -138,7 +138,7 @@ end
 
 export inUnitsOf
 # method documented as part of the AbstractQuantity interface
-function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)::SimpleQuantity
+function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
 
@@ -152,7 +152,7 @@ function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)::Si
         _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
         conversionFactor = originalUnitPrefactor / targetUnitPrefactor
 
-        resultingValue = originalValue .* conversionFactor
+        resultingValue = originalValue * conversionFactor
         resultingQuantity = SimpleQuantity( resultingValue, targetUnit )
     end
     return resultingQuantity
@@ -172,7 +172,7 @@ function inBasicSIUnits(simpleQuantity::SimpleQuantity)::SimpleQuantity
 
     ( conversionFactor, resultingBasicSIUnit ) = convertToBasicSI(originalUnit)
 
-    resultingValue = originalValue .* conversionFactor
+    resultingValue = originalValue * conversionFactor
     resultingQuantity = SimpleQuantity( resultingValue, resultingBasicSIUnit )
     return resultingQuantity
 end
