@@ -41,6 +41,9 @@ export valueOfDimensionless
 export inUnitsOf
 export inBasicSIUnits
 
+export AbstractQuantityArray
+export SimpleQuantityArray
+
 export Dimension
 export dimensionOf
 
