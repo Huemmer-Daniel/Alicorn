@@ -5,9 +5,7 @@ export SimpleQuantity
 A physical quantity consisting of a value and a physical unit.
 
 `SimpleQuantity` is a parametric type, where `T` is the type of the
-quantity's value. While the value can be of any type, `SimpleQuantity`
-implements the `AbstractQuantity` interface and hence assumes that the type
-`T` supports arithmetic operations.
+quantity's value. The type `T` needs to be a subtype of `Number`.
 
 # Fields
 - `value::T`: value of the quantity
@@ -15,8 +13,8 @@ implements the `AbstractQuantity` interface and hence assumes that the type
 
 # Constructor
 ```
-SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T
-SimpleQuantity(value::T) where T
+SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
+SimpleQuantity(value::T) where T <: Number
 ```
 
 If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is used by default.
@@ -43,7 +41,7 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    julia> quantity = 7 * nanometer
    7 nm
    ```
-3. The value can be of any type. Any mathematical operation included in the
+3. The value can be of any numerical type `T <: Number`. Any mathematical operation included in the
    interface of [`AbstractQuantity`](@ref) is applied to the value field, and
    the unit is modified accordingly.
    ```jldoctest
@@ -52,52 +50,27 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    julia> nanometer = ucat.nano * ucat.meter
    UnitFactor nm
 
-   julia> quantity1 = [4 5] * nanometer
-   SimpleQuantity{Array{Int64,2}} of unit nm
+   julia> quantity = 5 * nanometer
+   5 nm
 
-   julia> quantity1sqrd = quantity1 * transpose(quantity1)
-   SimpleQuantity{Array{Int64,2}} of unit nm^2
-
-   julia> quantity1sqrd.value
-   1×1 Array{Int64,2}:
-    41
-   ```
-   The responsibility to check that the resulting quantity is meaningful and
-   supports arithemtic operations lies with the user. For example, Alicorn
-   allows to assign a unit to a string. String concatenation with * or ^ results
-   in a corresponding change of the unit:
-   ```jldoctest; setup = :( ucat = UnitCatalogue(); nanometer = ucat.nano * ucat.meter )
-   julia> quantity2 = "this is nonsense" * nanometer
-   SimpleQuantity{String} of unit nm
-
-   julia> quantity2sqrd = quantity2^2
-   SimpleQuantity{String} of unit nm^2
-
-   julia> quantity2sqrd.value
-   "this is nonsensethis is nonsense"
-   ```
-   On the other hand, multiplication with a number
-   raises an exception since there is no corresponding method for strings.
-   ```
-   julia> 2 * quantity2
-   MethodError: no method matching *(::Int64, ::SimpleQuantity{String})
-   [...]
+   julia> sqrt(quantity)
+   2.23606797749979 nm^5e-1
    ```
 """
 mutable struct SimpleQuantity{T} <: AbstractQuantity{T}
     value::T
     unit::Unit
 
-    function SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T
+    function SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
         unit::Unit = convertToUnit(abstractUnit)
-        simpleQuantity = new{typeof(value)}(value, unit)
+        simpleQuantity = new{T}(value, unit)
         return simpleQuantity
     end
 end
 
 ## External constructors
 
-function SimpleQuantity(value::T) where T
+function SimpleQuantity(value::T) where T <: Number
     unit = unitlessUnit
     simpleQuantity = SimpleQuantity(value, unit)
     return simpleQuantity
@@ -234,14 +207,14 @@ function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity::SimpleQuantity, object::Any)
+function Base.:*(simpleQuantity::SimpleQuantity, object::Number)
     productValue = simpleQuantity.value * object
     productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
     return productQuantity
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:*(object::Any, simpleQuantity::SimpleQuantity)
+function Base.:*(object::Number, simpleQuantity::SimpleQuantity)
     productValue = object * simpleQuantity.value
     productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
     return productQuantity
@@ -264,7 +237,7 @@ function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:/(simpleQuantity::SimpleQuantity, object::Any)
+function Base.:/(simpleQuantity::SimpleQuantity, object::Number)
     quotientValue = simpleQuantity.value / object
     quotientUnit = simpleQuantity.unit
     quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
@@ -272,7 +245,7 @@ function Base.:/(simpleQuantity::SimpleQuantity, object::Any)
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:/(object::Any, simpleQuantity::SimpleQuantity)
+function Base.:/(object::Number, simpleQuantity::SimpleQuantity)
     quotientValue = object / simpleQuantity.value
     quotientUnit = inv(simpleQuantity.unit)
     quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
@@ -352,7 +325,7 @@ function Base.repeat(simpleQuantity::SimpleQuantity{A}, counts::Vararg{Integer, 
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.ndims(simpleQuantity::SimpleQuantity{T}) where {T <: Union{Number, AbstractArray{<:Any}}}
+function Base.ndims(simpleQuantity::SimpleQuantity{T}) where T <: Number
     ndims = Base.ndims(simpleQuantity.value)
     return ndims
 end
@@ -390,7 +363,7 @@ function _assertIsUnitless(simpleQuantity)
 end
 
 """
-    Base.:*(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+    Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
 
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
@@ -402,12 +375,12 @@ julia> 3.5 * ucat.tesla
 3.5 T
 ```
 """
-function Base.:*(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+function Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
     return SimpleQuantity(value, abstractUnit)
 end
 
 """
-    Base.:/(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+    Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
 
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
@@ -419,7 +392,7 @@ julia> 3.5 / ucat.second
 3.5 s^-1
 ```
 """
-function Base.:/(value::Any, abstractUnit::AbstractUnit)::SimpleQuantity
+function Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantity(value, inverseAbstractUnit)
 end

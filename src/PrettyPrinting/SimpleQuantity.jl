@@ -22,13 +22,3 @@ function generatePrettyStringForNumber(simpleQuantity)
 
     return valueStr * " " * unitStr
 end
-
-function generatePrettyStringGeneral(simpleQuantity)
-    value = simpleQuantity.value
-    valueType = typeof(value)
-
-    unit = simpleQuantity.unit
-    unitStr = _generateStringRepresentation(unit)
-
-    return "SimpleQuantity{$valueType} of unit " * unitStr
-end

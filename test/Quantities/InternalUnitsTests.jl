@@ -76,13 +76,13 @@ end
 
 function _getExamplesFor_InternalUnits_ErrorsIfInternalUnitsNotReals()
     invalidUnits = Dict{String, SimpleQuantity}()
-    invalidUnits["mass"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.gram
-    invalidUnits["length"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.meter
-    invalidUnits["time"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.second
-    invalidUnits["current"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.ampere
-    invalidUnits["temperature"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.kelvin
-    invalidUnits["amount"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.mol
-    invalidUnits["luminousIntensity"] = TestingTools.generateRandomNonzeroReal(dim=2) * Alicorn.candela
+    invalidUnits["mass"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.gram
+    invalidUnits["length"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.meter
+    invalidUnits["time"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.second
+    invalidUnits["current"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.ampere
+    invalidUnits["temperature"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.kelvin
+    invalidUnits["amount"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.mol
+    invalidUnits["luminousIntensity"] = TestingTools.generateRandomNonzeroComplex() * Alicorn.candela
     return invalidUnits
 end
 

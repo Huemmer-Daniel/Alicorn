@@ -100,17 +100,17 @@ function Base.:*(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 end
 
 """
-    Base.:*(quantity::AbstractQuantity, object::Any)
-    Base.:*(object::Any, quantity::AbstractQuantity)
+    Base.:*(quantity::AbstractQuantity, object::Number)
+    Base.:*(object::Number, quantity::AbstractQuantity)
 
-Multiply a physical quantity with a dimensionless object. It is assumed that multipliation of `quantity.value` with `object` is implemented.
+Multiply a physical quantity with a dimensionless number.
 """
-function Base.:*(quantity::AbstractQuantity, object::Any)
+function Base.:*(quantity::AbstractQuantity, object::Number)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
 end
 
-function Base.:*(object::Any, quantity::AbstractQuantity)
+function Base.:*(object::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
 end
@@ -127,17 +127,17 @@ function Base.:/(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 end
 
 """
-    Base.:/(quantity::AbstractQuantity, object::Any)
-    Base.:/(object::Any, quantity::AbstractQuantity)
+    Base.:/(quantity::AbstractQuantity, object::Number)
+    Base.:/(object::Number, quantity::AbstractQuantity)
 
-Divide a physical quantity by a dimensionless object (or vice versa). It is assumed that division of `quantity.value` by `object` (and vice versa) is implemented.
+Divide a physical quantity by a dimensionless object (or vice versa).
 """
-function Base.:/(quantity::AbstractQuantity, object::Any)
+function Base.:/(quantity::AbstractQuantity, object::Number)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of division")
 end
 
-function Base.:/(object::Any, quantity::AbstractQuantity)
+function Base.:/(object::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of division")
 end
@@ -201,52 +201,3 @@ function Base.size(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of the size function")
 end
-
-
-# TODO: move to AbstractQuantityArray
-# """
-#     Base.getindex(abstractQuantity::AbstractQuantity, index...)
-#
-# Returns an element from a collection `abstractQuantity` wrapped by AbstractQuantity as an AbstractQuantity object with the corresponding unit.
-# """
-# function Base.getindex(collection::AbstractQuantity, index...)
-#     subtype = typeof(collection)
-#     error("subtype $subtype of AbstractQuantity misses an implementation of the getindex function")
-# end
-#
-# TODO: move to AbstractQuantityArray
-# """
-#     Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, index...) where A <: AbstractArray
-#
-# Sets an element in an array wrapped by AbstractQuantity.
-#
-# The `element` needs to have a unit compatible with the unit of `array`, and `element.value` has to be of a type that can be converted to the type of `array.value`.
-# """
-# function Base.setindex!(array::AbstractQuantity{A}, element::AbstractQuantity, index...) where A <: AbstractArray
-#     subtype = typeof(array)
-#     error("subtype $subtype of AbstractQuantity misses an implementation of the setindex! function")
-# end
-#
-# TODO: move to AbstractQuantityArray
-# """
-#     Base.repeat(array::AbstractQuantity{A}, counts::Vararg{Integer, N}) where {A <: AbstractArray, N}
-#
-# Construct an array with the same unit as `array` by repeating `array` a given number of times in each dimension, specified by `counts`.
-# """
-# function Base.repeat(array::AbstractQuantity{A}, counts::Vararg{Integer, N}) where {A <: AbstractArray, N}
-#     subtype = typeof(array)
-#     error("subtype $subtype of AbstractQuantity misses an implementation of the repeat function")
-# end
-
-## AbstractArray interface
-
-# TODO: move to AbstractQuantityArray
-# """
-#     Base.ndims(abstractQuantity::AbstractQuantity{T}) where {T <: Union{Number, AbstractArray}
-#
-# Return the number of dimensions of the array wrapped by the AbstractQuantity.
-# """
-# function Base.ndims(abstractQuantity::AbstractQuantity{T}) where {T <: Union{Number, AbstractArray}}
-#     subtype = typeof(abstractQuantity)
-#     error("subtype $subtype of AbstractQuantity misses an implementation of the ndims function")
-# end

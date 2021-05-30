@@ -211,9 +211,7 @@ function _getSimpleQuantityExamples()
         # float
         ( SimpleQuantity( float, unit ), "4.345193 kg^3.1 TH^-2" ),
         # complex
-        ( SimpleQuantity( complex, unit ), "1 + 3im kg^3.1 TH^-2" ),
-        # array
-        ( SimpleQuantity( array, unit ), "SimpleQuantity{$typeofArray} of unit kg^3.1 TH^-2" )
+        ( SimpleQuantity( complex, unit ), "1 + 3im kg^3.1 TH^-2" )
     ]
 end
 

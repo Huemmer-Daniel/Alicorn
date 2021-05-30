@@ -11,8 +11,6 @@ function run()
         # initialization
         @test canInstanciateSimpleQuantityWithRealValue()
         @test canInstanciateSimpleQuantityWithComplexValue()
-        @test canInstanciateSimpleQuantityWithRealValuedArray()
-        @test canInstanciateSimpleQuantityWithComplexValuedArray()
         @test canInstanciateSimpleQuantityWithBaseUnit()
         @test canInstanciateSimpleQuantityWithUnitFactor()
         @test canInstanciateSimpleQuantityWithoutUnit()
@@ -55,12 +53,6 @@ function run()
         # array methods
         @test length_implemented()
         @test size_implemented()
-        @test getindex_implemented()
-        @test setindex!_implemented()
-        test_setindex!_errorsForIncompatibleTypes()
-        test_setindex!_errorsForIncompatibleUnits()
-        @test repeat_implemented()
-        @test ndims_implemented()
     end
 end
 
@@ -85,19 +77,6 @@ function canInstanciateSimpleQuantityWithComplexValue()
     unit = TestingTools.generateRandomUnit()
     return _testInstanciation(value, unit)
 end
-
-function canInstanciateSimpleQuantityWithRealValuedArray()
-    value = TestingTools.generateRandomReal(dim=(2,3))
-    unit = TestingTools.generateRandomUnit()
-    return _testInstanciation(value, unit)
-end
-
-function canInstanciateSimpleQuantityWithComplexValuedArray()
-    value = TestingTools.generateRandomComplex(dim=(2,3))
-    unit = TestingTools.generateRandomUnit()
-    return _testInstanciation(value, unit)
-end
-
 
 function canInstanciateSimpleQuantityWithBaseUnit()
     value = TestingTools.generateRandomReal()
@@ -186,19 +165,14 @@ function _getExamplesFor_Any_AbstractUnit_multiplication()
     unit = TestingTools.generateRandomUnit()
 
     scalar = TestingTools.generateRandomReal()
-    array = TestingTools.generateRandomReal( dim=(2,3) )
 
     # format: factor1, factor2, correct result for factor1 * factor2
-    # where factor1 is of any type and factor2 is a subtype of AbstractUnit
+    # where factor1 is of Number type and factor2 is a subtype of AbstractUnit
     examples = [
         # factor1 is a real number
         ( scalar, baseUnit, SimpleQuantity(scalar, baseUnit) ),
         ( scalar, unitFactor, SimpleQuantity(scalar, unitFactor) ),
         ( scalar, unit, SimpleQuantity(scalar, unit) ),
-        # factor1 is a real-valued array
-        ( array, baseUnit, SimpleQuantity(array, baseUnit) ),
-        ( array, unitFactor, SimpleQuantity(array, unitFactor) ),
-        ( array, unit, SimpleQuantity(array, unit) )
     ]
 end
 
@@ -213,19 +187,13 @@ function _getExamplesFor_Any_AbstractUnit_division()
     unit = TestingTools.generateRandomUnit()
 
     scalar = TestingTools.generateRandomReal()
-    array = TestingTools.generateRandomReal( dim=(2,3) )
 
     # format: dividend, divisor, correct result for dividend / divisor
-    # where dividend is of any type and divisor is an AbstractUnit
+    # where dividend is of Number type and divisor is an AbstractUnit
     examples = [
-        # factor1 is a real number
         ( scalar, baseUnit, SimpleQuantity(scalar, inv(baseUnit) ) ),
         ( scalar, unitFactor, SimpleQuantity(scalar, inv(unitFactor) ) ),
         ( scalar, unit, SimpleQuantity(scalar, inv(unit)) ),
-        # factor1 is a real-valued array
-        ( array, baseUnit, SimpleQuantity(array, inv(baseUnit)) ),
-        ( array, unitFactor, SimpleQuantity(array, inv(unitFactor)) ),
-        ( array, unit, SimpleQuantity(array, inv(unit)) )
     ]
 end
 
@@ -287,8 +255,7 @@ function _getExamplesFor_inUnitsOf()
         ( 7 * ucat.meter, ucat.milli*ucat.meter, 7000 * (ucat.milli*ucat.meter) ),
         ( 2 * (ucat.milli * ucat.second)^2, ucat.second^2, 2e-6 * ucat.second^2 ),
         ( 1 * ucat.joule, ucat.electronvolt, (1/electronvoltInBasicSI) * ucat.electronvolt ),
-        ( 5 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit),
-        ( [7, 2] * ucat.meter, ucat.milli*ucat.meter, [7000, 2000] * (ucat.milli*ucat.meter) )
+        ( 5 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit)
     ]
 end
 
@@ -317,31 +284,16 @@ function _getExamplesFor_inBasicSIUnits()
 end
 
 function addition_implemented()
-    scalarExamples = _getScalarExamplesFor_addition()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:+, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_addition()
-    worksForMatrices = TestingTools.testDyadicFunction(Base.:+, matrixExamples)
-
-    return (worksForScalars && worksForMatrices)
+    examples = _getExamplesFor_addition()
+    return TestingTools.testDyadicFunction(Base.:+, examples)
 end
 
-function _getScalarExamplesFor_addition()
+function _getExamplesFor_addition()
     # format: addend1, addend2, correct sum
     examples = [
         ( 2 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit ),
         ( 7 * ucat.meter, 2 * (ucat.milli * ucat.meter), 7.002 * ucat.meter ),
         ( 2 * (ucat.milli * ucat.meter), 7 * ucat.meter , 7.002e3 * (ucat.milli * ucat.meter) )
-    ]
-    return examples
-end
-
-function _getMatrixExamplesFor_addition()
-    # format: addend1, addend2, correct sum
-    examples = [
-        ( [2, 1] * Alicorn.unitlessUnit, [1, 2] * Alicorn.unitlessUnit, [3, 3] * Alicorn.unitlessUnit ),
-        ( [7; 2] * ucat.siemens, [2; 7] * (ucat.milli * ucat.siemens), [7.002; 2.007] * ucat.siemens ),
-        ( [2; 7] * (ucat.milli * ucat.second), [7; 2] * ucat.second , [7.002e3; 2.007e3] * (ucat.milli * ucat.second) )
     ]
     return examples
 end
@@ -364,32 +316,17 @@ function _generateMismatchedAddends()
 end
 
 function subtraction_implemented()
-    scalarExamples = _getScalarExamplesFor_subtraction()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:-, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_subtraction()
-    worksForMatrices = TestingTools.testDyadicFunction(Base.:-, matrixExamples)
-
-    return (worksForScalars && worksForMatrices)
+    examples = _getExamplesFor_subtraction()
+    return TestingTools.testDyadicFunction(Base.:-, examples)
 end
 
 
-function _getScalarExamplesFor_subtraction()
+function _getExamplesFor_subtraction()
     # format: addend1, addend2, correct sum
     examples = [
         ( 2 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
         ( 7 * ucat.meter, 2 * (ucat.milli * ucat.meter), 6.998 * ucat.meter ),
         ( 2 * (ucat.milli * ucat.meter), 7 * ucat.meter , -6.998e3 * (ucat.milli * ucat.meter) )
-    ]
-    return examples
-end
-
-function _getMatrixExamplesFor_subtraction()
-    # format: addend1, addend2, correct sum
-    examples = [
-        ( [2, 1] * Alicorn.unitlessUnit, [1, 2] * Alicorn.unitlessUnit, [1, -1] * Alicorn.unitlessUnit ),
-        ( [7; 2] * ucat.siemens, [2; 7] * (ucat.milli * ucat.siemens), [6.998; 1.993] * ucat.siemens ),
-        ( [2; 7] * (ucat.milli * ucat.second), [7; 2] * ucat.second , [-6.998e3; -1.993e3] * (ucat.milli * ucat.second) )
     ]
     return examples
 end
@@ -401,19 +338,11 @@ function test_subtraction_ErrorsForMismatchedDimensions()
 end
 
 function multiplication_implemented()
-    scalarExamples = _getScalarExamplesFor_multiplication()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:*, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_multiplication()
-    worksForMatrices = TestingTools.testDyadicFunction(Base.:*, matrixExamples)
-
-    mixedExamples = _getMixedExamplesFor_multiplication()
-    worksForMixed = TestingTools.testDyadicFunction(Base.:*, mixedExamples)
-
-    return (worksForScalars && worksForMatrices && worksForMixed)
+    examples = _getExamplesFor_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
 end
 
-function _getScalarExamplesFor_multiplication()
+function _getExamplesFor_multiplication()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
@@ -423,18 +352,6 @@ function _getScalarExamplesFor_multiplication()
         (2 * ucat.second, 2.5 * ucat.meter, 5 * ucat.second * ucat.meter ),
         ( -7 * ucat.lumen * (ucat.nano * ucat.second),  2.5 * (ucat.pico * ucat.second) , -17.5 * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
         ( 2 * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, 8 * (ucat.milli * ucat.candela)^-2 )
-    ]
-    return examples
-end
-
-function _getMatrixExamplesFor_multiplication()
-    # format: factor1, factor2, correct product factor1 * factor2
-    examples = [
-        ( [1 1] * Alicorn.unitlessUnit, [1; 1] * Alicorn.unitlessUnit, [2] * Alicorn.unitlessUnit ),
-        ( [1 0; 2 0] * Alicorn.unitlessUnit, [2 3; 4 5] * ucat.second, [2 3; 4 6] * ucat.second ),
-        ( [2 3; 4 5] * ucat.second, [1 0; 2 0] * Alicorn.unitlessUnit, [8 0; 14 0] * ucat.second ),
-        ( [2.5] * ucat.meter, [2 3] * ucat.second, [5 7.5] * ucat.meter * ucat.second ),
-        ( [2.5] * ucat.second, [2 3] * ucat.meter, [5 7.5] * ucat.second * ucat.meter )
     ]
     return examples
 end
@@ -452,19 +369,11 @@ function _getMixedExamplesFor_multiplication()
 end
 
 function multiplicationWithDimensionless_implemented()
-    scalarExamples = _getScalarExamplesFor_multiplicationWithDimensionless()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:*, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_multiplicationWithDimensionless()
-    worksForMatrices = TestingTools.testDyadicFunction(Base.:*, matrixExamples)
-
-    mixedExamples = _getMixedExamplesFor_multiplicationWithDimensionless()
-    worksForMixed = TestingTools.testDyadicFunction(Base.:*, mixedExamples)
-
-    return (worksForScalars && worksForMatrices && worksForMixed)
+    examples = _getExamplesFor_multiplicationWithDimensionless()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
 end
 
-function _getScalarExamplesFor_multiplicationWithDimensionless()
+function _getExamplesFor_multiplicationWithDimensionless()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1, 1 * Alicorn.unitlessUnit ),
@@ -477,41 +386,12 @@ function _getScalarExamplesFor_multiplicationWithDimensionless()
     return examples
 end
 
-function _getMatrixExamplesFor_multiplicationWithDimensionless()
-    # format: factor1, factor2, correct product factor1 * factor2
-    examples = [
-        ( [1 1] * Alicorn.unitlessUnit, [1; 1], [2] * Alicorn.unitlessUnit ),
-        ( [1 1], [1; 1] * Alicorn.unitlessUnit, [2] * Alicorn.unitlessUnit ),
-        ( [1 0; 2 0] * ucat.second, [2 3; 4 5] , [2 3; 4 6] * ucat.second ),
-        ( [2 3; 4 5], [1 0; 2 0] * ucat.second, [8 0; 14 0] * ucat.second )
-    ]
-    return examples
-end
-
-function _getMixedExamplesFor_multiplicationWithDimensionless()
-    # format: factor1, factor2, correct product factor1 * factor2
-    examples = [
-        ( [1 1] * Alicorn.unitlessUnit, 2, [2 2] * Alicorn.unitlessUnit ),
-        ( 2, [1 1] * Alicorn.unitlessUnit, [2 2] * Alicorn.unitlessUnit ),
-        ( [1 0; 2 0] * ucat.second, 3, [3 0; 6 0] * ucat.second ),
-        ( 3, [1 0; 2 0] * ucat.second, [3 0; 6 0] * ucat.second ),
-        ( 2.5 * ucat.meter, [2 3] , [5 7.5] * ucat.meter  ),
-        ( [2 3], 2.5 * ucat.meter, [5 7.5] * ucat.meter  )
-    ]
-    return examples
-end
-
 function division_implemented()
-    scalarExamples = _getScalarExamplesFor_division()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:/, scalarExamples)
-
-    mixedExamples = _getMixedExamplesFor_division()
-    worksForMixed = TestingTools.testDyadicFunction(Base.:/, mixedExamples)
-
-    return (worksForScalars && worksForMixed)
+    examples = _getExamplesFor_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
 end
 
-function _getScalarExamplesFor_division()
+function _getExamplesFor_division()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
@@ -525,32 +405,13 @@ function _getScalarExamplesFor_division()
     return examples
 end
 
-function _getMixedExamplesFor_division()
-    # format: factor1, factor2, correct product factor1 * factor2
-    examples = [
-        ( [1 1] * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, [1 1] * Alicorn.unitlessUnit ),
-        ( [2, 3] * Alicorn.unitlessUnit, 2 * ucat.second, [1, 1.5] * ucat.second^-1 ),
-        ( [2; 10] * ucat.second, 5 * Alicorn.unitlessUnit, [0.4; 2] * ucat.second ),
-        ( [4 4] * ucat.meter,  2 * ucat.second, [2 2] * ucat.meter / ucat.second ),
-        ( [4 4] * ucat.second, 2 * ucat.meter, [2 2] * ucat.second / ucat.meter ),
-        ( [-7 -7] * ucat.lumen * (ucat.nano * ucat.second),  2 * (ucat.pico * ucat.second) , [-3.5 -3.5] * ucat.lumen * (ucat.nano * ucat.second) / (ucat.pico * ucat.second) ),
-        ( [2 2; 2 2] * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, [0.5 0.5; 0.5 0.5] * (ucat.milli * ucat.candela)^-6 )
-    ]
-    return examples
-end
-
 function divisionByDimensionless_implemented()
-    scalarExamples = _getScalarExamplesFor_divisionByDimensionless()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:/, scalarExamples)
-
-    mixedExamples = _getMixedExamplesFor_divisionByDimensionless()
-    worksForMixed = TestingTools.testDyadicFunction(Base.:/, mixedExamples)
-
-    return (worksForScalars && worksForMixed)
+    examples = _getExamplesFor_divisionByDimensionless()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
 end
 
 
-function _getScalarExamplesFor_divisionByDimensionless()
+function _getExamplesFor_divisionByDimensionless()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 2 , 1/2 * Alicorn.unitlessUnit ),
@@ -563,28 +424,12 @@ function _getScalarExamplesFor_divisionByDimensionless()
     return examples
 end
 
-function _getMixedExamplesFor_divisionByDimensionless()
-    # format: factor1, factor2, correct product factor1 * factor2
-    examples = [
-        ( [1 1] * Alicorn.unitlessUnit, 1, [1 1] * Alicorn.unitlessUnit ),
-        ( [1 1], 1 * Alicorn.unitlessUnit, [1 1] * Alicorn.unitlessUnit ),
-        ( [2, 3] * ucat.second, 2 , [1, 1.5] * ucat.second ),
-        ( [2, 3] , 2 * ucat.second , [1, 1.5] / ucat.second ),
-    ]
-    return examples
-end
-
 function inv_implemented()
-    scalarExamples = _getScalarExamplesFor_inv()
-    worksForScalars = TestingTools.testMonadicFunction(Base.inv, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_inv()
-    worksForMatrices = TestingTools.testMonadicFunction(Base.inv, matrixExamples)
-
-    return worksForScalars && worksForMatrices
+    examples = _getExamplesFor_inv()
+    return TestingTools.testMonadicFunction(Base.inv, examples)
 end
 
-function _getScalarExamplesFor_inv()
+function _getExamplesFor_inv()
     # format: SimpleQuantity, correct result for SimpleQuantity^-1
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit),
@@ -594,27 +439,12 @@ function _getScalarExamplesFor_inv()
     return examples
 end
 
-function _getMatrixExamplesFor_inv()
-    # format: SimpleQuantity, correct result for SimpleQuantity^-1
-    examples = [
-        ( [1 0 ; 0 1] * Alicorn.unitlessUnit, [1 0 ; 0 1] * Alicorn.unitlessUnit),
-        ( [2 4; 2 8] * ucat.meter, [1 -0.5; -0.25 0.25] * ucat.meter^-1),
-        ( -[2 4; 2 8] * (ucat.femto * ucat.meter)^-1 * ucat.joule, -[1 -0.5; -0.25 0.25] * (ucat.femto * ucat.meter) * ucat.joule^-1 )
-    ]
-    return examples
-end
-
 function exponentiation_implemented()
-    scalarExamples = _getScalarExamplesFor_exponentiation()
-    worksForScalars = TestingTools.testDyadicFunction(Base.:^, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_exponentiation()
-    worksForMatrices = TestingTools.testDyadicFunction(Base.:^, matrixExamples)
-
-    return worksForScalars && worksForMatrices
+    examples = _getExamplesFor_exponentiation()
+    return TestingTools.testDyadicFunction(Base.:^, examples)
 end
 
-function _getScalarExamplesFor_exponentiation()
+function _getExamplesFor_exponentiation()
     # format: SimpleQuantity, exponent, correct result for SimpleQuantity^exponent
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1, 1 * Alicorn.unitlessUnit ),
@@ -626,27 +456,12 @@ function _getScalarExamplesFor_exponentiation()
     return examples
 end
 
-function _getMatrixExamplesFor_exponentiation()
-    # format: SimpleQuantity, exponent, correct result for SimpleQuantity^exponent
-    examples = [
-        ( [1 0; 0 1] * Alicorn.unitlessUnit, 1, [1 0; 0 1] * Alicorn.unitlessUnit ),
-        ( [1 0; 0 1] * Alicorn.unitlessUnit, 2, [1 0; 0 1] * Alicorn.unitlessUnit ),
-        ( [1 2; 3 4] * ucat.meter, 0, [1 0; 0 1] * Alicorn.unitlessUnit ),
-    ]
-    return examples
-end
-
 function sqrt_implemented()
-    scalarExamples = _getScalarExamplesFor_sqrt()
-    worksForScalars = TestingTools.testMonadicFunction(Base.sqrt, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_sqrt()
-    worksForMatrices = TestingTools.testMonadicFunction(Base.sqrt, matrixExamples)
-
-    return worksForScalars && worksForMatrices
+    examples = _getExamplesFor_sqrt()
+    return TestingTools.testMonadicFunction(Base.sqrt, examples)
 end
 
-function _getScalarExamplesFor_sqrt()
+function _getExamplesFor_sqrt()
     # format: SimpleQuantity, correct result for sqrt(SimpleQuantity)
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
@@ -655,28 +470,13 @@ function _getScalarExamplesFor_sqrt()
     return examples
 end
 
-function _getMatrixExamplesFor_sqrt()
-    # format: SimpleQuantity, correct result for sqrt(SimpleQuantity)
-    examples = [
-        ( [1 0; 0 1] * Alicorn.unitlessUnit, [1 0; 0 1] * Alicorn.unitlessUnit),
-        ( [4 0; 0 4] * (ucat.pico * ucat.meter)^-3, [2 0; 0 2] * (ucat.pico * ucat.meter)^-1.5 )
-    ]
-    return examples
-end
-
 # other methods
 function length_implemented()
-    scalarExamples = _getScalarExamplesFor_length()
-    worksForScalars = TestingTools.testMonadicFunction(Base.length, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_length()
-    worksForMatrices = TestingTools.testMonadicFunction(Base.length, matrixExamples)
-
-    works = (worksForScalars && worksForMatrices)
-    return works
+    examples = _getExamplesFor_length()
+    return TestingTools.testMonadicFunction(Base.length, examples)
 end
 
-function _getScalarExamplesFor_length()
+function _getExamplesFor_length()
     # format: SimpleQuantity, correct result for length(SimpleQuantity)
     examples = [
         ( 1123 * ucat.meter, 1 )
@@ -684,164 +484,17 @@ function _getScalarExamplesFor_length()
     return examples
 end
 
-function _getMatrixExamplesFor_length()
-    # format: SimpleQuantity, correct result for sqrt(SimpleQuantity)
-    examples = [
-        ( [1 0; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 6)
-    ]
-    return examples
-end
-
 function size_implemented()
-    scalarExamples = _getScalarExamplesFor_size()
-    worksForScalars = TestingTools.testMonadicFunction(Base.size, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_size()
-    worksForMatrices = TestingTools.testMonadicFunction(Base.size, matrixExamples)
-
-    works = (worksForScalars && worksForMatrices)
-    return works
+    examples = _getExamplesFor_size()
+    return TestingTools.testMonadicFunction(Base.size, examples)
 end
 
-function _getScalarExamplesFor_size()
+function _getExamplesFor_size()
     # format: SimpleQuantity, correct result for size(SimpleQuantity)
     examples = [
         ( 1123 * ucat.meter, () )
     ]
     return examples
-end
-
-function _getMatrixExamplesFor_size()
-    # format: SimpleQuantity, correct result for size(SimpleQuantity)
-    examples = [
-        ( [1 0; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, (3, 2) ),
-        ( [1 0 2; 0 1 3] * (ucat.pico * ucat.meter)^-3, (2, 3) )
-    ]
-    return examples
-end
-
-function getindex_implemented()
-    scalarExamples = _getScalarExamplesFor_getindex()
-    worksForScalars = true
-    for (simpleQuantity, index, correctOutput) in scalarExamples
-        returnedOutput = Base.getindex(simpleQuantity, index...)
-        worksForScalars &= (returnedOutput == correctOutput)
-    end
-
-    matrixExamples = _getMatrixExamplesFor_getindex()
-    worksForMatrices = true
-    for (simpleQuantity, index, correctOutput) in matrixExamples
-        returnedOutput = Base.getindex(simpleQuantity, index...)
-        worksForMatrices &= (returnedOutput == correctOutput)
-    end
-
-    works = (worksForScalars && worksForMatrices)
-    return works
-end
-
-function _getScalarExamplesFor_getindex()
-    # format: SimpleQuantity, index, correct result for getindex(SimpleQuantity, index)
-    examples = [
-        ( 1123 * ucat.meter, 1, 1123 * ucat.meter )
-    ]
-    return examples
-end
-
-function _getMatrixExamplesFor_getindex()
-    # format: SimpleQuantity, index, correct result for getindex(SimpleQuantity, index)
-    examples = [
-        ( [1 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, (3,1), 2 * (ucat.pico * ucat.meter)^-3 ),
-        ( [1 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 4, 7 * (ucat.pico * ucat.meter)^-3 ),
-        ( [1 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 6, 3 * (ucat.pico * ucat.meter)^-3 )
-    ]
-    return examples
-end
-
-function setindex!_implemented()
-    matrixExamples = _getMatrixExamplesFor_setindex!()
-    worksForMatrices = true
-    for (simpleQuantityArray, simpleQuantity, index, correctOutput) in matrixExamples
-        returnedOutput = Base.setindex!(simpleQuantityArray, simpleQuantity, index...)
-        worksForMatrices &= (returnedOutput == correctOutput)
-    end
-
-    return worksForMatrices
-end
-
-function _getMatrixExamplesFor_setindex!()
-    # format: SimpleQuantityArray, SimpleQuantity, index, correct result for getindex(SimpleQuantity, index)
-    examples = [
-        (
-            [1.0 7; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3,
-            2.3 * (ucat.pico * ucat.meter)^-3,
-            (3,1),
-            [1 7; 0 1; 2.3 3] * (ucat.pico * ucat.meter)^-3
-        )
-    ]
-    return examples
-end
-
-function test_setindex!_errorsForIncompatibleTypes()
-    array = Array{Int64}([1 2; 3 4]) * ucat.meter
-    element = Float64(2.5) * ucat.meter
-    expectedError = InexactError(:Int64, Int64, 2.5)
-    @test_throws expectedError (array[1] = element)
-end
-
-function test_setindex!_errorsForIncompatibleUnits()
-    array = Array{Float64}([1 2; 3 4]) * ucat.meter
-    element = Float64(2.5) * ucat.second
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
-    @test_throws expectedError (array[1] = element)
-end
-
-function repeat_implemented()
-    matrixExamples = _getMatrixExamplesFor_repeat()
-
-    worksForMatrices = true
-    for (simpleQuantityArray, counts, correctOutput) in matrixExamples
-        returnedOutput = Base.repeat(simpleQuantityArray, counts...)
-        worksForMatrices &= (returnedOutput == correctOutput)
-    end
-
-    return worksForMatrices
-end
-
-function _getMatrixExamplesFor_repeat()
-    # format: A::SimpleQuantity{A} where A <: AbstractArray, counts, correct output for repeat(A, counts...)
-    array = [1 2; 3 4]
-    examples = [
-        ( array * ucat.meter, (2, 3), repeat(array, 2, 3) * ucat.meter )
-    ]
-    return examples
-end
-
-function ndims_implemented()
-    scalarExamples = _getScalarExamplesFor_ndims()
-    worksForScalars = TestingTools.testMonadicFunction(Base.ndims, scalarExamples)
-
-    matrixExamples = _getMatrixExamplesFor_ndims()
-    worksForMatrices = TestingTools.testMonadicFunction(Base.ndims, matrixExamples)
-
-    works = (worksForScalars && worksForMatrices)
-    return works
-end
-
-function _getScalarExamplesFor_ndims()
-    # format: SimpleQuantity{<:Number}, correct result for ndims(SimpleQuantity{<:Number})
-    examples = [
-        ( SimpleQuantity(7, ucat.meter), 0 ),
-        ( SimpleQuantity(7.5im, ucat.second), 0 )
-    ]
-end
-
-function _getMatrixExamplesFor_ndims()
-    # format: SimpleQuantity{<:AbstractArray}, correct result for ndims(SimpleQuantity{<:AbstractArray})
-    examples = [
-        ( SimpleQuantity([1 2; 3 4; 5 6], ucat.meter), 2 ),
-        ( SimpleQuantity([1 2 3], ucat.second), 2 ),
-        ( SimpleQuantity([1, 2, 3], ucat.second), 1 )
-    ]
 end
 
 end # module

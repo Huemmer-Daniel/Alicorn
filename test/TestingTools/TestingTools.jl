@@ -61,6 +61,14 @@ function generateRandomComplex(; dim = 1)
     return realPart + im .* imagPart
 end
 
+function generateRandomNonzeroComplex(; dim = 1)
+    randomComplex = 0
+    while prod(randomComplex) == 0
+        randomComplex = generateRandomComplex(dim=dim)
+    end
+    return randomComplex
+end
+
 function generateRandomExponent(; dim = 1)
     randomExponent = generateRandomReal(dim=dim)
     randomExponent = Alicorn.Utils.tryCastingToInt(randomExponent)

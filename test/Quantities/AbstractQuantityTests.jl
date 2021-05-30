@@ -29,10 +29,6 @@ function run()
         # array methods
         test_length_required()
         test_size_required()
-        test_getindex_required()
-        test_setindex!_required()
-        test_repeat_required()
-        test_ndims_required()
     end
 end
 
@@ -139,31 +135,5 @@ function test_size_required()
     expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the size function")
     @test_throws expectedError size(mockQuantity)
 end
-
-function test_getindex_required()
-    mockQuantity = MockQuantityStub{Any}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the getindex function")
-    @test_throws expectedError getindex(mockQuantity, 1)
-end
-
-function test_setindex!_required()
-    mockQuantityArray = MockQuantityStub{Matrix{Any}}()
-    mockQuantity = MockQuantityStub{Any}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Matrix{Any}} of AbstractQuantity misses an implementation of the setindex! function")
-    @test_throws expectedError setindex!(mockQuantityArray, mockQuantity, 1)
-end
-
-function test_repeat_required()
-    mockQuantityArray = MockQuantityStub{Matrix{Any}}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Matrix{Any}} of AbstractQuantity misses an implementation of the repeat function")
-    @test_throws expectedError repeat(mockQuantityArray, 2, 3)
-end
-
-function test_ndims_required()
-    mockQuantityArray = MockQuantityStub{Matrix{Any}}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Matrix{Any}} of AbstractQuantity misses an implementation of the ndims function")
-    @test_throws expectedError ndims(mockQuantityArray)
-end
-
 
 end # module
