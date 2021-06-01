@@ -38,7 +38,7 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    julia> nanometer = ucat.nano * ucat.meter
    UnitFactor nm
 
-   julia> quantity = 7 * nanometer
+   julia> quantity = 7 nanometer
    7 nm
    ```
 3. The value can be of any numerical type `T <: Number`. Any mathematical operation included in the
@@ -50,7 +50,7 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    julia> nanometer = ucat.nano * ucat.meter
    UnitFactor nm
 
-   julia> quantity = 5 * nanometer
+   julia> quantity = 5 nanometer
    5 nm
 
    julia> sqrt(quantity)
@@ -68,7 +68,7 @@ mutable struct SimpleQuantity{T} <: AbstractQuantity{T}
     end
 end
 
-## External constructors
+## ## External constructors
 
 function SimpleQuantity(value::T) where T <: Number
     unit = unitlessUnit
@@ -76,38 +76,46 @@ function SimpleQuantity(value::T) where T <: Number
     return simpleQuantity
 end
 
-## Methods implementing the interface of AbstractQuantity
+## ## Methods for creating a SimpleQuantity
 
 """
-    Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
 
-Compare two `SimpleQuantity` objects.
+Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
-The two quantities are equal if both their values and their units are equal.
-Note that the units are not converted during the comparison.
-
-# Examples
+# Example
 ```jldoctest
 julia> ucat = UnitCatalogue() ;
 
-julia> q1 = 7 * ucat.meter
-7 m
-
-julia> q2 = 700 * (ucat.centi * ucat.meter)
-700 cm
-
-julia> q1 == q1
-true
-
-julia> q1 == q2
-false
+julia> 3.5 * ucat.tesla
+3.5 T
 ```
 """
-function Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    valuesEqual = ( simpleQuantity1.value == simpleQuantity2.value )
-    unitsEqual = ( simpleQuantity1.unit == simpleQuantity2.unit )
-    return valuesEqual && unitsEqual
+function Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+    return SimpleQuantity(value, abstractUnit)
 end
+
+"""
+    Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+
+Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
+
+# Example
+```jldoctest
+julia> ucat = UnitCatalogue() ;
+
+julia> 3.5 / ucat.second
+3.5 s^-1
+```
+"""
+function Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+    inverseAbstractUnit = inv(abstractUnit)
+    return SimpleQuantity(value, inverseAbstractUnit)
+end
+
+## ## Methods implementing the interface of AbstractQuantity
+
+## 1. Unit conversion
 
 export inUnitsOf
 # method documented as part of the AbstractQuantity interface
@@ -169,6 +177,9 @@ function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::Si
 
     return SimpleQuantity(value, unitQuotient)
 end
+
+## 2. Arithmetic unary and binary operators
+
 
 # method documented as part of the AbstractQuantity interface
 function Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
@@ -268,6 +279,47 @@ function Base.:^(simpleQuantity::SimpleQuantity, exponent::Real)
     return exponentiatedQuantity
 end
 
+## 3. Updating binary operators
+
+## 4. Numeric comparison
+
+"""
+    Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+
+Compare two `SimpleQuantity` objects.
+
+The two quantities are equal if both their values and their units are equal.
+Note that the units are not converted during the comparison.
+
+# Examples
+```jldoctest
+julia> ucat = UnitCatalogue() ;
+
+julia> q1 = 7 * ucat.meter
+7 m
+
+julia> q2 = 700 * (ucat.centi * ucat.meter)
+700 cm
+
+julia> q1 == q1
+true
+
+julia> q1 == q2
+false
+```
+"""
+function Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    valuesEqual = ( simpleQuantity1.value == simpleQuantity2.value )
+    unitsEqual = ( simpleQuantity1.unit == simpleQuantity2.unit )
+    return valuesEqual && unitsEqual
+end
+
+## 5. Rounding
+
+## 6. Sign and absolute value
+
+## 7. Roots
+
 # method documented as part of the AbstractQuantity interface
 function Base.sqrt(simpleQuantity::SimpleQuantity)
     rootOfValue = sqrt(simpleQuantity.value)
@@ -276,13 +328,12 @@ function Base.sqrt(simpleQuantity::SimpleQuantity)
     return rootOfQuantity
 end
 
-# method documented as part of the AbstractQuantity interface
-function Base.transpose(simpleQuantity::SimpleQuantity)
-    transposeOfValue = transpose(simpleQuantity.value)
-    unit = simpleQuantity.unit
-    transposeOfQuantity = SimpleQuantity(transposeOfValue, unit)
-    return transposeOfQuantity
-end
+
+## 8. Literal zero
+
+## 9. Complex numbers
+
+## 10. Compatibility with array functions
 
 # method documented as part of the AbstractQuantity interface
 function Base.length(simpleQuantity::SimpleQuantity)
@@ -302,35 +353,7 @@ function Base.getindex(simpleQuantity::SimpleQuantity, index...)
     return simpleQuantity
 end
 
-# method documented as part of the AbstractQuantity interface
-function Base.setindex!(simpleQuantity::SimpleQuantity{A}, element::SimpleQuantity, index...) where A <: AbstractArray
-    element = _convertElementToTypeAndUnitOfArray(simpleQuantity, element)
-    setindex!(simpleQuantity.value, element.value, index...)
-    return simpleQuantity
-end
-
-function _convertElementToTypeAndUnitOfArray(simpleQuantity::SimpleQuantity{A}, element::SimpleQuantity) where A <: AbstractArray
-    element.value = convert(typeof(simpleQuantity.value[1]), element.value)
-    element = inUnitsOf(element, simpleQuantity.unit)
-    return element
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.repeat(simpleQuantity::SimpleQuantity{A}, counts::Vararg{Integer, N}) where {A <: AbstractArray, N}
-    abstractArray = simpleQuantity.value
-    repeatedAbstractArray = repeat(abstractArray, counts...)
-    unit = simpleQuantity.unit
-    repeatedSimpleQuantity = SimpleQuantity(repeatedAbstractArray, unit)
-    return repeatedSimpleQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.ndims(simpleQuantity::SimpleQuantity{T}) where T <: Number
-    ndims = Base.ndims(simpleQuantity.value)
-    return ndims
-end
-
-## Methods
+## ## Additional Methods
 
 export valueOfDimensionless
 """
@@ -360,39 +383,4 @@ function _assertIsUnitless(simpleQuantity)
     if !(unit == unitlessUnit)
         throw(Exceptions.UnitMismatchError("quantity is not dimensionless"))
     end
-end
-
-"""
-    Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
-
-Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
-
-# Example
-```jldoctest
-julia> ucat = UnitCatalogue() ;
-
-julia> 3.5 * ucat.tesla
-3.5 T
-```
-"""
-function Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
-    return SimpleQuantity(value, abstractUnit)
-end
-
-"""
-    Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
-
-Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
-
-# Example
-```jldoctest
-julia> ucat = UnitCatalogue() ;
-
-julia> 3.5 / ucat.second
-3.5 s^-1
-```
-"""
-function Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
-    inverseAbstractUnit = inv(abstractUnit)
-    return SimpleQuantity(value, inverseAbstractUnit)
 end

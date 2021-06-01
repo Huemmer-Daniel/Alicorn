@@ -8,24 +8,11 @@ Currently the only concrete subtype of `AbstractQuantity` is [`SimpleQuantity`](
 """
 abstract type AbstractQuantity{T} end
 
-## 1. Generic functions
-# these functions need to work for all implementations of AbstractQuantity
-
-## 2. Interface
+# Interface
 # the following functions need to be extended for concrete implementations of
 # AbstractQuantity
 
-"""
-    Base.:==(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
-
-Compare two physical quantities.
-
-The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
-"""
-function Base.:(==)(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
-    subtype = typeof(quantity1)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the == function")
-end
+## 1. Unit conversion
 
 export inUnitsOf
 """
@@ -68,6 +55,8 @@ function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of the division by an AbstractUnit")
 end
+
+## 2. Arithmetic unary and binary operators
 
 """
     Base.:+(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
@@ -115,7 +104,6 @@ function Base.:*(object::Number, quantity::AbstractQuantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
 end
 
-
 """
     Base.:/(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
@@ -127,17 +115,17 @@ function Base.:/(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 end
 
 """
-    Base.:/(quantity::AbstractQuantity, object::Number)
-    Base.:/(object::Number, quantity::AbstractQuantity)
+    Base.:/(quantity::AbstractQuantity, number::Number)
+    Base.:/(number::Number, quantity::AbstractQuantity)
 
-Divide a physical quantity by a dimensionless object (or vice versa).
+Divide a physical quantity by a dimensionless number (or vice versa).
 """
-function Base.:/(quantity::AbstractQuantity, object::Number)
+function Base.:/(quantity::AbstractQuantity, number::Number)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of division")
 end
 
-function Base.:/(object::Number, quantity::AbstractQuantity)
+function Base.:/(number::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of division")
 end
@@ -162,6 +150,28 @@ function Base.:^(quantity::AbstractQuantity, exponent::Real)
     error("subtype $subtype of AbstractQuantity misses an implementation of exponentiation")
 end
 
+## 3. Updating binary operators
+
+## 4. Numeric comparison
+
+"""
+    Base.:==(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+
+Compare two physical quantities.
+
+The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
+"""
+function Base.:(==)(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    subtype = typeof(quantity1)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the == function")
+end
+
+## 5. Rounding
+
+## 6. Sign and absolute value
+
+## 7. Roots
+
 """
     Base.sqrt(quantity::AbstractQuantity)
 
@@ -172,15 +182,12 @@ function Base.sqrt(quantity::AbstractQuantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of the sqrt function")
 end
 
-"""
-    Base.transpose(quantity::AbstractQuantity)
 
-Transpose `quantity`.
-"""
-function Base.transpose(quantity::AbstractQuantity)
-    subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the transpose function")
-end
+## 8. Literal zero
+
+## 9. Complex numbers
+
+## 10. Compatibility with array functions
 
 """
     Base.length(quantity::AbstractQuantity)
