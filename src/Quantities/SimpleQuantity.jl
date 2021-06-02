@@ -15,9 +15,10 @@ quantity's value. The type `T` needs to be a subtype of `Number`.
 ```
 SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
 SimpleQuantity(value::T) where T <: Number
+SimpleQuantity(abstractUnit::AbstractUnit)
 ```
 
-If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is used by default.
+If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is used by default. If no value is passed to the constructor, the value is set to 1 by default.
 
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
@@ -62,7 +63,7 @@ mutable struct SimpleQuantity{T} <: AbstractQuantity{T}
     unit::Unit
 
     function SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
-        unit::Unit = convertToUnit(abstractUnit)
+        unit = convertToUnit(abstractUnit)
         simpleQuantity = new{T}(value, unit)
         return simpleQuantity
     end
@@ -72,6 +73,13 @@ end
 
 function SimpleQuantity(value::T) where T <: Number
     unit = unitlessUnit
+    simpleQuantity = SimpleQuantity(value, unit)
+    return simpleQuantity
+end
+
+function SimpleQuantity(abstractUnit::AbstractUnit)
+    value = 1
+    unit = convertToUnit(abstractUnit)
     simpleQuantity = SimpleQuantity(value, unit)
     return simpleQuantity
 end
@@ -143,6 +151,17 @@ function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitE
     if baseUnitExponents1 != baseUnitExponents2
         throw( Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree") )
     end
+end
+
+export inUnitsOf
+"""
+    inUnitsOf(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+
+Express `simpleQuantity1` in units of `simpleQuantity2`.
+"""
+function inUnitsOf(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    targetUnit = simpleQuantity2.unit
+    return inUnitsOf(simpleQuantity1, targetUnit)
 end
 
 export inBasicSIUnits

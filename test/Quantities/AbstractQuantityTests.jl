@@ -11,8 +11,11 @@ struct MockQuantityStub{T} <: AbstractQuantity{T} end
 function run()
     # test interface to be implemented by AbstractUnit realizations
     @testset "AbstractQuantity interface to implement" begin
-        test_equality_required()
         test_inUnitsOf_required()
+
+        # TODO below
+
+        test_equality_required()
         test_inBasicSIUnits_required()
         test_AbstractQuantity_AbstractUnit_multiplicationRequired()
         test_AbstractQuantity_AbstractUnit_divisionRequired()

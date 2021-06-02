@@ -8,26 +8,27 @@ const ucat = UnitCatalogue()
 
 function run()
     @testset "SimpleQuantity" begin
-        # initialization
+        # Constructors
         @test canInstanciateSimpleQuantityWithRealValue()
         @test canInstanciateSimpleQuantityWithComplexValue()
         @test canInstanciateSimpleQuantityWithBaseUnit()
         @test canInstanciateSimpleQuantityWithUnitFactor()
         @test canInstanciateSimpleQuantityWithoutUnit()
-
+        @test canInstanciateSimpleQuantityWithoutValue()
         @test fieldsCorrectlyInitialized()
 
-        @test_skip canInstanciateSimpleQuantityFromAbstractUnit()
+        # Methods for creating a SimpleQuantity
+        @test Number_AbstractUnit_multiplication()
+        @test Number_AbstractUnit_division()
 
-        # initialization by multiplication and division
-        @test Any_AbstractUnit_multiplication()
-        @test Any_AbstractUnit_division()
+        # Unit conversion
+        @test inUnitsOf_implemented()
+        @test inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
 
+        # TODO below
         @test SimpleQuantity_AbstractUnit_multiplication()
         @test SimpleQuantity_AbstractUnit_division()
 
-        # unit conversion
-        @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
         @test inBasicSIUnits_implemented()
         @test valueOfDimensionless_implemented()
@@ -59,55 +60,77 @@ end
 function canInstanciateSimpleQuantityWithRealValue()
     value = TestingTools.generateRandomReal()
     unit = TestingTools.generateRandomUnit()
-    return _testInstanciation(value, unit)
+    simpleQuantity = SimpleQuantity(value, unit)
+    correctFields = Dict([
+        ("value", value),
+        ("unit", unit)
+    ])
+    return _verifyHasCorrectFields(simpleQuantity, correctFields)
 end
 
-function _testInstanciation(value, unit::AbstractUnit)
-    pass = false
-    try
-        SimpleQuantity(value, unit)
-        pass = true
-    catch
-    end
-    return pass
+function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
+    correctValue = (simpleQuantity.value == correctFields["value"])
+    correctUnit = (simpleQuantity.unit == correctFields["unit"])
+    correct = correctValue && correctUnit
+    return correct
 end
 
 function canInstanciateSimpleQuantityWithComplexValue()
     value = TestingTools.generateRandomComplex()
     unit = TestingTools.generateRandomUnit()
-    return _testInstanciation(value, unit)
+    simpleQuantity = SimpleQuantity(value, unit)
+    correctFields = Dict([
+        ("value", value),
+        ("unit", unit)
+    ])
+    return _verifyHasCorrectFields(simpleQuantity, correctFields)
 end
 
 function canInstanciateSimpleQuantityWithBaseUnit()
     value = TestingTools.generateRandomReal()
     baseUnit = TestingTools.generateRandomBaseUnit()
-    return _testInstanciation(value, baseUnit)
+    simpleQuantity = SimpleQuantity(value, baseUnit)
+    correctFields = Dict([
+        ("value", value),
+        ("unit", Unit(baseUnit))
+    ])
+    return _verifyHasCorrectFields(simpleQuantity, correctFields)
 end
 
 function canInstanciateSimpleQuantityWithUnitFactor()
     value = TestingTools.generateRandomReal()
     unitFactor = TestingTools.generateRandomUnitFactor()
-    return _testInstanciation(value, unitFactor)
+    simpleQuantity = SimpleQuantity(value, unitFactor)
+    correctFields = Dict([
+        ("value", value),
+        ("unit", Unit(unitFactor))
+    ])
+    return _verifyHasCorrectFields(simpleQuantity, correctFields)
 end
 
 function canInstanciateSimpleQuantityWithoutUnit()
     value = TestingTools.generateRandomReal()
-    returnedSimpleQuantity = SimpleQuantity(value)
-    correctSimpleQuantity = SimpleQuantity(value, Alicorn.unitlessUnit)
-    pass = (returnedSimpleQuantity == correctSimpleQuantity)
-    return pass
+    simpleQuantity = SimpleQuantity(value)
+    correctFields = Dict([
+        ("value", value),
+        ("unit", Alicorn.unitlessUnit)
+    ])
+    return _verifyHasCorrectFields(simpleQuantity, correctFields)
+end
+
+function canInstanciateSimpleQuantityWithoutValue()
+    unit = TestingTools.generateRandomUnit()
+    simpleQuantity = SimpleQuantity(unit)
+    correctFields = Dict([
+        ("value", 1),
+        ("unit", unit)
+    ])
+    return _verifyHasCorrectFields(simpleQuantity, correctFields)
 end
 
 function fieldsCorrectlyInitialized()
     (randomSimpleQuantity, randomSimpleQuantityFields) = TestingTools.generateRandomSimpleQuantityWithFields()
     return _verifyHasCorrectFields(randomSimpleQuantity, randomSimpleQuantityFields)
-end
-
-function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, randomFields::Dict{String,Any})
-    correctValue = (simpleQuantity.value == randomFields["value"])
-    correctUnit = (simpleQuantity.unit == randomFields["unit"])
-    correct = correctValue && correctUnit
-    return correct
 end
 
 function valueOfDimensionless_implemented()
@@ -154,12 +177,12 @@ function _getExamplesFor_equality()
     return examples
 end
 
-function Any_AbstractUnit_multiplication()
-    examples = _getExamplesFor_Any_AbstractUnit_multiplication()
+function Number_AbstractUnit_multiplication()
+    examples = _getExamplesFor_Number_AbstractUnit_multiplication()
     return TestingTools.testDyadicFunction(Base.:*, examples)
 end
 
-function _getExamplesFor_Any_AbstractUnit_multiplication()
+function _getExamplesFor_Number_AbstractUnit_multiplication()
     baseUnit = TestingTools.generateRandomBaseUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
     unit = TestingTools.generateRandomUnit()
@@ -176,12 +199,12 @@ function _getExamplesFor_Any_AbstractUnit_multiplication()
     ]
 end
 
-function Any_AbstractUnit_division()
-    examples = _getExamplesFor_Any_AbstractUnit_division()
+function Number_AbstractUnit_division()
+    examples = _getExamplesFor_Number_AbstractUnit_division()
     return TestingTools.testDyadicFunction(Base.:/, examples)
 end
 
-function _getExamplesFor_Any_AbstractUnit_division()
+function _getExamplesFor_Number_AbstractUnit_division()
     baseUnit = TestingTools.generateRandomBaseUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
     unit = TestingTools.generateRandomUnit()
@@ -256,6 +279,24 @@ function _getExamplesFor_inUnitsOf()
         ( 2 * (ucat.milli * ucat.second)^2, ucat.second^2, 2e-6 * ucat.second^2 ),
         ( 1 * ucat.joule, ucat.electronvolt, (1/electronvoltInBasicSI) * ucat.electronvolt ),
         ( 5 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit)
+    ]
+end
+
+function inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
+    examples = _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
+    return TestingTools.testDyadicFunction(inUnitsOf, examples)
+end
+
+function _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
+    electronvoltInBasicSI = ucat.electronvolt.prefactor
+
+    # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 7 * ucat.meter, 8.9 * (ucat.milli*ucat.meter), 7000 * (ucat.milli*ucat.meter) ),
+        ( 2 * (ucat.milli * ucat.second)^2, pi * ucat.second^2, 2e-6 * ucat.second^2 ),
+        ( 1 * ucat.joule, -8.0 * ucat.electronvolt, (1/electronvoltInBasicSI) * ucat.electronvolt ),
+        ( 5 * Alicorn.unitlessUnit, -9 * Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit)
     ]
 end
 
