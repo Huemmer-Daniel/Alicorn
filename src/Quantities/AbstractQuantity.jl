@@ -38,6 +38,7 @@ end
 
 """
     Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
+    Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
 
 Modify the unit of `quantity` by multiplying it with `unit`.
 """
@@ -46,22 +47,55 @@ function Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
     error("subtype $subtype of AbstractQuantity misses an implementation of the multiplication with an AbstractUnit")
 end
 
+function Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the multiplication with an AbstractUnit")
+end
+
 """
     Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
+    Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)
 
-Modify the unit of `quantity` by dividing it by `unit`.
+Modify the unit of `quantity` by dividing it by `unit`, or vice versa.
 """
 function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
     subtype = typeof(quantity)
     error("subtype $subtype of AbstractQuantity misses an implementation of the division by an AbstractUnit")
 end
 
+function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity, )
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the division of an AbstractUnit")
+end
+
 ## 2. Arithmetic unary and binary operators
+
+"""
+    Base.:+(quantity::AbstractQuantity)
+
+Unary plus operator, acting as the identity operator.
+"""
+function Base.:+(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the unary plus operator")
+end
+
+"""
+    Base.:-(quantity::AbstractQuantity)
+
+Unary minus operator, returning the additive inverse of the quantity.
+"""
+function Base.:-(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("subtype $subtype of AbstractQuantity misses an implementation of the unary minus operator")
+end
 
 """
     Base.:+(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
 Add two physical quantities.
+
+The behavior of the addition depends on the concrete implementation of `AbstractQuantity`.
 """
 function Base.:+(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
@@ -72,11 +106,15 @@ end
     Base.:-(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
 Subtract `quantity2` from `quantity1`.
+
+The behavior of the subtraction depends on the concrete implementation of `AbstractQuantity`.
 """
 function Base.:-(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
     error("subtype $subtype of AbstractQuantity misses an implementation of subtraction")
 end
+
+# TODO below
 
 """
     Base.:*(quantity1::AbstractQuantity, quantity2::AbstractQuantity)

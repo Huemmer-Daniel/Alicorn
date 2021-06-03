@@ -4,23 +4,31 @@ using Alicorn
 using Test
 using ..TestingTools
 
-## 1. Mock implementations of AbstractQuantity interface
+## Mock implementations of AbstractQuantity interface
 struct MockQuantityStub{T} <: AbstractQuantity{T} end
 
-## 2. Test mock implementation
+## Test interface using mock implementation
 function run()
     # test interface to be implemented by AbstractUnit realizations
     @testset "AbstractQuantity interface to implement" begin
+
+        # 1. Unit conversion
         test_inUnitsOf_required()
+        test_inBasicSIUnits_required()
+        test_AbstractQuantity_AbstractUnit_multiplicationRequired()
+        test_AbstractUnit_AbstractQuantity_multiplicationRequired()
+        test_AbstractQuantity_AbstractUnit_divisionRequired()
+        test_AbstractUnit_AbstractQuantity_divisionRequired()
+
+        # 2. Arithemtic unary and binary operators
+        test_unary_plus_required()
+        test_unary_minus_required()
+        test_addition_required()
+        test_subtraction_required()
 
         # TODO below
 
         test_equality_required()
-        test_inBasicSIUnits_required()
-        test_AbstractQuantity_AbstractUnit_multiplicationRequired()
-        test_AbstractQuantity_AbstractUnit_divisionRequired()
-        test_addition_required()
-        test_subtraction_required()
         test_multiplication_required()
         test_multiplicationWithDimensionless_required()
         test_division_required()
@@ -35,11 +43,7 @@ function run()
     end
 end
 
-function test_equality_required()
-    mockQuantity = MockQuantityStub{Any}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the == function")
-    @test_throws expectedError (mockQuantity == mockQuantity)
-end
+## 1. Unit conversion
 
 function test_inUnitsOf_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -61,11 +65,39 @@ function test_AbstractQuantity_AbstractUnit_multiplicationRequired()
     @test_throws expectedError mockQuantity * unit
 end
 
+function test_AbstractUnit_AbstractQuantity_multiplicationRequired()
+    mockQuantity = MockQuantityStub{Any}()
+    unit = TestingTools.generateRandomUnit()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the multiplication with an AbstractUnit")
+    @test_throws expectedError unit * mockQuantity
+end
+
 function test_AbstractQuantity_AbstractUnit_divisionRequired()
     mockQuantity = MockQuantityStub{Any}()
     unit = TestingTools.generateRandomUnit()
     expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the division by an AbstractUnit")
     @test_throws expectedError mockQuantity / unit
+end
+
+function test_AbstractUnit_AbstractQuantity_divisionRequired()
+    mockQuantity = MockQuantityStub{Any}()
+    unit = TestingTools.generateRandomUnit()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the division of an AbstractUnit")
+    @test_throws expectedError unit / mockQuantity
+end
+
+## 2. Arithmetic unary and binary operators
+
+function test_unary_plus_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the unary plus operator")
+    @test_throws expectedError (+mockQuantity)
+end
+
+function test_unary_minus_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the unary minus operator")
+    @test_throws expectedError (-mockQuantity)
 end
 
 function test_addition_required()
@@ -80,10 +112,18 @@ function test_subtraction_required()
     @test_throws expectedError mockQuantity - mockQuantity
 end
 
+## TODO below
+
 function test_multiplication_required()
     mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of multiplication")
     @test_throws expectedError mockQuantity * mockQuantity
+end
+
+function test_division_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of division")
+    @test_throws expectedError mockQuantity / mockQuantity
 end
 
 function test_multiplicationWithDimensionless_required()
@@ -93,11 +133,6 @@ function test_multiplicationWithDimensionless_required()
     @test_throws expectedError mockQuantity * 2
 end
 
-function test_division_required()
-    mockQuantity = MockQuantityStub{Any}()
-    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of division")
-    @test_throws expectedError mockQuantity / mockQuantity
-end
 
 function test_divisionByDimensionless_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -124,6 +159,14 @@ function test_sqrt_required()
     expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the sqrt function")
     @test_throws expectedError sqrt(mockQuantity)
 end
+
+
+function test_equality_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any} of AbstractQuantity misses an implementation of the == function")
+    @test_throws expectedError (mockQuantity == mockQuantity)
+end
+
 
 # Array methods
 

@@ -166,7 +166,7 @@ end
 
 export inBasicSIUnits
 # method documented as part of the AbstractQuantity interface
-function inBasicSIUnits(simpleQuantity::SimpleQuantity)::SimpleQuantity
+function inBasicSIUnits(simpleQuantity::SimpleQuantity)
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
 
@@ -178,7 +178,7 @@ function inBasicSIUnits(simpleQuantity::SimpleQuantity)::SimpleQuantity
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::SimpleQuantity
+function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)
     value = simpleQuantity.value
     unit = simpleQuantity.unit
 
@@ -188,7 +188,17 @@ function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::Si
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::SimpleQuantity
+function Base.:*(abstractUnit::AbstractUnit, simpleQuantity::SimpleQuantity)
+    value = simpleQuantity.value
+    unit = simpleQuantity.unit
+
+    unitProduct = abstractUnit * unit
+
+    return SimpleQuantity(value, unitProduct)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)
     value = simpleQuantity.value
     unit = simpleQuantity.unit
 
@@ -197,10 +207,40 @@ function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)::Si
     return SimpleQuantity(value, unitQuotient)
 end
 
+# method documented as part of the AbstractQuantity interface
+function Base.:/(abstractUnit::AbstractUnit, simpleQuantity::SimpleQuantity)
+    value = simpleQuantity.value
+    unit = simpleQuantity.unit
+
+    unitQuotient = abstractUnit / unit
+
+    return SimpleQuantity(1/value, unitQuotient)
+end
+
 ## 2. Arithmetic unary and binary operators
 
+# method documented as part of the AbstractQuantity interface
+function Base.:+(simpleQuantity::SimpleQuantity)
+    return simpleQuantity
+end
 
 # method documented as part of the AbstractQuantity interface
+function Base.:-(simpleQuantity::SimpleQuantity)
+    value = -simpleQuantity.value
+    unit = simpleQuantity.unit
+    return SimpleQuantity( value, unit )
+end
+
+"""
+    Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+
+Add two SimpleQuantities.
+
+The resulting quantity is expressed in units of `simpleQuantity1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and `simpleQuantity2` are of different dimensions
+"""
 function Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     targetUnit = simpleQuantity1.unit
     simpleQuantity2 = _addition_ConvertQuantityToTargetUnit(simpleQuantity2, targetUnit)
@@ -227,14 +267,21 @@ function _handleExceptionInAddition(exception::Exception)
     end
 end
 
-# method documented as part of the AbstractQuantity interface
+"""
+    Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+
+Subtract two SimpleQuantities.
+
+The resulting quantity is expressed in units of `simpleQuantity1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and `simpleQuantity2` are of different dimensions
+"""
 function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    targetUnit = simpleQuantity1.unit
-    simpleQuantity2 = _addition_ConvertQuantityToTargetUnit(simpleQuantity2, targetUnit)
-    differenceValue = simpleQuantity1.value - simpleQuantity2.value
-    differenceQuantity = SimpleQuantity( differenceValue, targetUnit )
-    return differenceQuantity
+    return simpleQuantity1 + (-simpleQuantity2)
 end
+
+## TODO below
 
 # method documented as part of the AbstractQuantity interface
 function Base.:*(simpleQuantity::SimpleQuantity, object::Number)
