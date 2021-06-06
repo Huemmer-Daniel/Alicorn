@@ -36,31 +36,36 @@ function run()
         @test unaryPlus_implemented()
         @test unaryMinus_implemented()
         @test addition_implemented()
-        @test subtraction_implemented()
-
-        # TODO below
-
-        @test valueOfDimensionless_implemented()
-        test_valueOfDimensionless_ErrorsIfNotUnitless()
-
-        # arithmetics
-        @test equality_implemented()
-
         test_addition_ErrorsForMismatchedDimensions()
+        @test subtraction_implemented()
         test_subtraction_ErrorsForMismatchedDimensions()
-
         @test multiplication_implemented()
         @test multiplicationWithDimensionless_implemented()
         @test division_implemented()
         @test divisionByDimensionless_implemented()
-
-        @test inv_implemented()
+        @test inverseDivision_implemented()
+        @test inverseDivisionByDimensionless_implemented()
         @test exponentiation_implemented()
+        @test inv_implemented()
+
+        # 3. Updating binary operators
+        # 4. Numeric comparison
+        @test equality_implemented()
+
+        # 5. Rounding
+        # 6. Sign and absolute value
+        # 7. Roots
         @test sqrt_implemented()
 
-        # array methods
+        # 8. Literal zero
+        # 9. Complex numbers
+        # 10. Compatibility with array functions
         @test length_implemented()
         @test size_implemented()
+
+        # additional methods
+        @test valueOfDimensionless_implemented()
+        test_valueOfDimensionless_ErrorsIfNotUnitless()
     end
 end
 
@@ -375,69 +380,6 @@ function _getExamplesFor_addition()
     return examples
 end
 
-function subtraction_implemented()
-    examples = _getExamplesFor_subtraction()
-    return TestingTools.testDyadicFunction(Base.:-, examples)
-end
-
-function _getExamplesFor_subtraction()
-    # format: addend1, addend2, correct sum
-    examples = [
-        ( 2 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
-        ( 7 * ucat.meter, 2 * (ucat.milli * ucat.meter), 6.998 * ucat.meter ),
-        ( 2 * (ucat.milli * ucat.meter), 7 * ucat.meter , -6.998e3 * (ucat.milli * ucat.meter) )
-    ]
-    return examples
-end
-
-
-## TODO below
-
-function valueOfDimensionless_implemented()
-    examples = _getExamplesFor_valueOfDimensionless()
-    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
-end
-
-function _getExamplesFor_valueOfDimensionless()
-    # format: quantity, correct result for valueOfDimensionless(quantity)
-    examples = [
-        (SimpleQuantity(7), 7),
-        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
-    ]
-    return examples
-end
-
-function test_valueOfDimensionless_ErrorsIfNotUnitless()
-    simpleQuantity = 7 * Alicorn.meter
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
-    @test_throws expectedError valueOfDimensionless(simpleQuantity)
-end
-
-function equality_implemented()
-    examples = _getExamplesFor_equality()
-    return TestingTools.testDyadicFunction(Base.:(==), examples)
-end
-
-function _getExamplesFor_equality()
-    value = TestingTools.generateRandomReal()
-    unit = TestingTools.generateRandomUnit()
-
-    randomSimpleQuantity1 = SimpleQuantity(value, unit)
-    randomSimpleQuantity1Copy = deepcopy(randomSimpleQuantity1)
-
-    randomSimpleQuantity2 = SimpleQuantity(value, unit^2)
-    randomSimpleQuantity3 = SimpleQuantity(2*value, unit)
-
-    # format: quantity1, quantity2, correct result for quantity1 == quantity2
-    examples = [
-        ( randomSimpleQuantity1, randomSimpleQuantity1Copy, true ),
-        ( randomSimpleQuantity1, randomSimpleQuantity2, false ),
-        ( randomSimpleQuantity1, randomSimpleQuantity3, false )
-    ]
-    return examples
-end
-
-
 function test_addition_ErrorsForMismatchedDimensions()
     (mismatchedAddend1, mismatchedAddend2) = _generateMismatchedAddends()
     expectedError = Alicorn.Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
@@ -453,6 +395,21 @@ function _generateMismatchedAddends()
     mismatchedAddend2 = (2*value) * mismatchedUnit
 
     return (mismatchedAddend1, mismatchedAddend2)
+end
+
+function subtraction_implemented()
+    examples = _getExamplesFor_subtraction()
+    return TestingTools.testDyadicFunction(Base.:-, examples)
+end
+
+function _getExamplesFor_subtraction()
+    # format: addend1, addend2, correct sum
+    examples = [
+        ( 2 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 7 * ucat.meter, 2 * (ucat.milli * ucat.meter), 6.998 * ucat.meter ),
+        ( 2 * (ucat.milli * ucat.meter), 7 * ucat.meter , -6.998e3 * (ucat.milli * ucat.meter) )
+    ]
+    return examples
 end
 
 function test_subtraction_ErrorsForMismatchedDimensions()
@@ -476,18 +433,6 @@ function _getExamplesFor_multiplication()
         (2 * ucat.second, 2.5 * ucat.meter, 5 * ucat.second * ucat.meter ),
         ( -7 * ucat.lumen * (ucat.nano * ucat.second),  2.5 * (ucat.pico * ucat.second) , -17.5 * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
         ( 2 * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, 8 * (ucat.milli * ucat.candela)^-2 )
-    ]
-    return examples
-end
-
-function _getMixedExamplesFor_multiplication()
-    # format: factor1, factor2, correct product factor1 * factor2
-    examples = [
-        ( [1 1] * Alicorn.unitlessUnit, 2 * Alicorn.unitlessUnit, [2 2] * Alicorn.unitlessUnit ),
-        ( [1 0; 2 0] * Alicorn.unitlessUnit, 3 * ucat.second, [3 0; 6 0] * ucat.second ),
-        ( 3 * ucat.second, [1 0; 2 0] * Alicorn.unitlessUnit, [3 0; 6 0] * ucat.second ),
-        ( 2.5 * ucat.meter, [2 3] * ucat.second, [5 7.5] * ucat.meter * ucat.second ),
-        ( [2 3] * ucat.second, 2.5 * ucat.meter, [5 7.5] * ucat.second * ucat.meter )
     ]
     return examples
 end
@@ -516,7 +461,7 @@ function division_implemented()
 end
 
 function _getExamplesFor_division()
-    # format: factor1, factor2, correct product factor1 * factor2
+    # format: factor1, factor2, correct result for factor1 / factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
         ( 1 * Alicorn.unitlessUnit, 2 * ucat.second, 0.5 / ucat.second ),
@@ -534,9 +479,8 @@ function divisionByDimensionless_implemented()
     return TestingTools.testDyadicFunction(Base.:/, examples)
 end
 
-
 function _getExamplesFor_divisionByDimensionless()
-    # format: factor1, factor2, correct product factor1 * factor2
+    # format: factor1, factor2, correct result for factor1 / factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 2 , 1/2 * Alicorn.unitlessUnit ),
         ( 2, 1 * Alicorn.unitlessUnit , 2 * Alicorn.unitlessUnit ),
@@ -548,17 +492,39 @@ function _getExamplesFor_divisionByDimensionless()
     return examples
 end
 
-function inv_implemented()
-    examples = _getExamplesFor_inv()
-    return TestingTools.testMonadicFunction(Base.inv, examples)
+function inverseDivision_implemented()
+    examples = _getExamplesFor_inverseDivision()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
 end
 
-function _getExamplesFor_inv()
-    # format: SimpleQuantity, correct result for SimpleQuantity^-1
+function _getExamplesFor_inverseDivision()
+    # format: factor1, factor2, correct result for factor1 / factor2
     examples = [
-        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit),
-        ( 2 * ucat.meter, 0.5 * ucat.meter^-1),
-        ( -5 * (ucat.femto * ucat.meter)^-1 * ucat.joule, -0.2 * (ucat.femto * ucat.meter) * ucat.joule^-1 )
+        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 2 * ucat.second, 1 * Alicorn.unitlessUnit, 0.5 / ucat.second ),
+        ( 1 * Alicorn.unitlessUnit, 2 * ucat.second, 2 * ucat.second ),
+        ( 2 * ucat.second, 2.5 * ucat.meter, 1.25 * ucat.meter / ucat.second ),
+        ( 2 * ucat.meter, 5 * ucat.second, 2.5 * ucat.second / ucat.meter ),
+        ( 2 * (ucat.pico * ucat.second), -7 * ucat.lumen * (ucat.nano * ucat.second),  -3.5 * ucat.lumen * (ucat.nano * ucat.second) / (ucat.pico * ucat.second) ),
+        ( 4 * (ucat.milli * ucat.candela)^2, 2 * (ucat.milli * ucat.candela)^-4, 0.5 * (ucat.milli * ucat.candela)^-6 )
+    ]
+    return examples
+end
+
+function inverseDivisionByDimensionless_implemented()
+    examples = _getExamplesFor_inverseDivisionByDimensionless()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
+end
+
+function _getExamplesFor_inverseDivisionByDimensionless()
+    # format: factor1, factor2, correct result factor1 \ factor2
+    examples = [
+        ( 2 , 1 * Alicorn.unitlessUnit, 1/2 * Alicorn.unitlessUnit ),
+        ( 1 * Alicorn.unitlessUnit, 2, 2 * Alicorn.unitlessUnit ),
+        ( 2 * ucat.second, 4, 2 / ucat.second ),
+        ( 4, 2 * ucat.second, 1/2 * ucat.second ),
+        ( 2, -7 * ucat.lumen * (ucat.nano * ucat.second), -3.5 * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( -4 * (ucat.milli * ucat.candela)^2, 2, -0.5 * (ucat.milli * ucat.candela)^-2 )
     ]
     return examples
 end
@@ -580,6 +546,54 @@ function _getExamplesFor_exponentiation()
     return examples
 end
 
+function inv_implemented()
+    examples = _getExamplesFor_inv()
+    return TestingTools.testMonadicFunction(Base.inv, examples)
+end
+
+function _getExamplesFor_inv()
+    # format: SimpleQuantity, correct result for SimpleQuantity^-1
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit),
+        ( 2 * ucat.meter, 0.5 * ucat.meter^-1),
+        ( -5 * (ucat.femto * ucat.meter)^-1 * ucat.joule, -0.2 * (ucat.femto * ucat.meter) * ucat.joule^-1 )
+    ]
+    return examples
+end
+## 3. Updating binary operators
+
+## 4. Numeric comparison
+
+function equality_implemented()
+    examples = _getExamplesFor_equality()
+    return TestingTools.testDyadicFunction(Base.:(==), examples)
+end
+
+function _getExamplesFor_equality()
+    value = TestingTools.generateRandomReal()
+    unit = TestingTools.generateRandomUnit()
+
+    randomSimpleQuantity1 = SimpleQuantity(value, unit)
+    randomSimpleQuantity1Copy = deepcopy(randomSimpleQuantity1)
+
+    randomSimpleQuantity2 = SimpleQuantity(value, unit^2)
+    randomSimpleQuantity3 = SimpleQuantity(2*value, unit)
+
+    # format: quantity1, quantity2, correct result for quantity1 == quantity2
+    examples = [
+        ( randomSimpleQuantity1, randomSimpleQuantity1Copy, true ),
+        ( randomSimpleQuantity1, randomSimpleQuantity2, false ),
+        ( randomSimpleQuantity1, randomSimpleQuantity3, false )
+    ]
+    return examples
+end
+
+## 5. Rounding
+
+## 6. Sign and absolute value
+
+## 7. Roots
+
 function sqrt_implemented()
     examples = _getExamplesFor_sqrt()
     return TestingTools.testMonadicFunction(Base.sqrt, examples)
@@ -594,7 +608,12 @@ function _getExamplesFor_sqrt()
     return examples
 end
 
-# other methods
+## 8. Literal zero
+
+## 9. Complex numbers
+
+## 10. Compatibility with array functions
+
 function length_implemented()
     examples = _getExamplesFor_length()
     return TestingTools.testMonadicFunction(Base.length, examples)
@@ -619,6 +638,28 @@ function _getExamplesFor_size()
         ( 1123 * ucat.meter, () )
     ]
     return examples
+end
+
+## Additional methods
+
+function valueOfDimensionless_implemented()
+    examples = _getExamplesFor_valueOfDimensionless()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
+end
+
+function _getExamplesFor_valueOfDimensionless()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantity(7), 7),
+        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless()
+    simpleQuantity = 7 * Alicorn.meter
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(simpleQuantity)
 end
 
 end # module

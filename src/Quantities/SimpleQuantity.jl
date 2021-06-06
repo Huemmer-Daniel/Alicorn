@@ -281,27 +281,25 @@ function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
     return simpleQuantity1 + (-simpleQuantity2)
 end
 
-## TODO below
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity::SimpleQuantity, object::Number)
-    productValue = simpleQuantity.value * object
-    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
-    return productQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(object::Number, simpleQuantity::SimpleQuantity)
-    productValue = object * simpleQuantity.value
-    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
-    return productQuantity
-end
-
 # method documented as part of the AbstractQuantity interface
 function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     productValue = simpleQuantity1.value * simpleQuantity2.value
     productUnit = simpleQuantity1.unit * simpleQuantity2.unit
     productQuantity = SimpleQuantity(productValue, productUnit)
+    return productQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(simpleQuantity::SimpleQuantity, number::Number)
+    productValue = simpleQuantity.value * number
+    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
+    return productQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(number::Number, simpleQuantity::SimpleQuantity)
+    productValue = number * simpleQuantity.value
+    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
     return productQuantity
 end
 
@@ -314,27 +312,34 @@ function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:/(simpleQuantity::SimpleQuantity, object::Number)
-    quotientValue = simpleQuantity.value / object
+function Base.:/(simpleQuantity::SimpleQuantity, number::Number)
+    quotientValue = simpleQuantity.value / number
     quotientUnit = simpleQuantity.unit
     quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
     return quotientQuantity
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.:/(object::Number, simpleQuantity::SimpleQuantity)
-    quotientValue = object / simpleQuantity.value
+function Base.:/(number::Number, simpleQuantity::SimpleQuantity)
+    quotientValue = number / simpleQuantity.value
     quotientUnit = inv(simpleQuantity.unit)
     quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
     return quotientQuantity
 end
 
 # method documented as part of the AbstractQuantity interface
-function Base.inv(simpleQuantity::SimpleQuantity)
-    inverseValue = inv(simpleQuantity.value)
-    inverseUnit = inv(simpleQuantity.unit)
-    inverseQuantity = SimpleQuantity(inverseValue, inverseUnit)
-    return inverseQuantity
+function Base.:\(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    return simpleQuantity2 / simpleQuantity1
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:\(simpleQuantity::SimpleQuantity, number::Number)
+    return number / simpleQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:\(number::Number, simpleQuantity::SimpleQuantity)
+    return simpleQuantity / number
 end
 
 # method documented as part of the AbstractQuantity interface
@@ -343,6 +348,14 @@ function Base.:^(simpleQuantity::SimpleQuantity, exponent::Real)
     exponentiatedUnit = (simpleQuantity.unit)^exponent
     exponentiatedQuantity = SimpleQuantity(exponentiatedValue, exponentiatedUnit)
     return exponentiatedQuantity
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.inv(simpleQuantity::SimpleQuantity)
+    inverseValue = inv(simpleQuantity.value)
+    inverseUnit = inv(simpleQuantity.unit)
+    inverseQuantity = SimpleQuantity(inverseValue, inverseUnit)
+    return inverseQuantity
 end
 
 ## 3. Updating binary operators
@@ -393,7 +406,6 @@ function Base.sqrt(simpleQuantity::SimpleQuantity)
     rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
     return rootOfQuantity
 end
-
 
 ## 8. Literal zero
 

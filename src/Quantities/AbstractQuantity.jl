@@ -22,7 +22,7 @@ Express `quantity` as an object of type `SimpleQuantity` in terms of the unit sp
 """
 function inUnitsOf(quantity::AbstractQuantity, targetUnit::AbstractUnit)::SimpleQuantity
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the inUnitsOf function")
+    error("missing specialization of inUnitsOf(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
 end
 
 export inBasicSIUnits
@@ -33,7 +33,7 @@ Express `quantity` as an object of type `SimpleQuantity` using the seven basic S
 """
 function inBasicSIUnits(quantity::AbstractQuantity)::SimpleQuantity
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the inBasicSIUnits function")
+    error("missing specialization of inBasicSIUnits(::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -44,12 +44,12 @@ Modify the unit of `quantity` by multiplying it with `unit`.
 """
 function Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the multiplication with an AbstractUnit")
+    error("missing specialization of Base.:*(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
 end
 
 function Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the multiplication with an AbstractUnit")
+    error("missing specialization of Base.:*(::AbstractUnit, ::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -60,12 +60,12 @@ Modify the unit of `quantity` by dividing it by `unit`, or vice versa.
 """
 function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the division by an AbstractUnit")
+    error("missing specialization of Base.:/(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
 end
 
 function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity, )
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the division of an AbstractUnit")
+    error("missing specialization of Base.:/(::AbstractUnit, ::AbstractQuantity) for subtype $subtype")
 end
 
 ## 2. Arithmetic unary and binary operators
@@ -77,7 +77,7 @@ Unary plus operator, acting as the identity operator.
 """
 function Base.:+(quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the unary plus operator")
+    error("missing specialization of Base.:+(::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -87,7 +87,7 @@ Unary minus operator, returning the additive inverse of the quantity.
 """
 function Base.:-(quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the unary minus operator")
+    error("missing specialization of Base.:-(::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -99,7 +99,7 @@ The behavior of the addition depends on the concrete implementation of `Abstract
 """
 function Base.:+(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
-    error("subtype $subtype of AbstractQuantity misses an implementation of addition")
+    error("missing specialization of Base.:+(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -111,10 +111,8 @@ The behavior of the subtraction depends on the concrete implementation of `Abstr
 """
 function Base.:-(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
-    error("subtype $subtype of AbstractQuantity misses an implementation of subtraction")
+    error("missing specialization of Base.:-(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
-
-# TODO below
 
 """
     Base.:*(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
@@ -123,7 +121,7 @@ Multiply two physical quantities.
 """
 function Base.:*(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
-    error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
+    error("missing specialization of Base.:*(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -132,14 +130,14 @@ end
 
 Multiply a physical quantity with a dimensionless number.
 """
-function Base.:*(quantity::AbstractQuantity, object::Number)
+function Base.:*(quantity::AbstractQuantity, number::Number)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
+    error("missing specialization of Base.:*(::AbstractQuantity, ::Number) for subtype $subtype")
 end
 
-function Base.:*(object::Number, quantity::AbstractQuantity)
+function Base.:*(number::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of multiplication")
+    error("missing specialization of Base.:*(::Number, ::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -149,7 +147,7 @@ Divide `quantity1` by `quantity2`.
 """
 function Base.:/(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
-    error("subtype $subtype of AbstractQuantity misses an implementation of division")
+    error("missing specialization of Base.:/(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -160,22 +158,38 @@ Divide a physical quantity by a dimensionless number (or vice versa).
 """
 function Base.:/(quantity::AbstractQuantity, number::Number)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of division")
+    error("missing specialization of Base.:/(::AbstractQuantity, ::Number) for subtype $subtype")
 end
 
 function Base.:/(number::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of division")
+    error("missing specialization of Base.:/(::Number, ::AbstractQuantity) for subtype $subtype")
 end
 
-"""
-    Base.inv(quantity::AbstractQuantity)
+raw"
+    Base.:\(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
-Determine the multiplicative inverse of `quantity`.
-"""
-function Base.inv(quantity::AbstractQuantity)
+Inverse divide: divide `quantity2` by `quantity1`.
+"
+function Base.:\(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    subtype = typeof(quantity1)
+    error(raw"missing specialization of Base.:\(::AbstractQuantity, ::AbstractQuantity) for subtype " * "$subtype")
+end
+
+raw"
+    Base.:\(quantity::AbstractQuantity, number::Number)
+    Base.:\(number::Number, quantity::AbstractQuantity)
+
+Inverse divide: divide `quantity2` by `number` (or vice versa).
+"
+function Base.:\(quantity::AbstractQuantity, number::Number)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the inv function")
+    error(raw"missing specialization of Base.:\(::AbstractQuantity, ::Number) for subtype " * "$subtype")
+end
+
+function Base.:\(number::Number, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error(raw"missing specialization of Base.:\(::Number, ::AbstractQuantity) for subtype " * "$subtype")
 end
 
 """
@@ -185,8 +199,19 @@ Raise `quantity` to the power of `exponent`.
 """
 function Base.:^(quantity::AbstractQuantity, exponent::Real)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of exponentiation")
+    error("missing specialization of Base.:^(::AbstractQuantity, ::Number) for subtype $subtype")
 end
+
+"""
+    Base.inv(quantity::AbstractQuantity)
+
+Determine the multiplicative inverse of `quantity`.
+"""
+function Base.inv(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.inv(::AbstractQuantity) for subtype $subtype")
+end
+
 
 ## 3. Updating binary operators
 
@@ -201,7 +226,7 @@ The behavior of the comparison depends on the concrete subtype of `AbstractUnit`
 """
 function Base.:(==)(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the == function")
+    error("missing specialization of Base.:==(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
 
 ## 5. Rounding
@@ -217,7 +242,7 @@ Take the square root of `quantity`.
 """
 function Base.sqrt(quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the sqrt function")
+    error("missing specialization of Base.sqrt(::AbstractQuantity) for subtype $subtype")
 end
 
 
@@ -234,7 +259,7 @@ Returns `length(quantity.value)`.
 """
 function Base.length(quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the length function")
+    error("missing specialization of Base.length(::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -244,5 +269,5 @@ Returns `size(quantity.value)`.
 """
 function Base.size(quantity::AbstractQuantity)
     subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantity misses an implementation of the size function")
+    error("missing specialization of Base.size(::AbstractQuantity) for subtype $subtype")
 end
