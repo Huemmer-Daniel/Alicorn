@@ -36,6 +36,7 @@ function run()
 
         # 4. Numeric comparison
         test_equality_required()
+        test_isless_required()
 
         # 5. Rounding
         # 6. Sign and absolute value
@@ -189,6 +190,14 @@ function test_equality_required()
     expectedError = Core.ErrorException("missing specialization of Base.:==(::AbstractQuantity, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError (mockQuantity == mockQuantity)
 end
+
+function test_isless_required()
+    mockQuantity1 = MockQuantityStub{Any}()
+    mockQuantity2 = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.isless(::AbstractQuantity, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError isless(mockQuantity1, mockQuantity2)
+end
+
 
 ## 5. Rounding
 

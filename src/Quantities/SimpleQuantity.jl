@@ -365,10 +365,15 @@ end
 """
     Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
 
-Compare two `SimpleQuantity` objects.
+Returns `true` if `simpleQuantity1` and `simpleQuantity2` are of equal value.
 
-The two quantities are equal if both their values and their units are equal.
-Note that the units are not converted during the comparison.
+If necessary, `simpleQuantity2` is expressed in units of `simpleQuantity1.unit`
+before the comparison. Note that the conversion oftens lead to rounding errors
+that render `simpleQuantity1` not equal `simpleQuantity2`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and
+`simpleQuantity2` are not of the same dimension
 
 # Examples
 ```jldoctest
@@ -384,13 +389,47 @@ julia> q1 == q1
 true
 
 julia> q1 == q2
-false
+true
 ```
 """
 function Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    valuesEqual = ( simpleQuantity1.value == simpleQuantity2.value )
-    unitsEqual = ( simpleQuantity1.unit == simpleQuantity2.unit )
-    return valuesEqual && unitsEqual
+    simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
+    return ( simpleQuantity1.value == simpleQuantity2.value )
+end
+
+function _ensureComparedWithSameUnit(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    try
+        simpleQuantity2 = inUnitsOf(simpleQuantity2, simpleQuantity1)
+    catch exception
+        _handleExceptionIn_ensureComparedWithSameUnit(exception)
+    end
+    return simpleQuantity2
+end
+
+function _handleExceptionIn_ensureComparedWithSameUnit(exception)
+    if isa(exception, Exceptions.DimensionMismatchError)
+        newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+        throw(newException)
+    else
+        rethrow()
+    end
+end
+
+"""
+    Base.isless(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+
+Returns `true` if `simpleQuantity1` is of lesser value than `simpleQuantity2`.
+
+If necessary, `simpleQuantity2` is expressed in units of `simpleQuantity1.unit`
+before the comparison. Note that the conversion often leads to rounding errors.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and
+`simpleQuantity2` are not of the same dimension
+"""
+function Base.isless(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
+    return isless( simpleQuantity1.value, simpleQuantity2.value )
 end
 
 ## 5. Rounding

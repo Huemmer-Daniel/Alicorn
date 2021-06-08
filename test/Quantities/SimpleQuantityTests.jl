@@ -51,6 +51,9 @@ function run()
         # 3. Updating binary operators
         # 4. Numeric comparison
         @test equality_implemented()
+        test_equality_ErrorsForMismatchedDimensions()
+        @test isless_implemented()
+        test_isless_ErrorsForMismatchedDimensions()
 
         # 5. Rounding
         # 6. Sign and absolute value
@@ -381,12 +384,12 @@ function _getExamplesFor_addition()
 end
 
 function test_addition_ErrorsForMismatchedDimensions()
-    (mismatchedAddend1, mismatchedAddend2) = _generateMismatchedAddends()
+    (mismatchedAddend1, mismatchedAddend2) = _generateDimensionMismatchedQuantities()
     expectedError = Alicorn.Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
     @test_throws expectedError (mismatchedAddend1 + mismatchedAddend2)
 end
 
-function _generateMismatchedAddends()
+function _generateDimensionMismatchedQuantities()
     unit = TestingTools.generateRandomUnit()
     mismatchedUnit = unit * Alicorn.meter
 
@@ -413,7 +416,7 @@ function _getExamplesFor_subtraction()
 end
 
 function test_subtraction_ErrorsForMismatchedDimensions()
-    (mismatchedAddend1, mismatchedAddend2) = _generateMismatchedAddends()
+    (mismatchedAddend1, mismatchedAddend2) = _generateDimensionMismatchedQuantities()
     expectedError = Alicorn.Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
     @test_throws expectedError (mismatchedAddend1 - mismatchedAddend2)
 end
@@ -570,23 +573,59 @@ function equality_implemented()
 end
 
 function _getExamplesFor_equality()
-    value = TestingTools.generateRandomReal()
-    unit = TestingTools.generateRandomUnit()
+    baseUnit = TestingTools.generateRandomBaseUnit()
 
-    randomSimpleQuantity1 = SimpleQuantity(value, unit)
-    randomSimpleQuantity1Copy = deepcopy(randomSimpleQuantity1)
+    sQuantity1 = SimpleQuantity(7, baseUnit)
+    sQuantity1Copy = deepcopy(sQuantity1)
 
-    randomSimpleQuantity2 = SimpleQuantity(value, unit^2)
-    randomSimpleQuantity3 = SimpleQuantity(2*value, unit)
+    sQuantity2 = SimpleQuantity(0.7, ucat.deca * baseUnit)
+    sQuantity3 = SimpleQuantity(pi, baseUnit)
 
     # format: quantity1, quantity2, correct result for quantity1 == quantity2
     examples = [
-        ( randomSimpleQuantity1, randomSimpleQuantity1Copy, true ),
-        ( randomSimpleQuantity1, randomSimpleQuantity2, false ),
-        ( randomSimpleQuantity1, randomSimpleQuantity3, false )
+        ( sQuantity1, sQuantity1Copy, true ),
+        ( sQuantity1, sQuantity2, true ),
+        ( sQuantity1, sQuantity3, false )
     ]
     return examples
 end
+
+function test_equality_ErrorsForMismatchedDimensions()
+    (mismatchedSQ1, mismatchedSQ2) = _generateDimensionMismatchedQuantities()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+    @test_throws expectedError (mismatchedSQ1 == mismatchedSQ2)
+end
+
+function isless_implemented()
+    examples = _getExamplesFor_isless()
+    return TestingTools.testDyadicFunction(Base.isless, examples)
+end
+
+function _getExamplesFor_isless()
+    value = abs(TestingTools.generateRandomReal())
+    baseUnit = TestingTools.generateRandomBaseUnit()
+
+    sQuantity1 = SimpleQuantity(value, baseUnit)
+    sQuantity2 = SimpleQuantity(-value, baseUnit)
+    sQuantity3 = SimpleQuantity(2*value, baseUnit)
+    sQuantity4 = SimpleQuantity(value, ucat.deci * baseUnit)
+
+    # format: quantity1, quantity2, correct result for isless(quantity1, quantity2)
+    examples = [
+        ( sQuantity1, sQuantity2, false ),
+        ( sQuantity2, sQuantity1, true ),
+        ( sQuantity1, sQuantity3, true ),
+        ( sQuantity1, sQuantity4, false )
+    ]
+    return examples
+end
+
+function test_isless_ErrorsForMismatchedDimensions()
+    (mismatchedSQ1, mismatchedSQ2) = _generateDimensionMismatchedQuantities()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+    @test_throws expectedError isless(mismatchedSQ1, mismatchedSQ2)
+end
+
 
 ## 5. Rounding
 

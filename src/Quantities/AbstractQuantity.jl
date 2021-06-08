@@ -212,15 +212,12 @@ function Base.inv(quantity::AbstractQuantity)
     error("missing specialization of Base.inv(::AbstractQuantity) for subtype $subtype")
 end
 
-
-## 3. Updating binary operators
-
 ## 4. Numeric comparison
 
 """
     Base.:==(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
-Compare two physical quantities.
+Returns true if `quantity1` is equal to `quantity2`.
 
 The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
 """
@@ -228,6 +225,19 @@ function Base.:(==)(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
     error("missing specialization of Base.:==(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
+
+"""
+    Base.isless(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+
+Returns true if `quantity1` is less than `quantity2`.
+
+The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
+"""
+function Base.isless(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    subtype = typeof(quantity1)
+    error("missing specialization of Base.isless(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
+end
+
 
 ## 5. Rounding
 
