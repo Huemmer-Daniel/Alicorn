@@ -37,9 +37,21 @@ function run()
         # 4. Numeric comparison
         test_equality_required()
         test_isless_required()
+        test_isfinite_required()
+        test_isinf_required()
+        test_isnan_required()
+        test_isnan_required()
+        test_isapprox_required()
 
         # 5. Rounding
+        test_mod2pi_required()
+
         # 6. Sign and absolute value
+        test_abs_required()
+        test_abs2_required()
+        test_sign_required()
+        test_signbit_required()
+
         # 7. Roots
         test_sqrt_required()
 
@@ -198,10 +210,64 @@ function test_isless_required()
     @test_throws expectedError isless(mockQuantity1, mockQuantity2)
 end
 
+function test_isfinite_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.isfinite(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError isfinite(mockQuantity)
+end
+
+function test_isinf_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.isinf(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError isinf(mockQuantity)
+end
+
+function test_isnan_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.isnan(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError isnan(mockQuantity)
+end
+
+function test_isapprox_required()
+    mockQuantity1 = MockQuantityStub{Any}()
+    mockQuantity2 = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.isapprox(::AbstractQuantity, ::AbstractQuantity, ::Real) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError isapprox(mockQuantity1, mockQuantity2)
+end
 
 ## 5. Rounding
 
+function test_mod2pi_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.mod2pi(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError mod2pi(mockQuantity)
+end
+
 ## 6. Sign and absolute value
+
+function test_abs_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.abs(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError abs(mockQuantity)
+end
+
+function test_abs2_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.abs2(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError abs2(mockQuantity)
+end
+
+function test_sign_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.sign(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError sign(mockQuantity)
+end
+
+function test_signbit_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.signbit(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError signbit(mockQuantity)
+end
 
 ## 7. Roots
 

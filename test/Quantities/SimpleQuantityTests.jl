@@ -48,15 +48,26 @@ function run()
         @test exponentiation_implemented()
         @test inv_implemented()
 
-        # 3. Updating binary operators
         # 4. Numeric comparison
         @test equality_implemented()
         test_equality_ErrorsForMismatchedDimensions()
         @test isless_implemented()
         test_isless_ErrorsForMismatchedDimensions()
+        @test isfinite_implemented()
+        @test isinf_implemented()
+        @test isnan_implemented()
+        @test isapprox_implemented()
+        test_isapprox_ErrorsForMismatchedDimensions()
 
         # 5. Rounding
+        @test mod2pi_implemented()
+
         # 6. Sign and absolute value
+        @test abs_implemented()
+        @test abs2_implemented()
+        @test sign_implemented()
+        @test signbit_implemented()
+
         # 7. Roots
         @test sqrt_implemented()
 
@@ -626,10 +637,177 @@ function test_isless_ErrorsForMismatchedDimensions()
     @test_throws expectedError isless(mismatchedSQ1, mismatchedSQ2)
 end
 
+function isfinite_implemented()
+    examples = _getExamplesFor_isfinite()
+    return TestingTools.testMonadicFunction(Base.isfinite, examples)
+end
+
+function _getExamplesFor_isfinite()
+    unit = TestingTools.generateRandomUnit()
+
+    sQuantity1 = SimpleQuantity(Inf, unit)
+    sQuantity2 = SimpleQuantity(-Inf, unit)
+    sQuantity3 = SimpleQuantity(NaN, unit)
+    sQuantity4 = SimpleQuantity(pi, unit)
+
+    # format: quantity1, quantity2, correct result for isless(quantity1, quantity2)
+    examples = [
+        ( sQuantity1, false ),
+        ( sQuantity2, false ),
+        ( sQuantity3, false ),
+        ( sQuantity4, true )
+    ]
+    return examples
+end
+
+function isinf_implemented()
+    examples = _getExamplesFor_isinf()
+    return TestingTools.testMonadicFunction(Base.isinf, examples)
+end
+
+function _getExamplesFor_isinf()
+    unit = TestingTools.generateRandomUnit()
+
+    sQuantity1 = SimpleQuantity(Inf, unit)
+    sQuantity2 = SimpleQuantity(-Inf, unit)
+    sQuantity3 = SimpleQuantity(NaN, unit)
+    sQuantity4 = SimpleQuantity(pi, unit)
+
+    # format: quantity1, quantity2, correct result for isless(quantity1, quantity2)
+    examples = [
+        ( sQuantity1, true ),
+        ( sQuantity2, true ),
+        ( sQuantity3, false ),
+        ( sQuantity4, false )
+    ]
+    return examples
+end
+
+function isnan_implemented()
+    examples = _getExamplesFor_isnan()
+    return TestingTools.testMonadicFunction(Base.isnan, examples)
+end
+
+function _getExamplesFor_isnan()
+    unit = TestingTools.generateRandomUnit()
+
+    sQuantity1 = SimpleQuantity(Inf, unit)
+    sQuantity2 = SimpleQuantity(NaN, unit)
+    sQuantity3 = SimpleQuantity(-NaN, unit)
+    sQuantity4 = SimpleQuantity(pi, unit)
+
+    # format: quantity1, quantity2, correct result for isless(quantity1, quantity2)
+    examples = [
+        ( sQuantity1, false ),
+        ( sQuantity2, true ),
+        ( sQuantity3, true ),
+        ( sQuantity4, false )
+    ]
+    return examples
+end
+
+function isapprox_implemented()
+    examples = _getExamplesFor_isapprox()
+    return _test_isapprox_examples(examples)
+end
+
+function _getExamplesFor_isapprox()
+    examples = [
+        ( 7 * ucat.meter, 71 * (ucat.deci * ucat.meter), 0.01, false ),
+        ( 7 * ucat.meter, 71 * (ucat.deci * ucat.meter), 0.015, true )
+    ]
+end
+
+function _test_isapprox_examples(examples::Array)
+    pass = true
+    for (sq1, sq2, rtol, correctResult) in examples
+        pass &= ( isapprox(sq1, sq2, rtol=rtol) == correctResult )
+    end
+    return pass
+end
+
+function test_isapprox_ErrorsForMismatchedDimensions()
+    (mismatchedSQ1, mismatchedSQ2) = _generateDimensionMismatchedQuantities()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+    @test_throws expectedError isapprox(mismatchedSQ1, mismatchedSQ2)
+end
 
 ## 5. Rounding
 
+function mod2pi_implemented()
+    examples = _getExamplesFor_mod2pi()
+    return TestingTools.testMonadicFunction(Base.mod2pi, examples)
+end
+
+function _getExamplesFor_mod2pi()
+    # format: SimpleQuantity, correct result for mod2pi(SimpleQuantity)
+    examples = [
+        ( 6*pi * Alicorn.unitlessUnit, mod2pi(6*pi) * Alicorn.unitlessUnit ),
+        ( -7.1*pi * Alicorn.ampere, mod2pi(-7.1*pi) * Alicorn.ampere )
+    ]
+    return examples
+end
+
 ## 6. Sign and absolute value
+
+function abs_implemented()
+    examples = _getExamplesFor_abs()
+    return TestingTools.testMonadicFunction(Base.abs, examples)
+end
+
+function _getExamplesFor_abs()
+    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    examples = [
+        ( 5.2 * ucat.joule, 5.2 * ucat.joule ),
+        ( -7.1 * ucat.ampere, 7.1 * ucat.ampere ),
+        ( (4 + 2im) * ucat.meter , sqrt(4^2 + 2^2) * ucat.meter )
+    ]
+    return examples
+end
+
+function abs2_implemented()
+    examples = _getExamplesFor_abs2()
+    return TestingTools.testMonadicFunction(Base.abs2, examples)
+end
+
+function _getExamplesFor_abs2()
+    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    examples = [
+        ( 5.2 * ucat.joule, (5.2)^2 * (ucat.joule)^2 ),
+        ( -7.1 * ucat.ampere, (7.1)^2 * (ucat.ampere)^2 ),
+        ( (4 + 2im) * ucat.meter , (4^2 + 2^2) * (ucat.meter)^2 )
+    ]
+    return examples
+end
+
+function sign_implemented()
+    examples = _getExamplesFor_sign()
+    return TestingTools.testMonadicFunction(Base.sign, examples)
+end
+
+function _getExamplesFor_sign()
+    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    examples = [
+        ( 5.2 * ucat.joule, 1 ),
+        ( -7.1 * ucat.ampere, -1 ),
+        ( (4 + 2im) * ucat.meter , sign(4 + 2im) )
+    ]
+    return examples
+end
+
+function signbit_implemented()
+    examples = _getExamplesFor_signbit()
+    return TestingTools.testMonadicFunction(Base.signbit, examples)
+end
+
+function _getExamplesFor_signbit()
+    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    examples = [
+        ( 5.2 * ucat.joule, false ),
+        ( -7.1 * ucat.ampere, true )
+    ]
+    return examples
+end
 
 ## 7. Roots
 

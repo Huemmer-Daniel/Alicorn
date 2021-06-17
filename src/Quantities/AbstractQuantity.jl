@@ -217,7 +217,7 @@ end
 """
     Base.:==(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
-Returns true if `quantity1` is equal to `quantity2`.
+Returns `true` if `quantity1` is equal to `quantity2`.
 
 The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
 """
@@ -229,7 +229,7 @@ end
 """
     Base.isless(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
-Returns true if `quantity1` is less than `quantity2`.
+Returns `true` if `quantity1` is less than `quantity2`.
 
 The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
 """
@@ -238,10 +238,80 @@ function Base.isless(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     error("missing specialization of Base.isless(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.isfinite(quantity::AbstractQuantity)
+
+Returns `true` if the value of `quantity` is a finite number.
+"""
+function Base.isfinite(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.isfinite(::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.isinf(quantity::AbstractQuantity)
+
+Returns `true` if the value of `quantity` is an infinite number.
+"""
+function Base.isinf(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.isinf(::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.isnan(quantity::AbstractQuantity)
+
+Returns `true` if the value of `quantity` is a NaN.
+"""
+function Base.isnan(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.isnan(::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.isapprox(quantity1::AbstractQuantity, quantity2::AbstractQuantity; rtol::Real = sqrt(eps()))
+
+Returns `true` if `abs(x-y) <= rtol*max(abs(x), abs(y))
+"""
+function Base.isapprox(quantity1::AbstractQuantity, quantity2::AbstractQuantity; rtol::Real = sqrt(eps()))
+    subtype = typeof(quantity1)
+    error("missing specialization of Base.isapprox(::AbstractQuantity, ::AbstractQuantity, ::Real) for subtype $subtype")
+end
+
 
 ## 5. Rounding
 
+"""
+    Base.mod2pi(quantity::AbstractQuantity)
+
+Modulus after division by `2π`, returning a quantity with a value in the range `[0,2π)`.
+"""
+function Base.mod2pi(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.mod2pi(::AbstractQuantity) for subtype $subtype")
+end
+
 ## 6. Sign and absolute value
+
+function Base.abs(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.abs(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.abs2(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.abs2(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.sign(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.sign(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.signbit(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.signbit(::AbstractQuantity) for subtype $subtype")
+end
 
 ## 7. Roots
 

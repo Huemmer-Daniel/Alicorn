@@ -432,9 +432,63 @@ function Base.isless(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQua
     return isless( simpleQuantity1.value, simpleQuantity2.value )
 end
 
+# method documented as part of the AbstractQuantity interface
+function Base.isfinite(simpleQuantity::SimpleQuantity)
+    return isfinite(simpleQuantity.value)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.isinf(simpleQuantity::SimpleQuantity)
+    return isinf(simpleQuantity.value)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.isnan(simpleQuantity::SimpleQuantity)
+    return isnan(simpleQuantity.value)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.isapprox(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity; rtol::Real = sqrt(eps()))
+    simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
+    return isapprox(simpleQuantity1.value, simpleQuantity2.value, rtol=rtol)
+end
+
 ## 5. Rounding
 
+# method documented as part of the AbstractQuantity interface
+function Base.mod2pi(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = mod2pi(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
+
 ## 6. Sign and absolute value
+
+# method documented as part of the AbstractQuantity interface
+function Base.abs(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = abs(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.abs2(simpleQuantity::SimpleQuantity)
+    unit = (simpleQuantity.unit)^2
+    value = abs2(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.sign(simpleQuantity::SimpleQuantity)
+    value = sign(simpleQuantity.value)
+    return value
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.signbit(simpleQuantity::SimpleQuantity)
+    value = signbit(simpleQuantity.value)
+    return value
+end
 
 ## 7. Roots
 
