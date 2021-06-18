@@ -51,9 +51,12 @@ function run()
         test_abs2_required()
         test_sign_required()
         test_signbit_required()
+        test_copysign_required()
+        test_flipsign_required()
 
         # 7. Roots
         test_sqrt_required()
+        test_cbrt_required()
 
         # 8. Literal zero
         # 9. Complex numbers
@@ -269,12 +272,40 @@ function test_signbit_required()
     @test_throws expectedError signbit(mockQuantity)
 end
 
+function test_copysign_required()
+    mockQuantity = MockQuantityStub{Any}()
+    mockQuantity2 = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.copysign(::AbstractQuantity, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError copysign(mockQuantity, mockQuantity2)
+    expectedError = Core.ErrorException("missing specialization of Base.copysign(::AbstractQuantity, ::Number) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError copysign(mockQuantity, -7)
+    expectedError = Core.ErrorException("missing specialization of Base.copysign(::Number, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError copysign(-7, mockQuantity)
+end
+
+function test_flipsign_required()
+    mockQuantity = MockQuantityStub{Any}()
+    mockQuantity2 = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.flipsign(::AbstractQuantity, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError flipsign(mockQuantity, mockQuantity2)
+    expectedError = Core.ErrorException("missing specialization of Base.flipsign(::AbstractQuantity, ::Number) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError flipsign(mockQuantity, -7)
+    expectedError = Core.ErrorException("missing specialization of Base.flipsign(::Number, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError flipsign(7, mockQuantity)
+end
+
 ## 7. Roots
 
 function test_sqrt_required()
     mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException("missing specialization of Base.sqrt(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError sqrt(mockQuantity)
+end
+
+function test_cbrt_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.cbrt(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError cbrt(mockQuantity)
 end
 
 ## 8. Literal zero

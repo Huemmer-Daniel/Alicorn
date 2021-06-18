@@ -490,6 +490,42 @@ function Base.signbit(simpleQuantity::SimpleQuantity)
     return value
 end
 
+# method documented as part of the AbstractQuantity interface
+function Base.copysign(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    unit = simpleQuantity1.unit
+    value = copysign(simpleQuantity1.value, simpleQuantity2.value)
+    return SimpleQuantity(value, unit)
+end
+
+function Base.copysign(simpleQuantity::SimpleQuantity, number::Number)
+    unit = simpleQuantity.unit
+    value = copysign(simpleQuantity.value, number)
+    return SimpleQuantity(value, unit)
+end
+
+function Base.copysign(number::Number, simpleQuantity::SimpleQuantity)
+    value = copysign(number, simpleQuantity.value)
+    return value
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.flipsign(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    unit = simpleQuantity1.unit
+    value = flipsign(simpleQuantity1.value, simpleQuantity2.value)
+    return SimpleQuantity(value, unit)
+end
+
+function Base.flipsign(simpleQuantity::SimpleQuantity, number::Number)
+    unit = simpleQuantity.unit
+    value = flipsign(simpleQuantity.value, number)
+    return SimpleQuantity(value, unit)
+end
+
+function Base.flipsign(number::Number, simpleQuantity::SimpleQuantity)
+    value = flipsign(number, simpleQuantity.value)
+    return value
+end
+
 ## 7. Roots
 
 # method documented as part of the AbstractQuantity interface
@@ -499,6 +535,15 @@ function Base.sqrt(simpleQuantity::SimpleQuantity)
     rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
     return rootOfQuantity
 end
+
+# method documented as part of the AbstractQuantity interface
+function Base.cbrt(simpleQuantity::SimpleQuantity)
+    rootOfValue = cbrt(simpleQuantity.value)
+    rootOfUnit = cbrt(simpleQuantity.unit)
+    rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
+    return rootOfQuantity
+end
+
 
 ## 8. Literal zero
 

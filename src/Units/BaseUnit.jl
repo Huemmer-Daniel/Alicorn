@@ -127,6 +127,15 @@ function Base.sqrt(baseUnit::BaseUnit)
     return UnitFactor(baseUnit)^0.5
 end
 
+"""
+    Base.cbrt(baseUnit::BaseUnit)
+
+Take the cubic root of `baseUnit` and return it as unit of type `UnitFactor`.
+"""
+function Base.cbrt(baseUnit::BaseUnit)
+    return UnitFactor(baseUnit)^(1/3)
+end
+
 ## Constants of type BaseUnit
 
 export unitlessBaseUnit

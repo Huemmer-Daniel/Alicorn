@@ -313,16 +313,60 @@ function Base.signbit(quantity::AbstractQuantity)
     error("missing specialization of Base.signbit(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.copysign(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    Base.copysign(quantity::AbstractQuantity, number::Number)
+    Base.copysign(number::Number, quantity::AbstractQuantity)
+
+Change sign of the first argument to the sign of the second argument.
+"""
+function Base.copysign(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    subtype = typeof(quantity1)
+    error("missing specialization of Base.copysign(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.copysign(quantity::AbstractQuantity, number::Number)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.copysign(::AbstractQuantity, ::Number) for subtype $subtype")
+end
+
+function Base.copysign(number::Number, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.copysign(::Number, ::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.flipsign(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    Base.flipsign(quantity::AbstractQuantity, number::Number)
+    Base.flipsign(number::Number, quantity::AbstractQuantity)
+
+Change sign of the first argument if the second argument is negative.
+"""
+function Base.flipsign(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
+    subtype = typeof(quantity1)
+    error("missing specialization of Base.flipsign(::AbstractQuantity, ::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.flipsign(quantity::AbstractQuantity, number::Number)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.flipsign(::AbstractQuantity, ::Number) for subtype $subtype")
+end
+
+function Base.flipsign(number::Number, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.flipsign(::Number, ::AbstractQuantity) for subtype $subtype")
+end
+
 ## 7. Roots
 
-"""
-    Base.sqrt(quantity::AbstractQuantity)
-
-Take the square root of `quantity`.
-"""
 function Base.sqrt(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.sqrt(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.cbrt(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.cbrt(::AbstractQuantity) for subtype $subtype")
 end
 
 

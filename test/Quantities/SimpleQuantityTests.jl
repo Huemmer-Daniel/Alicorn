@@ -67,9 +67,12 @@ function run()
         @test abs2_implemented()
         @test sign_implemented()
         @test signbit_implemented()
+        @test copysign_implemented()
+        @test flipsign_implemented()
 
         # 7. Roots
         @test sqrt_implemented()
+        @test cbrt_implemented()
 
         # 8. Literal zero
         # 9. Complex numbers
@@ -771,7 +774,7 @@ function abs2_implemented()
 end
 
 function _getExamplesFor_abs2()
-    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    # format: SimpleQuantity, correct result for abs2(SimpleQuantity)
     examples = [
         ( 5.2 * ucat.joule, (5.2)^2 * (ucat.joule)^2 ),
         ( -7.1 * ucat.ampere, (7.1)^2 * (ucat.ampere)^2 ),
@@ -786,7 +789,7 @@ function sign_implemented()
 end
 
 function _getExamplesFor_sign()
-    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    # format: SimpleQuantity, correct result for sign(SimpleQuantity)
     examples = [
         ( 5.2 * ucat.joule, 1 ),
         ( -7.1 * ucat.ampere, -1 ),
@@ -801,13 +804,60 @@ function signbit_implemented()
 end
 
 function _getExamplesFor_signbit()
-    # format: SimpleQuantity, correct result for abs(SimpleQuantity)
+    # format: SimpleQuantity, correct result for signbit(SimpleQuantity)
     examples = [
         ( 5.2 * ucat.joule, false ),
         ( -7.1 * ucat.ampere, true )
     ]
     return examples
 end
+
+function copysign_implemented()
+    examples = _getExamplesFor_copysign()
+    return TestingTools.testDyadicFunction(Base.copysign, examples)
+end
+
+function _getExamplesFor_copysign()
+    # format: SimpleQuantity, object, correct result for copysign(SimpleQuantity, object)
+    examples = [
+        ( 5.2 * ucat.joule, -3.5, -5.2 * ucat.joule ),
+        ( 5.2 * ucat.joule, 3.5, 5.2 * ucat.joule ),
+        ( 3.5, 5.2 * ucat.joule, 3.5 ),
+        ( 3.5, -5.2 * ucat.joule, -3.5 ),
+        ( -3.5, 5.2 * ucat.joule, 3.5 ),
+        ( -3.5, -5.2 * ucat.joule, -3.5 ),
+        ( -7.1 * ucat.ampere, 5.2 * ucat.joule, 7.1 * ucat.ampere),
+        ( -7.1 * ucat.ampere, -5.2 * ucat.joule, -7.1 * ucat.ampere ),
+        ( 7.1 * ucat.ampere, 5.2 * ucat.joule, 7.1 * ucat.ampere ),
+        ( 7.1 * ucat.ampere, -5.2 * ucat.joule, -7.1 * ucat.ampere )
+    ]
+    return examples
+end
+
+function flipsign_implemented()
+    examples = _getExamplesFor_flipsign()
+    return TestingTools.testDyadicFunction(Base.flipsign, examples)
+end
+
+function _getExamplesFor_flipsign()
+    # format: SimpleQuantity, correct result for flipsign(SimpleQuantity, object)
+    examples = [
+        ( 5.2 * ucat.joule, -5.2 * ucat.joule, -5.2 * ucat.joule ),
+        ( -5.2 * ucat.joule, -5.2 * ucat.joule, 5.2 * ucat.joule ),
+        ( 5.2 * ucat.joule, 5.2 * ucat.joule, 5.2 * ucat.joule ),
+        ( -5.2 * ucat.joule, -5.2 * ucat.joule, 5.2 * ucat.joule ),
+        ( 3.5, -5.2 * ucat.joule, -3.5 ),
+        ( -3.5, -5.2 * ucat.joule, 3.5 ),
+        ( 3.5, 5.2 * ucat.joule, 3.5 ),
+        ( 3.5, -5.2 * ucat.joule, -3.5 ),
+        ( 5.2 * ucat.joule, -3.5, -5.2 * ucat.joule ),
+        ( -5.2 * ucat.joule, -3.5, 5.2 * ucat.joule ),
+        ( 5.2 * ucat.joule, 3.5, 5.2 * ucat.joule ),
+        ( -5.2 * ucat.joule, 3.5, -5.2 * ucat.joule )
+    ]
+    return examples
+end
+
 
 ## 7. Roots
 
@@ -821,6 +871,20 @@ function _getExamplesFor_sqrt()
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
         ( 4 * (ucat.pico * ucat.meter)^-3, 2 * (ucat.pico * ucat.meter)^-1.5 )
+    ]
+    return examples
+end
+
+function cbrt_implemented()
+    examples = _getExamplesFor_cbrt()
+    return TestingTools.testMonadicFunction(Base.cbrt, examples)
+end
+
+function _getExamplesFor_cbrt()
+    # format: SimpleQuantity, correct result for cbrt(SimpleQuantity)
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 4 * (ucat.pico * ucat.meter)^-3, cbrt(4) * (ucat.pico * ucat.meter)^-1 )
     ]
     return examples
 end

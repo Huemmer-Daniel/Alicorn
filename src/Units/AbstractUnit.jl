@@ -143,3 +143,13 @@ function Base.:sqrt(abstractUnit::AbstractUnit)
    subtype = typeof(abstractUnit)
    error("subtype $subtype of AbstractUnit misses an implementation of the Base.sqrt function")
 end
+
+"""
+    Base.:cbrt(abstractUnit::AbstractUnit)
+
+Take the cubic root of a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
+"""
+function Base.:cbrt(abstractUnit::AbstractUnit)
+   subtype = typeof(abstractUnit)
+   error("subtype $subtype of AbstractUnit misses an implementation of the Base.cbrt function")
+end

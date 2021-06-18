@@ -201,6 +201,14 @@ function Base.sqrt(unitFactor::UnitFactor)
     return unitFactor^(0.5)
 end
 
+"""
+    Base.cbrt(unitFactor::UnitFactor)
+
+Take the cubic root of `unitFactor` and return it as unit of type `UnitFactor`.
+"""
+function Base.cbrt(unitFactor::UnitFactor)
+    return unitFactor^(1/3)
+end
 
 ## Constants of type UnitFactor
 
