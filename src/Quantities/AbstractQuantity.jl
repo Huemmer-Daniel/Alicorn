@@ -212,7 +212,7 @@ function Base.inv(quantity::AbstractQuantity)
     error("missing specialization of Base.inv(::AbstractQuantity) for subtype $subtype")
 end
 
-## 4. Numeric comparison
+## 3. Numeric comparison
 
 """
     Base.:==(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
@@ -279,7 +279,7 @@ function Base.isapprox(quantity1::AbstractQuantity, quantity2::AbstractQuantity;
 end
 
 
-## 5. Rounding
+## 4. Rounding
 
 """
     Base.mod2pi(quantity::AbstractQuantity)
@@ -291,7 +291,7 @@ function Base.mod2pi(quantity::AbstractQuantity)
     error("missing specialization of Base.mod2pi(::AbstractQuantity) for subtype $subtype")
 end
 
-## 6. Sign and absolute value
+## 5. Sign and absolute value
 
 function Base.abs(quantity::AbstractQuantity)
     subtype = typeof(quantity)
@@ -357,7 +357,7 @@ function Base.flipsign(number::Number, quantity::AbstractQuantity)
     error("missing specialization of Base.flipsign(::Number, ::AbstractQuantity) for subtype $subtype")
 end
 
-## 7. Roots
+## 6. Roots
 
 function Base.sqrt(quantity::AbstractQuantity)
     subtype = typeof(quantity)
@@ -370,11 +370,41 @@ function Base.cbrt(quantity::AbstractQuantity)
 end
 
 
-## 8. Literal zero
+## 7. Literal zero
 
-## 9. Complex numbers
+"""
+    Base.zero(quantity::AbstractQuantity)
 
-## 10. Compatibility with array functions
+Return a quantity which has the same unit as `quantity` and value zero of the same type as the value of `quantity`.
+"""
+function Base.zero(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.zero(::AbstractQuantity) for subtype $subtype")
+end
+
+## 8. Complex numbers
+
+function Base.real(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.real(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.imag(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.imag(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.conj(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.conj(::AbstractQuantity) for subtype $subtype")
+end
+
+function Base.angle(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.angle(::AbstractQuantity) for subtype $subtype")
+end
+
+## 9. Compatibility with array functions
 
 """
     Base.length(quantity::AbstractQuantity)
@@ -394,4 +424,26 @@ Returns `size(quantity.value)`.
 function Base.size(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.size(::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.ndims(quantity::AbstractQuantity)
+
+Returns `ndims(quantity.value)`.
+"""
+function Base.ndims(quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.ndims(::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.getindex(quantity::AbstractQuantity, inds...)
+
+Attempts to access `quantity` as an array.
+
+The method is provided to ensure compatibility with the syntax for accessing elements of `AbstractQuantityArray` objects.
+"""
+function Base.getindex(quantity::AbstractQuantity, inds...)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.getindex(::AbstractQuantity, inds...) for subtype $subtype")
 end

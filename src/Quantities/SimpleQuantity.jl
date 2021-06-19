@@ -358,9 +358,7 @@ function Base.inv(simpleQuantity::SimpleQuantity)
     return inverseQuantity
 end
 
-## 3. Updating binary operators
-
-## 4. Numeric comparison
+## 3. Numeric comparison
 
 """
     Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
@@ -453,7 +451,7 @@ function Base.isapprox(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQ
     return isapprox(simpleQuantity1.value, simpleQuantity2.value, rtol=rtol)
 end
 
-## 5. Rounding
+## 4. Rounding
 
 # method documented as part of the AbstractQuantity interface
 function Base.mod2pi(simpleQuantity::SimpleQuantity)
@@ -462,7 +460,7 @@ function Base.mod2pi(simpleQuantity::SimpleQuantity)
     return SimpleQuantity(value, unit)
 end
 
-## 6. Sign and absolute value
+## 5. Sign and absolute value
 
 # method documented as part of the AbstractQuantity interface
 function Base.abs(simpleQuantity::SimpleQuantity)
@@ -526,7 +524,7 @@ function Base.flipsign(number::Number, simpleQuantity::SimpleQuantity)
     return value
 end
 
-## 7. Roots
+## 6. Roots
 
 # method documented as part of the AbstractQuantity interface
 function Base.sqrt(simpleQuantity::SimpleQuantity)
@@ -544,12 +542,67 @@ function Base.cbrt(simpleQuantity::SimpleQuantity)
     return rootOfQuantity
 end
 
+## 7. Literal zero
 
-## 8. Literal zero
+# method documented as part of the AbstractQuantity interface
+function Base.zero(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = zero(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
 
-## 9. Complex numbers
+"""
+    Base.zero(numberType::Type, unit::AbstractUnit)
 
-## 10. Compatibility with array functions
+Return a `SimpleQuantity` with unit `unit` and value `zero(numberType)`.
+
+
+# Raises Exceptions
+- `Alicorn.DomainError`: if `numberType` is not a subtype of `Number`.
+"""
+function Base.zero(numberType::Type, unit::AbstractUnit)
+    _assertIsSubtypeOfNumber(numberType)
+    value = zero(numberType)
+    return SimpleQuantity(value, unit)
+end
+
+function _assertIsSubtypeOfNumber(type::Type)
+    if !(type<:Number)
+        error = Core.DomainError(type, "type $type is not a subtype of Number")
+        throw(error)
+    end
+end
+
+## 8. Complex numbers
+
+# method documented as part of the AbstractQuantity interface
+function Base.real(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = real(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.imag(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = imag(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.conj(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = conj(simpleQuantity.value)
+    return SimpleQuantity(value, unit)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.angle(simpleQuantity::SimpleQuantity)
+    value = angle(simpleQuantity.value)
+    return value
+end
+
+## 9. Compatibility with array functions
 
 # method documented as part of the AbstractQuantity interface
 function Base.length(simpleQuantity::SimpleQuantity)
@@ -559,6 +612,11 @@ end
 # method documented as part of the AbstractQuantity interface
 function Base.size(simpleQuantity::SimpleQuantity)
     return size(simpleQuantity.value)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.ndims(simpleQuantity::SimpleQuantity)
+    return ndims(simpleQuantity.value)
 end
 
 # method documented as part of the AbstractQuantity interface

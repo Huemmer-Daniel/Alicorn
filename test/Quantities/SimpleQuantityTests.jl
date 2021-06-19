@@ -48,7 +48,7 @@ function run()
         @test exponentiation_implemented()
         @test inv_implemented()
 
-        # 4. Numeric comparison
+        # 3. Numeric comparison
         @test equality_implemented()
         test_equality_ErrorsForMismatchedDimensions()
         @test isless_implemented()
@@ -59,10 +59,10 @@ function run()
         @test isapprox_implemented()
         test_isapprox_ErrorsForMismatchedDimensions()
 
-        # 5. Rounding
+        # 4. Rounding
         @test mod2pi_implemented()
 
-        # 6. Sign and absolute value
+        # 5. Sign and absolute value
         @test abs_implemented()
         @test abs2_implemented()
         @test sign_implemented()
@@ -70,15 +70,27 @@ function run()
         @test copysign_implemented()
         @test flipsign_implemented()
 
-        # 7. Roots
+        # 6. Roots
         @test sqrt_implemented()
         @test cbrt_implemented()
 
-        # 8. Literal zero
-        # 9. Complex numbers
-        # 10. Compatibility with array functions
+        # 7. Literal zero
+        @test zero_implemented()
+        @test zero_dyadicImplemented()
+        test_zero_dyadic_errorsOnNonnumberType()
+
+        # 8. Complex numbers
+        @test real_implemented()
+        @test imag_implemented()
+        @test conj_implemented()
+        @test angle_implemented()
+
+        # 9. Compatibility with array functions
         @test length_implemented()
         @test size_implemented()
+        @test ndims_implemented()
+        @test getindex_implemented()
+        test_getindex_errorsForIndexGreaterOne()
 
         # additional methods
         @test valueOfDimensionless_implemented()
@@ -577,9 +589,8 @@ function _getExamplesFor_inv()
     ]
     return examples
 end
-## 3. Updating binary operators
 
-## 4. Numeric comparison
+## 3. Numeric comparison
 
 function equality_implemented()
     examples = _getExamplesFor_equality()
@@ -735,7 +746,7 @@ function test_isapprox_ErrorsForMismatchedDimensions()
     @test_throws expectedError isapprox(mismatchedSQ1, mismatchedSQ2)
 end
 
-## 5. Rounding
+## 4. Rounding
 
 function mod2pi_implemented()
     examples = _getExamplesFor_mod2pi()
@@ -751,7 +762,7 @@ function _getExamplesFor_mod2pi()
     return examples
 end
 
-## 6. Sign and absolute value
+## 5. Sign and absolute value
 
 function abs_implemented()
     examples = _getExamplesFor_abs()
@@ -859,7 +870,7 @@ function _getExamplesFor_flipsign()
 end
 
 
-## 7. Roots
+## 6. Roots
 
 function sqrt_implemented()
     examples = _getExamplesFor_sqrt()
@@ -889,11 +900,106 @@ function _getExamplesFor_cbrt()
     return examples
 end
 
-## 8. Literal zero
+## 7. Literal zero
 
-## 9. Complex numbers
+function zero_implemented()
+    examples = _getExamplesFor_zero()
+    return TestingTools.testMonadicFunction(Base.zero, examples)
+end
 
-## 10. Compatibility with array functions
+function _getExamplesFor_zero()
+    # format: SimpleQuantity, correct result for zero(SimpleQuantity)
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, zero(Int64) * Alicorn.unitlessUnit ),
+        ( 4.0 * (ucat.pico * ucat.meter)^-3, zero(Float64) * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function zero_dyadicImplemented()
+    examples = _getExamplesFor_zero_dyadic()
+    return TestingTools.testDyadicFunction(Base.zero, examples)
+end
+
+function _getExamplesFor_zero_dyadic()
+    # format: numberType, unit, correct result for zero(numberType, unit)
+    examples = [
+        ( UInt32, Alicorn.unitlessUnit, zero(UInt32) * Alicorn.unitlessUnit ),
+        ( Float64, (ucat.pico * ucat.meter)^-3, zero(Float64) * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function test_zero_dyadic_errorsOnNonnumberType()
+    type = String
+    expectedError = Core.DomainError(type, "type $type is not a subtype of Number")
+    @test_throws expectedError zero(type, ucat.meter)
+end
+
+## 8. Complex numbers
+
+function real_implemented()
+    examples = _getExamplesFor_real()
+    return TestingTools.testMonadicFunction(Base.real, examples)
+end
+
+function _getExamplesFor_real()
+    # format: SimpleQuantity, correct result for real(SimpleQuantity)
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 1im * Alicorn.unitlessUnit, 0 * Alicorn.unitlessUnit ),
+        ( (4.0 + 2im) * (ucat.pico * ucat.meter)^-3, 4.0 * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function imag_implemented()
+    examples = _getExamplesFor_imag()
+    return TestingTools.testMonadicFunction(Base.imag, examples)
+end
+
+function _getExamplesFor_imag()
+    # format: SimpleQuantity, correct result for imag(SimpleQuantity)
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 0 * Alicorn.unitlessUnit ),
+        ( 1im * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( (4.0 + 2im) * (ucat.pico * ucat.meter)^-3, 2.0 * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function conj_implemented()
+    examples = _getExamplesFor_conj()
+    return TestingTools.testMonadicFunction(Base.conj, examples)
+end
+
+function _getExamplesFor_conj()
+    # format: SimpleQuantity, correct result for conj(SimpleQuantity)
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 1im * Alicorn.unitlessUnit, -1im * Alicorn.unitlessUnit ),
+        ( (4.0 + 2im) * (ucat.pico * ucat.meter)^-3, (4.0 - 2im) * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function angle_implemented()
+    examples = _getExamplesFor_angle()
+    return TestingTools.testMonadicFunction(Base.angle, examples)
+end
+
+function _getExamplesFor_angle()
+    # format: SimpleQuantity, correct result for angle(SimpleQuantity)
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 0 ),
+        ( 1im * Alicorn.unitlessUnit, pi/2 ),
+        ( (4.0 + 2im) * (ucat.pico * ucat.meter)^-3, angle(4.0 + 2im) )
+    ]
+    return examples
+end
+
+
+## 9. Compatibility with array functions
 
 function length_implemented()
     examples = _getExamplesFor_length()
@@ -919,6 +1025,32 @@ function _getExamplesFor_size()
         ( 1123 * ucat.meter, () )
     ]
     return examples
+end
+
+function ndims_implemented()
+    examples = _getExamplesFor_ndims()
+    return TestingTools.testMonadicFunction(Base.ndims, examples)
+end
+
+function _getExamplesFor_ndims()
+    # format: SimpleQuantity, correct result for ndims(SimpleQuantity)
+    examples = [
+        ( 1123 * ucat.meter, 0 )
+    ]
+    return examples
+end
+
+function getindex_implemented()
+    example = 7.6 * ucat.ampere
+    returnedResult = getindex(example,1)
+    expectedResult = 7.6 * ucat.ampere
+    return (returnedResult == expectedResult)
+end
+
+function test_getindex_errorsForIndexGreaterOne()
+    example = 7.6 * ucat.ampere
+    expectedError = Core.BoundsError
+    @test_throws expectedError getindex(example, 2)
 end
 
 ## Additional methods

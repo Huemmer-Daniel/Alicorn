@@ -34,7 +34,7 @@ function run()
         test_exponentiation_required()
         test_inv_required()
 
-        # 4. Numeric comparison
+        # 3. Numeric comparison
         test_equality_required()
         test_isless_required()
         test_isfinite_required()
@@ -43,10 +43,10 @@ function run()
         test_isnan_required()
         test_isapprox_required()
 
-        # 5. Rounding
+        # 4. Rounding
         test_mod2pi_required()
 
-        # 6. Sign and absolute value
+        # 5. Sign and absolute value
         test_abs_required()
         test_abs2_required()
         test_sign_required()
@@ -54,15 +54,24 @@ function run()
         test_copysign_required()
         test_flipsign_required()
 
-        # 7. Roots
+        # 6. Roots
         test_sqrt_required()
         test_cbrt_required()
 
-        # 8. Literal zero
-        # 9. Complex numbers
-        # 10. Compatibility with array functions
+        # 7. Literal zero
+        test_zero_required()
+
+        # 8. Complex numbers
+        test_real_required()
+        test_imag_required()
+        test_conj_required()
+        test_angle_required()
+
+        # 9. Compatibility with array functions
         test_length_required()
         test_size_required()
+        test_ndims_required()
+        test_getindex_required()
     end
 end
 
@@ -190,15 +199,7 @@ function test_inv_required()
     @test_throws expectedError inv(mockQuantity)
 end
 
-## 3. Updating binary operators
-
-function test_updatingPlus_required()
-    mockQuantity = MockQuantityStub{Any}()
-    expectedError = Core.ErrorException("missing specialization of Base.+=(::AbstractQuantity, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
-    @test_throws expectedError inv(mockQuantity)
-end
-
-## 4. Numeric comparison
+## 3. Numeric comparison
 
 function test_equality_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -238,7 +239,7 @@ function test_isapprox_required()
     @test_throws expectedError isapprox(mockQuantity1, mockQuantity2)
 end
 
-## 5. Rounding
+## 4. Rounding
 
 function test_mod2pi_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -246,7 +247,7 @@ function test_mod2pi_required()
     @test_throws expectedError mod2pi(mockQuantity)
 end
 
-## 6. Sign and absolute value
+## 5. Sign and absolute value
 
 function test_abs_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -294,7 +295,7 @@ function test_flipsign_required()
     @test_throws expectedError flipsign(7, mockQuantity)
 end
 
-## 7. Roots
+## 6. Roots
 
 function test_sqrt_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -308,11 +309,41 @@ function test_cbrt_required()
     @test_throws expectedError cbrt(mockQuantity)
 end
 
-## 8. Literal zero
+## 7. Literal zero
 
-## 9. Complex numbers
+function test_zero_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.zero(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError zero(mockQuantity)
+end
 
-## 10. Compatibility with array functions
+## 8. Complex numbers
+
+function test_real_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.real(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError real(mockQuantity)
+end
+
+function test_imag_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.imag(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError imag(mockQuantity)
+end
+
+function test_conj_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.conj(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError conj(mockQuantity)
+end
+
+function test_angle_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.angle(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError angle(mockQuantity)
+end
+
+## 9. Compatibility with array functions
 
 function test_length_required()
     mockQuantity = MockQuantityStub{Any}()
@@ -324,6 +355,18 @@ function test_size_required()
     mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException("missing specialization of Base.size(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError size(mockQuantity)
+end
+
+function test_ndims_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.ndims(::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError ndims(mockQuantity)
+end
+
+function test_getindex_required()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.getindex(::AbstractQuantity, inds...) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError getindex(mockQuantity, 1)
 end
 
 end # module
