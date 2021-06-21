@@ -2,13 +2,13 @@ export AbstractQuantity
 """
     AbstractQuantity{T}
 
-Abstract supertype for all types that represent a physical quantity.
+Abstract supertype for all types that represent a scalar physical quantity.
 
 Currently the only concrete subtype of `AbstractQuantity` is [`SimpleQuantity`](@ref).
 """
 abstract type AbstractQuantity{T} end
 
-# Interface
+## ## Interface
 # the following functions need to be extended for concrete implementations of
 # AbstractQuantity
 
@@ -293,21 +293,45 @@ end
 
 ## 5. Sign and absolute value
 
+"""
+    Base.abs(quantity::AbstractQuantity)
+
+Apply `abs` to the value of `quantity` without changing its unit.
+"""
 function Base.abs(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.abs(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.abs2(quantity::AbstractQuantity)
+
+Apply `abs2` to the value of `quantity` without changing its unit.
+"""
 function Base.abs2(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.abs2(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.sign(quantity::AbstractQuantity)
+
+Apply `sign` to the value of `quantity`. The result is a number, not a quantity.
+
+Return zero if `x==0` and `x/|x|` otherwise.
+"""
 function Base.sign(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.sign(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.signbit(quantity::AbstractQuantity)
+
+Apply `signbit` to the value of `quantity`.
+
+Returns `true` if the value of the sign is negative, otherwise `false`.
+"""
 function Base.signbit(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.signbit(::AbstractQuantity) for subtype $subtype")
@@ -318,7 +342,7 @@ end
     Base.copysign(quantity::AbstractQuantity, number::Number)
     Base.copysign(number::Number, quantity::AbstractQuantity)
 
-Change sign of the first argument to the sign of the second argument.
+Change the sign of the first argument to the sign of the second argument.
 """
 function Base.copysign(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
@@ -340,7 +364,7 @@ end
     Base.flipsign(quantity::AbstractQuantity, number::Number)
     Base.flipsign(number::Number, quantity::AbstractQuantity)
 
-Change sign of the first argument if the second argument is negative.
+Invert the sign of the first argument if the second argument is negative.
 """
 function Base.flipsign(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
@@ -359,11 +383,21 @@ end
 
 ## 6. Roots
 
+"""
+    Base.sqrt(quantity::AbstractQuantity)
+
+Apply `sqrt` to the value of `quantity` and modify its unit accordingly.
+"""
 function Base.sqrt(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.sqrt(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.cbrt(quantity::AbstractQuantity)
+
+Apply `cbrt` to the value of `quantity` and modify its unit accordingly.
+"""
 function Base.cbrt(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.cbrt(::AbstractQuantity) for subtype $subtype")
@@ -384,21 +418,41 @@ end
 
 ## 8. Complex numbers
 
+"""
+    Base.real(quantity::AbstractQuantity)
+
+Apply `real` to the value of `quantity` without changing its unit.
+"""
 function Base.real(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.real(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.imag(quantity::AbstractQuantity)
+
+Apply `imag` to the value of `quantity` without changing its unit.
+"""
 function Base.imag(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.imag(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.conj(quantity::AbstractQuantity)
+
+Apply `conj` to the value of `quantity` without changing its unit.
+"""
 function Base.conj(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.conj(::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.angle(quantity::AbstractQuantity)
+
+Apply `angle` to the value of `quantity`. The result is a number in the range `[0,2π)`.
+"""
 function Base.angle(quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.angle(::AbstractQuantity) for subtype $subtype")

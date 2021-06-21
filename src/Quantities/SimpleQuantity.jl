@@ -2,7 +2,7 @@ export SimpleQuantity
 @doc raw"""
     SimpleQuantity{T} <: AbstractQuantity{T}
 
-A physical quantity consisting of a value and a physical unit.
+A physical quantity consisting of a scalar value and a physical unit.
 
 `SimpleQuantity` is a parametric type, where `T` is the type of the
 quantity's value. The type `T` needs to be a subtype of `Number`.
@@ -36,10 +36,10 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    ```jldoctest
    julia> ucat = UnitCatalogue() ;
 
-   julia> nanometer = ucat.nano * ucat.meter
+   julia> nm = ucat.nano * ucat.meter
    UnitFactor nm
 
-   julia> quantity = 7 nanometer
+   julia> quantity = 7nm
    7 nm
    ```
 3. The value can be of any numerical type `T <: Number`. Any mathematical operation included in the
@@ -48,10 +48,10 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    ```jldoctest
    julia> ucat = UnitCatalogue() ;
 
-   julia> nanometer = ucat.nano * ucat.meter
+   julia> nm = ucat.nano * ucat.meter
    UnitFactor nm
 
-   julia> quantity = 5 nanometer
+   julia> quantity = 5nm
    5 nm
 
    julia> sqrt(quantity)

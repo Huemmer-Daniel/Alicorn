@@ -6,7 +6,7 @@ export Dimension
 
 The dimension of a physical quantity.
 
-The dimension is expressed as a collection ``(a, b, c, d, e, f, g)``of powers exponentiating each of the seven basic dimensions of the SI system,
+The dimension is expressed as a collection ``(a, b, c, d, e, f, g)`` of powers exponentiating each of the seven basic dimensions of the SI system,
 ```math
 \mathrm{M}^a \, \mathrm{L}^b \, \mathrm{T}^c \, \mathrm{I}^d \, \mathrm{\Theta}^e \, \mathrm{N}^f \, \mathrm{J}^g,
 ```

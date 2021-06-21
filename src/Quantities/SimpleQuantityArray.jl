@@ -1,4 +1,11 @@
 export SimpleQuantityArray
+@doc raw"""
+    SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
+
+A physical quantity consisting of a number array and a physical unit.
+
+TODO
+"""
 mutable struct SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
     values::AbstractArray{T,N}
     unit::Unit
@@ -10,7 +17,21 @@ mutable struct SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
     end
 end
 
-## Broadcasting
+## ## External constructors
+
+
+## ## Methods for creating a SimpleQuantityArray
+
+
+## ## Methods implementing the interface of AbstractArray
+
+
+## ## Methods implementing the interface of AbstractQuantityArray
+
+
+## ## Broadcasting
+
+## TODO BELOW
 
 # parts of the AbstractArray interface
 Base.size(sqArray::SimpleQuantityArray) = size(sqArray.values)
@@ -107,12 +128,12 @@ function _addition_ConvertQuantityToTargetUnit(sqArray::SimpleQuantityArray, tar
     try
         sqArray = inUnitsOf(sqArray, targetUnit)
     catch exception
-        _handleExceptionInAddition(exception)
+        _handleExceptionInArrayAddition(exception)
     end
     return sqArray
 end
 
-function _handleExceptionInAddition(exception::Exception)
+function _handleExceptionInArrayAddition(exception::Exception)
     if isa(exception, Exceptions.DimensionMismatchError)
         newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
         throw(newException)
