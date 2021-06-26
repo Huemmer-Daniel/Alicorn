@@ -18,14 +18,51 @@ export inUnitsOf
 """
     inUnitsOf(qArray::AbstractQuantityArray, targetUnit::AbstractUnit)::SimpleQuantityArray
 
-Express `quantity` as an object of type `SimpleQuantity` in terms of the unit specified by `targetUnit`.
+Express `qArray` as an object of type `SimpleQuantityArray` in terms of the unit specified by `targetUnit`.
 """
 function inUnitsOf(qArray::AbstractQuantityArray, targetUnit::AbstractUnit)::SimpleQuantityArray
     subtype = typeof(qArray)
     error("missing specialization of inUnitsOf(::AbstractQuantityArray, ::AbstractUnit) for subtype $subtype")
 end
 
+export inBasicSIUnits
+"""
+    inBasicSIUnits(qArray::AbstractQuantity)::SimpleQuantityArray
+
+Express `qArray` as an object of type `SimpleQuantityArray` using the seven basic SI units.
+"""
+function inBasicSIUnits(qArray::AbstractQuantityArray)::SimpleQuantityArray
+    subtype = typeof(qArray)
+    error("missing specialization of inBasicSIUnits(::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
+
+Modify the unit of `qArray` by multiplying it with `unit`.
+"""
+function Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::AbstractQuantityArray, ::AbstractUnit) for subtype $subtype")
+end
+
+function Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::AbstractUnit, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+
+
+
+
+
+
+
+
+
 ## TODO below
+
 """
     Base.transpose(quantity::AbstractQuantityArray)
 

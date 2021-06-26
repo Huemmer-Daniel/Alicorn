@@ -16,6 +16,7 @@ function run()
         @test unitPrettyPrinting()
 
         @test simpleQuantityPrettyPrinting()
+        @test simpleQuantityArrayPrettyPrinting()
         @test dimensionPrettyPrinting()
         @test InternalUnits_PrettyPrinting()
     end
@@ -93,7 +94,7 @@ end
 
 function _getShowString(object)
     io = IOBuffer()
-    show(io, object)
+    show(io, "text/plain", object)
     generatedString = String(take!(io))
     return generatedString
 end
@@ -202,8 +203,6 @@ function _getSimpleQuantityExamples()
     int = 712
     float = 4.345193
     complex = 1 + 3im
-    array = [1 2; 3.4 5]
-    typeofArray = typeof(array)
 
     examples = [
         # integer
@@ -212,6 +211,24 @@ function _getSimpleQuantityExamples()
         ( SimpleQuantity( float, unit ), "4.345193 kg^3.1 TH^-2" ),
         # complex
         ( SimpleQuantity( complex, unit ), "1 + 3im kg^3.1 TH^-2" )
+    ]
+end
+
+function simpleQuantityArrayPrettyPrinting()
+    examples = _getSimpleQuantityArrayExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getSimpleQuantityArrayExamples()
+    ucat = UnitCatalogue()
+    unit = (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2)
+
+    array1 = [1 2; 3.4 5]
+
+    examples = [
+        # integer
+        ( SimpleQuantityArray( array1, unit ),
+        """2×2 Alicorn.Quantities.SimpleQuantityArray{Float64, 2} of unit kg^3.1 TH^-2:\n 1.0  2.0\n 3.4  5.0""")
     ]
 end
 

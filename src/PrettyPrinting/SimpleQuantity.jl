@@ -18,7 +18,7 @@ function generatePrettyStringForNumber(simpleQuantity)
     unit = simpleQuantity.unit
 
     valueStr = string(value)
-    unitStr = _generateStringRepresentation(unit)
+    unitStr = generateStringRepresentation(unit)
 
     return valueStr * " " * unitStr
 end

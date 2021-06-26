@@ -20,6 +20,7 @@ include("UnitCatalogue.jl")
 include("Unit.jl")
 
 include("SimpleQuantity.jl")
+include("SimpleQuantityArray.jl")
 include("Dimension.jl")
 include("InternalUnits.jl")
 

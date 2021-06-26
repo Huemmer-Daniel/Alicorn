@@ -1,18 +1,18 @@
 function Base.show(io::IO, unit::Unit)
-    output = generatePrettyPrintingOutput(unit)
+    output = _generatePrettyPrintingOutput(unit)
     print(io, output)
 end
 
-function generatePrettyPrintingOutput(unit::Unit)
-    stringRepresentation = _generateStringRepresentation(unit)
+function _generatePrettyPrintingOutput(unit::Unit)
+    stringRepresentation = generateStringRepresentation(unit)
     return "Unit " * stringRepresentation
 end
 
-function _generateStringRepresentation(unit::Unit)
+function generateStringRepresentation(unit::Unit)
     unitFactors = unit.unitFactors
     unitStrRepr = ""
     for unitFactor in unitFactors
-        unitFactorStrRepr = _generateStringRepresentation(unitFactor)
+        unitFactorStrRepr = generateStringRepresentation(unitFactor)
         unitStrRepr = _addStringWithWhitespace(unitStrRepr, unitFactorStrRepr)
     end
     return unitStrRepr

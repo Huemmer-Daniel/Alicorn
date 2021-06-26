@@ -87,7 +87,7 @@ end
 ## ## Methods for creating a SimpleQuantity
 
 """
-    Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+    Base.:*(value::Number, abstractUnit::AbstractUnit)
 
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
@@ -99,12 +99,12 @@ julia> 3.5 * ucat.tesla
 3.5 T
 ```
 """
-function Base.:*(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+function Base.:*(value::Number, abstractUnit::AbstractUnit)
     return SimpleQuantity(value, abstractUnit)
 end
 
 """
-    Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+    Base.:/(value::Number, abstractUnit::AbstractUnit)
 
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
@@ -116,7 +116,7 @@ julia> 3.5 / ucat.second
 3.5 s^-1
 ```
 """
-function Base.:/(value::Number, abstractUnit::AbstractUnit)::SimpleQuantity
+function Base.:/(value::Number, abstractUnit::AbstractUnit)
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantity(value, inverseAbstractUnit)
 end

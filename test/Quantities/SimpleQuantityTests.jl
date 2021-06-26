@@ -9,19 +9,19 @@ const ucat = UnitCatalogue()
 function run()
     @testset "SimpleQuantity" begin
 
-        # Constructors
+        #- Constructors
         @test canInstanciateSimpleQuantityWithRealValue()
         @test canInstanciateSimpleQuantityWithComplexValue()
         @test canInstanciateSimpleQuantityWithBaseUnit()
         @test canInstanciateSimpleQuantityWithUnitFactor()
         @test canInstanciateSimpleQuantityWithoutUnit()
         @test canInstanciateSimpleQuantityWithoutValue()
-        @test fieldsCorrectlyInitialized()
 
-        # Methods for constructing a SimpleQuantity
+        #- Methods for constructing a SimpleQuantity
         @test Number_AbstractUnit_multiplication()
         @test Number_AbstractUnit_division()
 
+        #- AbstractQuantity interface
         # 1. Unit conversion
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
@@ -92,13 +92,13 @@ function run()
         @test getindex_implemented()
         test_getindex_errorsForIndexGreaterOne()
 
-        # additional methods
+        #- additional methods
         @test valueOfDimensionless_implemented()
         test_valueOfDimensionless_ErrorsIfNotUnitless()
     end
 end
 
-## Constructors
+## #- Constructors
 
 function canInstanciateSimpleQuantityWithRealValue()
     value = TestingTools.generateRandomReal()
@@ -171,12 +171,7 @@ function canInstanciateSimpleQuantityWithoutValue()
     return _verifyHasCorrectFields(simpleQuantity, correctFields)
 end
 
-function fieldsCorrectlyInitialized()
-    (randomSimpleQuantity, randomSimpleQuantityFields) = TestingTools.generateRandomSimpleQuantityWithFields()
-    return _verifyHasCorrectFields(randomSimpleQuantity, randomSimpleQuantityFields)
-end
-
-## Methods for constructing a SimpleQuantity
+## #- Methods for constructing a SimpleQuantity
 
 function Number_AbstractUnit_multiplication()
     examples = _getExamplesFor_Number_AbstractUnit_multiplication()
@@ -221,7 +216,7 @@ function _getExamplesFor_Number_AbstractUnit_division()
     ]
 end
 
-
+## #- AbstractQuantity interface
 ## 1. Unit conversion
 
 function inUnitsOf_implemented()

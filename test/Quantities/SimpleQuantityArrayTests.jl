@@ -9,17 +9,35 @@ const ucat = UnitCatalogue()
 function run()
     @testset "SimpleQuantityArray" begin
 
-        # Constructors
+        #- Constructors
         @test canInstanciateSQArrayWithRealArray()
         @test canInstanciateSQArrayWithComplexArray()
         @test canInstanciateSQArraWithBaseUnit()
         @test canInstanciateSQArraWithUnitFactor()
         @test canInstanciateSQArraWithoutUnit()
-        @test canInstanciateSQArraWithoutValue()
+
+        #- Methods for constructing a SimpleQuantityArray
+        @test AbstractArray_AbstractUnit_multiplication()
+        @test AbstractArray_AbstractUnit_division()
+
+        #- AbstractArray interface
+        @test size_implemented()
+        @test size_withDim_implemented()
+        @test getindex_implemented()
+        @test setindex!_implemented()
+
+        #- AbstractQuantity interface
+        # 1. Unit conversion
+        @test inUnitsOf_implemented()
+        test_inUnitsOf_ErrorsForMismatchedUnits()
+        @test inBasicSIUnits_implemented()
+        @test SimpleQuantityArray_AbstractUnit_multiplication()
+        @test AbstractUnit_SimpleQuantityArray_multiplication()
+
     end
 end
 
-## Constructors
+## #- Constructors
 
 function canInstanciateSQArrayWithRealArray()
     values = TestingTools.generateRandomReal(dim = (2,2))
@@ -41,7 +59,6 @@ end
 
 function canInstanciateSQArrayWithComplexArray()
     values = TestingTools.generateRandomComplex(dim = (2,2))
-    println(values)
     unit = TestingTools.generateRandomUnit()
     sqArray = SimpleQuantityArray(values, unit)
     correctFields = Dict([
@@ -50,6 +67,284 @@ function canInstanciateSQArrayWithComplexArray()
     ])
     return _verifyHasCorrectFields(sqArray, correctFields)
 end
+
+function canInstanciateSQArraWithBaseUnit()
+    values = TestingTools.generateRandomReal(dim = (2,2))
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unit = convertToUnit(baseUnit)
+
+    sqArray = SimpleQuantityArray(values, baseUnit)
+    correctFields = Dict([
+        ("values", values),
+        ("unit", unit)
+    ])
+    return _verifyHasCorrectFields(sqArray, correctFields)
+end
+
+function canInstanciateSQArraWithUnitFactor()
+    values = TestingTools.generateRandomComplex(dim = (2,2))
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit = convertToUnit(unitFactor)
+
+    sqArray = SimpleQuantityArray(values, unitFactor)
+    correctFields = Dict([
+        ("values", values),
+        ("unit", unit)
+    ])
+    return _verifyHasCorrectFields(sqArray, correctFields)
+end
+
+function canInstanciateSQArraWithoutUnit()
+    values = TestingTools.generateRandomComplex(dim = (2,2))
+    sqArray = SimpleQuantityArray(values)
+    correctFields = Dict([
+        ("values", values),
+        ("unit", Alicorn.unitlessUnit)
+    ])
+    return _verifyHasCorrectFields(sqArray, correctFields)
+end
+
+## #- Methods for constructing a SimpleQuantityArray
+
+function AbstractArray_AbstractUnit_multiplication()
+    examples = _getExamplesFor_AbstractArray_AbstractUnit_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_AbstractArray_AbstractUnit_multiplication()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit = TestingTools.generateRandomUnit()
+
+    array1 = TestingTools.generateRandomReal(dim=(3,4))
+    array2 = TestingTools.generateRandomComplex(dim=(3,4))
+    array3 = TestingTools.generateRandomReal(dim=(1,4))
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1 is a subtype of AbstractArray and factor2 is a subtype of AbstractUnit
+    examples = [
+        # factor1 is a real number
+        ( array1, baseUnit, SimpleQuantityArray(array1, baseUnit) ),
+        ( array2, unitFactor, SimpleQuantityArray(array2, unitFactor) ),
+        ( array3, unit, SimpleQuantityArray(array3, unit) )
+    ]
+end
+
+function AbstractArray_AbstractUnit_division()
+    examples = _getExamplesFor_AbstractArray_AbstractUnit_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_AbstractArray_AbstractUnit_division()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit = TestingTools.generateRandomUnit()
+
+    array1 = TestingTools.generateRandomReal(dim=(3,4))
+    array2 = TestingTools.generateRandomComplex(dim=(3,4))
+    array3 = TestingTools.generateRandomReal(dim=(1,4))
+
+    # format: dividend, divisor, correct result for dividend / divisor
+    # where dividend is a subtype of AbstractArray and divisor is an AbstractUnit
+    examples = [
+        ( array1, baseUnit, SimpleQuantityArray(array1, inv(baseUnit) ) ),
+        ( array2, unitFactor, SimpleQuantityArray(array2, inv(unitFactor) ) ),
+        ( array3, unit, SimpleQuantityArray(array3, inv(unit)) ),
+    ]
+end
+
+## #- AbstractArray interface
+
+function size_implemented()
+    examples = _getExamplesFor_size()
+    return TestingTools.testMonadicFunction(Base.size, examples)
+end
+
+function _getExamplesFor_size()
+    unit = TestingTools.generateRandomUnit()
+
+    array1 = TestingTools.generateRandomReal(dim=(3,4))
+    array2 = TestingTools.generateRandomComplex(dim=(2))
+    array3 = TestingTools.generateRandomReal(dim=(1,4))
+
+    # format: ::SimpleQuantityArray, correct result for size(::SimpleQuantityArray)
+    examples = [
+        ( SimpleQuantityArray(array1, unit ), (3,4) ),
+        ( SimpleQuantityArray(array2, unit ), (2, ) ),
+        ( SimpleQuantityArray(array3, unit), (1,4) )
+    ]
+end
+
+function size_withDim_implemented()
+    examples = _getExamplesFor_size_withDim()
+    return TestingTools.testDyadicFunction(Base.size, examples)
+end
+
+function _getExamplesFor_size_withDim()
+    unit = TestingTools.generateRandomUnit()
+
+    array1 = TestingTools.generateRandomReal(dim=(3,4))
+    array2 = TestingTools.generateRandomComplex(dim=(2))
+    array3 = TestingTools.generateRandomReal(dim=(1,4))
+
+    # format: ::SimpleQuantityArray, dimension::Int, correct result for size(::SimpleQuantityArray, dimension)
+    examples = [
+        ( SimpleQuantityArray(array1, unit ), 1, 3 ),
+        ( SimpleQuantityArray(array2, unit ), 2, 1 ),
+        ( SimpleQuantityArray(array3, unit), 2, 4 ),
+        ( SimpleQuantityArray(array3, unit), 10, 1 )
+    ]
+end
+
+function getindex_implemented()
+    examples = _getExamplesFor_getindex()
+    return TestingTools.testDyadicFunction_Splat2ndArgs(Base.getindex, examples)
+end
+
+function _getExamplesFor_getindex()
+    unit = TestingTools.generateRandomUnit()
+
+    array = TestingTools.generateRandomReal(dim=(3,4))
+    sqArray = SimpleQuantityArray(array, unit )
+
+    # format: ::SimpleQuantityArray, indices, correct result for getindex(::SimpleQuantityArray, indices)
+    examples = [
+        ( sqArray, 1, array[1] ),
+        ( sqArray, 6, array[6] ),
+        ( sqArray, (2,3), array[2,3] )
+    ]
+end
+
+function setindex!_implemented()
+    examples = _getExamplesFor_setindex!()
+    return _test_setindex!(examples)
+end
+
+function _getExamplesFor_setindex!()
+    unit = TestingTools.generateRandomUnit()
+
+    array = zeros(3,4)
+    sqArray = SimpleQuantityArray(array, unit )
+
+    array1 = deepcopy(array)
+    array1[1] = 7
+
+    array2 = deepcopy(array)
+    array2[2,3] = 9
+
+    array3 = deepcopy(array)
+    array3[1:3] = [7, 8, 9]
+
+    # format: ::SimpleQuantityArray, vector, indices, correct result for setindex!(::SimpleQuantityArray, vector, indices)
+    examples = [
+        ( deepcopy(sqArray), 7, 1, SimpleQuantityArray(array1, unit ) ),
+        ( deepcopy(sqArray), 9, (2,3), SimpleQuantityArray(array2, unit ) ),
+        ( deepcopy(sqArray), [7, 8, 9], 1:3, SimpleQuantityArray(array3, unit ) )
+    ]
+end
+
+function _test_setindex!(examples::Array)
+    correct = true
+    for (sqArray, vector, indices, correctOutput) in examples
+        if isa(indices, Tuple)
+            returnedOutput = Base.setindex!(sqArray, vector, indices...)
+        else
+            returnedOutput = Base.setindex!(sqArray, vector, indices)
+        end
+        correct &= (returnedOutput == correctOutput)
+    end
+    return correct
+end
+
+## #- AbstractQuantityArray interface
+## 1. Unit conversion
+
+function inUnitsOf_implemented()
+    examples = _getExamplesFor_inUnitsOf()
+    return TestingTools.testDyadicFunction(inUnitsOf, examples)
+end
+
+function _getExamplesFor_inUnitsOf()
+    electronvoltInBasicSI = ucat.electronvolt.prefactor
+
+    # format: SimpleQuantityArray, Unit, SimpleQuantityArray expressed in units of Unit
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( [7; 3] * ucat.meter, ucat.milli*ucat.meter, [7000; 3000] * (ucat.milli*ucat.meter) ),
+        ( [2] * (ucat.milli * ucat.second)^2, ucat.second^2, [2e-6] * ucat.second^2 ),
+        ( ones(2,2) * ucat.joule, ucat.electronvolt, ( (1/electronvoltInBasicSI) * ones(2,2) ) * ucat.electronvolt ),
+        ( [5 2] * Alicorn.unitlessUnit, Alicorn.unitlessUnit, [5 2] * Alicorn.unitlessUnit)
+    ]
+end
+
+function test_inUnitsOf_ErrorsForMismatchedUnits()
+    sqArray = [7, 2] * Alicorn.meter
+    mismatchedUnit = Alicorn.second
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError inUnitsOf(sqArray, mismatchedUnit)
+end
+
+function inBasicSIUnits_implemented()
+    examples = _getExamplesFor_inBasicSIUnits()
+    return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
+end
+
+function _getExamplesFor_inBasicSIUnits()
+    # format: SimpleQuantityArray, SimpleQuantityArray expressed in terms of basic SI units
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( ones(2,2) * Alicorn.meter, ones(2,2) * Alicorn.meter ),
+        ( [4.2] * ucat.joule, [4.2] * (Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2) ),
+        ( [-4.5, 2] * (ucat.mega * ucat.henry)^2, [-4.5e12, 2e12] * ( Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4) ),
+        ( [1 2] * ucat.hour, [3600 7200]* Alicorn.second )
+    ]
+    return examples
+end
+
+function SimpleQuantityArray_AbstractUnit_multiplication()
+    examples = _getExamplesFor_SimpleQuantityArray_AbstractUnit_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_SimpleQuantityArray_AbstractUnit_multiplication()
+    values = TestingTools.generateRandomReal(dim=(2,3))
+    unit1 = TestingTools.generateRandomUnit()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit2 = TestingTools.generateRandomUnit()
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1 is a SimpleQuanity and factor2 is an AbstractUnit
+    examples = [
+        ( SimpleQuantityArray(values, unit1), baseUnit, SimpleQuantityArray( values, unit1 * baseUnit ) ),
+        ( SimpleQuantityArray(values, unit1), unitFactor, SimpleQuantityArray( values, unit1 * unitFactor ) ),
+        ( SimpleQuantityArray(values, unit1), unit2, SimpleQuantityArray( values, unit1 * unit2 ) )
+    ]
+    return examples
+end
+
+function AbstractUnit_SimpleQuantityArray_multiplication()
+    examples = _getExamplesFor_AbstractUnit_SimpleQuantityArray_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_AbstractUnit_SimpleQuantityArray_multiplication()
+    values = TestingTools.generateRandomReal(dim=(2,3))
+    unit1 = TestingTools.generateRandomUnit()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit2 = TestingTools.generateRandomUnit()
+
+    # format: factor1, factor2, correct result for factor1 * factor2
+    # where factor1 is an AbstractUnit and factor2 is a SimpleQuanity
+    examples = [
+        ( baseUnit, SimpleQuantityArray(values, unit1), SimpleQuantityArray( values, baseUnit * unit1 ) ),
+        ( unitFactor, SimpleQuantityArray(values, unit1), SimpleQuantityArray( values, unitFactor * unit1 ) ),
+        ( unit2, SimpleQuantityArray(values, unit1), SimpleQuantityArray( values, unit2 * unit1 ) )
+    ]
+    return examples
+end
+
 
 end # module
 
