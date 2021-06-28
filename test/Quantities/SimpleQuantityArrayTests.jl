@@ -30,9 +30,25 @@ function run()
         # 1. Unit conversion
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
+        @test inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
         @test inBasicSIUnits_implemented()
         @test SimpleQuantityArray_AbstractUnit_multiplication()
         @test AbstractUnit_SimpleQuantityArray_multiplication()
+        @test SimpleQuantityArray_AbstractUnit_division()
+        @test AbstractUnit_SimpleQuantityArray_division()
+
+        # 2. Arithemtic unary and binary operators
+        @test unaryPlus_implemented()
+        @test unaryMinus_implemented()
+        @test addition_implemented()
+        test_addition_ErrorsForMismatchedDimensions()
+        @test subtraction_implemented()
+        test_subtraction_ErrorsForMismatchedDimensions()
+        @test multiplication_implemented()
+        @test SimpleQuantityArray_SimpleQuantity_multiplication_implemented()
+        @test SimpleQuantity_SimpleQuantityArray_multiplication_implemented()
+        @test SimpleQuantityArray_Number_multiplication_implemented()
+        @test Number_SimpleQuantityArray_multiplication_implemented()
 
     end
 end
@@ -284,6 +300,24 @@ function test_inUnitsOf_ErrorsForMismatchedUnits()
     @test_throws expectedError inUnitsOf(sqArray, mismatchedUnit)
 end
 
+function inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
+    examples = _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
+    return TestingTools.testDyadicFunction(inUnitsOf, examples)
+end
+
+function _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
+    electronvoltInBasicSI = ucat.electronvolt.prefactor
+
+    # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit ),
+        ( [7] * ucat.meter, 8.9 * (ucat.milli*ucat.meter), [7000] * (ucat.milli*ucat.meter) ),
+        ( [2] * (ucat.milli * ucat.second)^2, pi * ucat.second^2, [2e-6] * ucat.second^2 ),
+        ( [1] * ucat.joule, -8.0 * ucat.electronvolt, [(1/electronvoltInBasicSI)] * ucat.electronvolt ),
+        ( [5; 5] * Alicorn.unitlessUnit, -9 * Alicorn.unitlessUnit, [5; 5] * Alicorn.unitlessUnit)
+    ]
+end
+
 function inBasicSIUnits_implemented()
     examples = _getExamplesFor_inBasicSIUnits()
     return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
@@ -345,6 +379,160 @@ function _getExamplesFor_AbstractUnit_SimpleQuantityArray_multiplication()
     return examples
 end
 
+function SimpleQuantityArray_AbstractUnit_division()
+    examples = _getExamplesFor_SimpleQuantityArray_AbstractUnit_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_SimpleQuantityArray_AbstractUnit_division()
+    values = TestingTools.generateRandomReal(dim=(2,3))
+    unit1 = TestingTools.generateRandomUnit()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit2 = TestingTools.generateRandomUnit()
+
+    # format: dividend, divisor, correct result for dividend / divisor
+    # where dividend is a SimpleQuanity and divisor is an AbstractUnit
+    examples = [
+        ( SimpleQuantityArray(values, unit1), baseUnit, SimpleQuantityArray( values, unit1 / baseUnit ) ),
+        ( SimpleQuantityArray(values, unit1), unitFactor, SimpleQuantityArray( values, unit1 / unitFactor ) ),
+        ( SimpleQuantityArray(values, unit1), unit2, SimpleQuantityArray( values, unit1 / unit2 ) )
+    ]
+    return examples
+end
+
+
+function AbstractUnit_SimpleQuantityArray_division()
+    examples = _getExamplesFor_AbstractUnit_SimpleQuantityArray_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_AbstractUnit_SimpleQuantityArray_division()
+    # we invert a random matrix:
+    # almost all square matrices are invertible,
+    # the subset of singular matrices is of zero measure, so we are mostly fine
+    values = TestingTools.generateRandomReal(dim=(2,2))
+    unit1 = TestingTools.generateRandomUnit()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    unit2 = TestingTools.generateRandomUnit()
+
+    # format: dividend, divisor, correct result for dividend / divisor
+    # where dividend is an AbstractUnit and divisor is a SimpleQuanity
+    examples = [
+        ( baseUnit, SimpleQuantityArray(values, unit1), SimpleQuantityArray( inv(values), baseUnit / unit1  ) ),
+        ( unitFactor, SimpleQuantityArray(values, unit1), SimpleQuantityArray( inv(values), unitFactor / unit1  ) ),
+        ( unit2, SimpleQuantityArray(values, unit1), SimpleQuantityArray( inv(values), unit2 / unit1  ) )
+    ]
+    return examples
+end
+
+## 2. Arithemtic unary and binary operators
+
+function unaryPlus_implemented()
+    randomSimpleQuantityArray = TestingTools.generateRandomSimpleQuantityArray()
+    correct = (randomSimpleQuantityArray == +randomSimpleQuantityArray)
+    return correct
+end
+
+function unaryMinus_implemented()
+    examples = _getExamplesFor_unaryMinus()
+    return TestingTools.testMonadicFunction(Base.:-, examples)
+end
+
+function _getExamplesFor_unaryMinus()
+    # format: ::simpleQuantityArray, correct result for -simpleQuantityArray
+    examples = [
+        ( [7.5] * ucat.meter, [-7.5] * ucat.meter),
+        ( [(-3.4 + 8.7im)] * ucat.ampere, [(3.4 - 8.7im)] * ucat.ampere)
+    ]
+    return examples
+end
+
+function addition_implemented()
+    examples = _getExamplesFor_addition()
+    return TestingTools.testDyadicFunction(Base.:+, examples)
+end
+
+function _getExamplesFor_addition()
+    # format: addend1, addend2, correct sum
+    examples = [
+        ( [2] * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit, [3] * Alicorn.unitlessUnit ),
+        ( [7; 3] * ucat.meter, [2; 1] * (ucat.milli * ucat.meter), [7.002; 3.001] * ucat.meter ),
+        ( [2] * (ucat.milli * ucat.meter), [7] * ucat.meter , [7.002e3] * (ucat.milli * ucat.meter) )
+    ]
+    return examples
+end
+
+function test_addition_ErrorsForMismatchedDimensions()
+    (mismatchedAddend1, mismatchedAddend2) = _generateDimensionMismatchedQuantityArrays()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
+    @test_throws expectedError (mismatchedAddend1 + mismatchedAddend2)
+end
+
+function _generateDimensionMismatchedQuantityArrays()
+    unit = TestingTools.generateRandomUnit()
+    mismatchedUnit = unit * Alicorn.meter
+
+    values = TestingTools.generateRandomReal(dim=(3,2))
+    mismatchedAddend1 = values * unit
+    mismatchedAddend2 = (2*values) * mismatchedUnit
+
+    return (mismatchedAddend1, mismatchedAddend2)
+end
+
+function subtraction_implemented()
+    examples = _getExamplesFor_subtraction()
+    return TestingTools.testDyadicFunction(Base.:-, examples)
+end
+
+function _getExamplesFor_subtraction()
+    # format: addend1, addend2, correct sum
+    examples = [
+        ( [2] * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit, [1]* Alicorn.unitlessUnit ),
+        ( [7 3] * ucat.meter, [2 1] * (ucat.milli * ucat.meter), [6.998 2.999] * ucat.meter ),
+        ( [2] * (ucat.milli * ucat.meter), [7] * ucat.meter , [-6.998e3] * (ucat.milli * ucat.meter) )
+    ]
+    return examples
+end
+
+function test_subtraction_ErrorsForMismatchedDimensions()
+    (mismatchedAddend1, mismatchedAddend2) = _generateDimensionMismatchedQuantityArrays()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
+    @test_throws expectedError (mismatchedAddend1 - mismatchedAddend2)
+end
+
+function multiplication_implemented()
+    examples = _getExamplesFor_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, ones(2,2)  * Alicorn.unitlessUnit, ( 2 * ones(2,2) ) * Alicorn.unitlessUnit ),
+        ( [1 1] * Alicorn.unitlessUnit, [2, 2] * ucat.second, [4] * ucat.second ),
+        ( [2, 2] * ucat.second, [1 1] * Alicorn.unitlessUnit, ( 2 * ones(2,2) ) * ucat.second ),
+        ( [2.5 3.5] * ucat.meter,  [2, 2] * ucat.second, [12.0] * ucat.meter * ucat.second ),
+        ( [2] * ucat.second, [2.5 2.5]* ucat.meter, [5.0 5.0] * ucat.second * ucat.meter ),
+        ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second),  [2.5 2.5] * (ucat.pico * ucat.second) , [-17.5 -17.5; 2.5 2.5] * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
+        ( [2 2] * (ucat.milli * ucat.candela)^-4, [4; 4] * (ucat.milli * ucat.candela)^2, [16] * (ucat.milli * ucat.candela)^-2 )
+    ]
+    return examples
+end
+
+function SimpleQuantityArray_SimpleQuantity_multiplication_implemented()
+    return false
+end
+function SimpleQuantity_SimpleQuantityArray_multiplication_implemented()
+    return false
+end
+function SimpleQuantityArray_Number_multiplication_implemented()
+    return false
+end
+function Number_SimpleQuantityArray_multiplication_implemented()
+    return false
+end
 
 end # module
 

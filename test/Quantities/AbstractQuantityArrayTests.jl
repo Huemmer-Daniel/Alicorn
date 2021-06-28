@@ -10,6 +10,9 @@ struct MockQuantityArrayStub{T,N} <: AbstractQuantityArray{T,N} end
 Base.size(A::MockQuantityArrayStub{T,N}) where {T,N} = (2,2)
 Base.getindex(A::MockQuantityArrayStub{T,N}, inds...) where {T,N} = 7
 
+## Mock implementations of AbstractQuantity interface
+struct MockQuantityStub{T} <: AbstractQuantity{T} end
+
 ## Test interface using mock implementation
 function run()
     # test interface to be implemented by AbstractUnitArray realizations
@@ -20,6 +23,19 @@ function run()
         test_inBasicSIUnits_required()
         test_AbstractQuantityArray_AbstractUnit_multiplicationRequired()
         test_AbstractUnit_AbstractQuantityArray_multiplicationRequired()
+        test_AbstractQuantityArray_AbstractUnit_divisionRequired()
+        test_AbstractUnit_AbstractQuantityArray_divisionRequired()
+
+        # 2. Arithemtic unary and binary operators
+        test_unary_plus_required()
+        test_unary_minus_required()
+        test_addition_required()
+        test_subtraction_required()
+        test_multiplication_required()
+        test_AbstractQuantityArray_AbstractQuantity_multiplication_required()
+        test_AbstractQuantity_AbstractQuantityArray_multiplication_required()
+        test_AbstractQuantityArray_Number_multiplication_required()
+        test_Number_AbstractQuantityArray_multiplication_required()
     end
 end
 
@@ -50,6 +66,78 @@ function test_AbstractUnit_AbstractQuantityArray_multiplicationRequired()
     unit = TestingTools.generateRandomUnit()
     expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractUnit, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
     @test_throws expectedError unit * mockQArray
+end
+
+function test_AbstractQuantityArray_AbstractUnit_divisionRequired()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    unit = TestingTools.generateRandomUnit()
+    expectedError = Core.ErrorException("missing specialization of Base.:/(::AbstractQuantityArray, ::AbstractUnit) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray / unit
+end
+
+function test_AbstractUnit_AbstractQuantityArray_divisionRequired()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    unit = TestingTools.generateRandomUnit()
+    expectedError = Core.ErrorException("missing specialization of Base.:/(::AbstractUnit, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError unit / mockQArray
+end
+
+## 2. Arithmetic unary and binary operators
+
+function test_unary_plus_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:+(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError (+mockQArray)
+end
+
+function test_unary_minus_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:-(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError (-mockQArray)
+end
+
+function test_addition_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:+(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray + mockQArray
+end
+
+function test_subtraction_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:-(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray - mockQArray
+end
+
+function test_multiplication_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray * mockQArray
+end
+
+function test_AbstractQuantityArray_AbstractQuantity_multiplication_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractQuantityArray, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray * mockQuantity
+end
+
+function test_AbstractQuantity_AbstractQuantityArray_multiplication_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    mockQuantity = MockQuantityStub{Any}()
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractQuantity, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQuantity * mockQArray
+end
+
+function test_AbstractQuantityArray_Number_multiplication_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractQuantityArray, ::Number) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray * 2
+end
+
+function test_Number_AbstractQuantityArray_multiplication_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::Number, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError 2 * mockQArray
 end
 
 end # module

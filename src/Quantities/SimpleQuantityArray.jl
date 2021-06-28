@@ -114,6 +114,17 @@ function inBasicSIUnits(sqArray::SimpleQuantityArray)
     return resultingQuantity
 end
 
+export inUnitsOf
+"""
+    inUnitsOf(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
+
+Express `sqArray` in units of `simpleQuantity`.
+"""
+function inUnitsOf(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
+    targetUnit = simpleQuantity.unit
+    return inUnitsOf(sqArray, targetUnit)
+end
+
 # method documented as part of the AbstractQuantity interface
 function Base.:*(sqArray::SimpleQuantityArray, abstractUnit::AbstractUnit)
     values = sqArray.values
@@ -133,6 +144,101 @@ function Base.:*(abstractUnit::AbstractUnit, sqArray::SimpleQuantityArray)
 
     return SimpleQuantityArray(values, unitProduct)
 end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(sqArray::SimpleQuantityArray, abstractUnit::AbstractUnit)
+    values = sqArray.values
+    unit = sqArray.unit
+
+    unitQuotient = unit / abstractUnit
+
+    return SimpleQuantityArray(values, unitQuotient)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(abstractUnit::AbstractUnit, sqArray::SimpleQuantityArray)
+    values = sqArray.values
+    unit = sqArray.unit
+
+    unitQuotient = abstractUnit / unit
+
+    return SimpleQuantityArray(inv(values), unitQuotient)
+end
+
+
+## 2. Arithmetic unary and binary operators
+
+# method documented as part of the AbstractQuantity interface
+function Base.:+(sqArray::SimpleQuantityArray)
+    return sqArray
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:-(sqArray::SimpleQuantityArray)
+    values = -sqArray.values
+    unit = sqArray.unit
+    return SimpleQuantityArray( values, unit )
+end
+
+
+"""
+    Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+
+Add two `SimpleQuantityArrays`.
+
+The resulting quantity is expressed in units of `sqArray1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and `sqArray2` are of different dimensions
+"""
+function Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    targetUnit = sqArray1.unit
+    sqArray2 = _addition_ConvertQuantityToTargetUnit(sqArray2, targetUnit)
+    sumValues = sqArray1.values + sqArray2.values
+    sumQuantity = SimpleQuantityArray( sumValues, targetUnit )
+    return sumQuantity
+end
+
+function _addition_ConvertQuantityToTargetUnit(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
+    try
+        sqArray = inUnitsOf(sqArray, targetUnit)
+    catch exception
+        _handleExceptionInArrayAddition(exception)
+    end
+    return simpleQuantsqArrayity
+end
+
+function _handleExceptionInArrayAddition(exception::Exception)
+    if isa(exception, Exceptions.DimensionMismatchError)
+        newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
+        throw(newException)
+    else
+        rethrow()
+    end
+end
+
+"""
+    Base.:-(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+
+Subtract two `SimpleQuantityArrays`.
+
+The resulting quantity is expressed in units of `sqArray1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and `sqArray2` are of different dimensions
+"""
+function Base.:-(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    return sqArray1 + (-sqArray2)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    productValues = sqArray1.values * sqArray2.values
+    productUnit = sqArray1.unit * sqArray2.unit
+    productQArray = SimpleQuantityArray(productValues, productUnit)
+    return productQArray
+end
+
 
 ## ## Broadcasting
 

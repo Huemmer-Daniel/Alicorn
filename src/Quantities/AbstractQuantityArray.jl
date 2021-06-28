@@ -52,14 +52,118 @@ function Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
     error("missing specialization of Base.:*(::AbstractUnit, ::AbstractQuantityArray) for subtype $subtype")
 end
 
+"""
+    Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray)
+
+Modify the unit of `qArray` by dividing it by `unit`, or vice versa.
+"""
+function Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:/(::AbstractQuantityArray, ::AbstractUnit) for subtype $subtype")
+end
+
+function Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:/(::AbstractUnit, ::AbstractQuantityArray) for subtype $subtype")
+end
 
 
+## 2. Arithmetic unary and binary operators
 
+"""
+    Base.:+(quantity::AbstractQuantityArray)
 
+Unary plus operator, acting as the identity operator.
+"""
+function Base.:+(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:+(::AbstractQuantityArray) for subtype $subtype")
+end
 
+"""
+    Base.:-(qArray::AbstractQuantityArray)
 
+Unary minus operator, returning the additive inverse of the quantity.
+"""
+function Base.:-(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:-(::AbstractQuantityArray) for subtype $subtype")
+end
 
+"""
+    Base.:+(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
 
+Add two arrays of physical quantities.
+
+The behavior of the addition depends on the concrete implementation of `AbstractQuantity`.
+"""
+function Base.:+(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+    subtype = typeof(qArray1)
+    error("missing specialization of Base.:+(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.:-(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+
+Subtract `qArray1` from `qArray1`.
+
+The behavior of the subtraction depends on the concrete implementation of `AbstractQuantity`.
+"""
+function Base.:-(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+    subtype = typeof(qArray1)
+    error("missing specialization of Base.:-(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.:*(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+
+Multiply two arrays of physical quantities.
+"""
+function Base.:*(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+    subtype = typeof(qArray1)
+    error("missing specialization of Base.:*(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.:*(qArray::AbstractQuantityArray, quantity::AbstractQuantity)
+
+Multiply an array of physical quantities with a physical quantity.
+"""
+function Base.:*(qArray::AbstractQuantityArray, quantity::AbstractQuantity)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::AbstractQuantityArray, ::AbstractQuantity) for subtype $subtype")
+end
+
+"""
+    Base.:*(quantity::AbstractQuantity, qArray::AbstractQuantityArray)
+
+Multiply an array of physical quantities with a physical quantity.
+"""
+function Base.:*(quantity::AbstractQuantity, qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::AbstractQuantity, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.:*(qArray::AbstractQuantityArray, number::Number)
+
+Multiply an array of physical quantities with a dimensionless number.
+"""
+function Base.:*(qArray::AbstractQuantityArray, number::Number)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::AbstractQuantityArray, ::Number) for subtype $subtype")
+end
+
+"""
+    Base.:*(number::Number, qArray::AbstractQuantityArray)
+
+Multiply a dimensionless number with an array of physical quantities.
+"""
+function Base.:*(number::Number, qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::Number, ::AbstractQuantityArray) for subtype $subtype")
+end
 
 ## TODO below
 

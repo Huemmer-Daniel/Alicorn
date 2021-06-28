@@ -296,7 +296,6 @@ end
 function generateRandomSimpleQuantityWithFields()
     randomValue = generateRandomReal()
     randomUnit = generateRandomUnit()
-
     randomFields = Dict{String,Any}()
     randomFields["value"] = randomValue
     randomFields["unit"] = randomUnit
@@ -304,6 +303,23 @@ function generateRandomSimpleQuantityWithFields()
     randomSimpleQuantity = SimpleQuantity(randomValue, randomUnit)
 
     return (randomSimpleQuantity, randomFields)
+end
+
+function generateRandomSimpleQuantityArray()
+    (randomSimpleQuantityArray,) = generateRandomSimpleQuantityArrayWithFields()
+    return randomSimpleQuantityArray
+end
+
+function generateRandomSimpleQuantityArrayWithFields()
+    randomValues = generateRandomReal(dim=(3,3))
+    randomUnit = generateRandomUnit()
+
+    randomFields = Dict{String,Any}()
+    randomFields["values"] = randomValues
+    randomFields["unit"] = randomUnit
+
+    randomSimpleQuantityArray = SimpleQuantityArray(randomValues, randomUnit)
+
 end
 
 function generateRandomInternalUnits()

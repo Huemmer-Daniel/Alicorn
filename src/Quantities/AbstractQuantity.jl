@@ -63,7 +63,7 @@ function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
     error("missing specialization of Base.:/(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
 end
 
-function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity, )
+function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.:/(::AbstractUnit, ::AbstractQuantity) for subtype $subtype")
 end
@@ -125,8 +125,8 @@ function Base.:*(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 end
 
 """
-    Base.:*(quantity::AbstractQuantity, object::Number)
-    Base.:*(object::Number, quantity::AbstractQuantity)
+    Base.:*(quantity::AbstractQuantity, number::Number)
+    Base.:*(number::Number, quantity::AbstractQuantity)
 
 Multiply a physical quantity with a dimensionless number.
 """
