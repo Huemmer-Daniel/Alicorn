@@ -184,8 +184,8 @@ function Base.:/(quantity::AbstractQuantity, qArray::AbstractQuantityArray)
 end
 
 """
-    Base.:*(qArray::AbstractQuantityArray, number::Number)
-    Base.:*(number::Number, qArray::AbstractQuantityArray)
+    Base.:/(qArray::AbstractQuantityArray, number::Number)
+    Base.:/(number::Number, qArray::AbstractQuantityArray)
 
 Divide an array of physical quantities by a dimensionless number or vice versa.
 """

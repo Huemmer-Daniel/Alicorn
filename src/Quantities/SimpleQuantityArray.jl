@@ -7,30 +7,30 @@ A physical quantity consisting of a number array and a physical unit.
 TODO
 """
 mutable struct SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
-    values::AbstractArray{T,N}
+    value::Array{T,N}
     unit::Unit
 
-    function SimpleQuantityArray(values::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    function SimpleQuantityArray(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
         unit = convertToUnit(abstractUnit)
-        sqArray = new{T,N}(values, unit)
+        sqArray = new{T,N}(value, unit)
         return sqArray
     end
 end
 
 ## ## External constructors
 
-function SimpleQuantityArray(values::AbstractArray{T,N}) where {T<:Number, N}
+function SimpleQuantityArray(value::Array{T,N}) where {T<:Number, N}
     unit = unitlessUnit
-    sqArray = SimpleQuantityArray(values, unit)
+    sqArray = SimpleQuantityArray(value, unit)
     return sqArray
 end
 
 ## ## Methods for creating a SimpleQuantityArray
 
 """
-    Base.:*(values::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    Base.:*(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
 
-Combine the array `values` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
+Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
 # Example
 ```jldoctest
@@ -42,14 +42,14 @@ julia> [3.5, 4.6] * ucat.tesla
  4.6
 ```
 """
-function Base.:*(values::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
-    return SimpleQuantityArray(values, abstractUnit)
+function Base.:*(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    return SimpleQuantityArray(value, abstractUnit)
 end
 
 """
-    Base.:/(values::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    Base.:/(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
 
-Combine the array `values` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
+Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
 # Example
 ```jldoctest
@@ -61,20 +61,20 @@ julia> [3.5, 4.6] / ucat.second
  4.6
 ```
 """
-function Base.:/(values::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+function Base.:/(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
     inverseAbstractUnit = inv(abstractUnit)
-    return SimpleQuantityArray(values, inverseAbstractUnit)
+    return SimpleQuantityArray(value, inverseAbstractUnit)
 end
 
 ## ## Methods implementing the interface of AbstractArray
 
-Base.size(sqArray::SimpleQuantityArray) = size(sqArray.values)
+Base.size(sqArray::SimpleQuantityArray) = size(sqArray.value)
 
 Base.IndexStyle(::Type{<:SimpleQuantityArray}) = IndexLinear()
 
-Base.getindex(sqArray::SimpleQuantityArray, inds...) = getindex(sqArray.values, inds...)
+Base.getindex(sqArray::SimpleQuantityArray, inds...) = getindex(sqArray.value, inds...)
 
-Base.setindex!(sqArray::SimpleQuantityArray, X::Union{<:AbstractArray{T,N}, <:Number}, inds...) where {T <: Number, N}= setindex!(sqArray.values, X, inds...)
+Base.setindex!(sqArray::SimpleQuantityArray, X::Union{AbstractArray{T,N}, Number}, inds...) where {T <: Number, N}= setindex!(sqArray.value, X, inds...)
 
 ## ## Methods implementing the interface of AbstractQuantityArray
 ## 1. Unit conversion
@@ -82,7 +82,7 @@ Base.setindex!(sqArray::SimpleQuantityArray, X::Union{<:AbstractArray{T,N}, <:Nu
 export inUnitsOf
 # method documented as part of the AbstractQuantityArray interface
 function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
-    originalValues = sqArray.values
+    originalvalue = sqArray.value
     originalUnit = sqArray.unit
 
     if originalUnit == targetUnit
@@ -95,8 +95,8 @@ function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
         _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
         conversionFactor = originalUnitPrefactor / targetUnitPrefactor
 
-        resultingValues = originalValues .* conversionFactor
-        resultingQuantityArray = SimpleQuantityArray( resultingValues, targetUnit )
+        resultingvalue = originalvalue .* conversionFactor
+        resultingQuantityArray = SimpleQuantityArray( resultingvalue, targetUnit )
     end
     return resultingQuantityArray
 end
@@ -104,13 +104,13 @@ end
 export inBasicSIUnits
 # method documented as part of the AbstractQuantityArray interface
 function inBasicSIUnits(sqArray::SimpleQuantityArray)
-    originalValues = sqArray.values
+    originalvalue = sqArray.value
     originalUnit = sqArray.unit
 
     ( conversionFactor, resultingBasicSIUnit ) = convertToBasicSI(originalUnit)
 
-    resultingValues = originalValues * conversionFactor
-    resultingQuantity = SimpleQuantityArray( resultingValues, resultingBasicSIUnit )
+    resultingvalue = originalvalue * conversionFactor
+    resultingQuantity = SimpleQuantityArray( resultingvalue, resultingBasicSIUnit )
     return resultingQuantity
 end
 
@@ -127,42 +127,42 @@ end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:*(sqArray::SimpleQuantityArray, abstractUnit::AbstractUnit)
-    values = sqArray.values
+    value = sqArray.value
     unit = sqArray.unit
 
     unitProduct = unit * abstractUnit
 
-    return SimpleQuantityArray(values, unitProduct)
+    return SimpleQuantityArray(value, unitProduct)
 end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:*(abstractUnit::AbstractUnit, sqArray::SimpleQuantityArray)
-    values = sqArray.values
+    value = sqArray.value
     unit = sqArray.unit
 
     unitProduct = abstractUnit * unit
 
-    return SimpleQuantityArray(values, unitProduct)
+    return SimpleQuantityArray(value, unitProduct)
 end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:/(sqArray::SimpleQuantityArray, abstractUnit::AbstractUnit)
-    values = sqArray.values
+    value = sqArray.value
     unit = sqArray.unit
 
     unitQuotient = unit / abstractUnit
 
-    return SimpleQuantityArray(values, unitQuotient)
+    return SimpleQuantityArray(value, unitQuotient)
 end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:/(abstractUnit::AbstractUnit, sqArray::SimpleQuantityArray)
-    values = sqArray.values
+    value = sqArray.value
     unit = sqArray.unit
 
     unitQuotient = abstractUnit / unit
 
-    return SimpleQuantityArray(inv(values), unitQuotient)
+    return SimpleQuantityArray(inv(value), unitQuotient)
 end
 
 
@@ -175,9 +175,9 @@ end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:-(sqArray::SimpleQuantityArray)
-    values = -sqArray.values
+    value = -sqArray.value
     unit = sqArray.unit
-    return SimpleQuantityArray( values, unit )
+    return SimpleQuantityArray( value, unit )
 end
 
 
@@ -194,8 +194,8 @@ The resulting quantity is expressed in units of `sqArray1`.
 function Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
     sqArray2 = _addition_ConvertQuantityToTargetUnit(sqArray2, targetUnit)
-    sumValues = sqArray1.values + sqArray2.values
-    sumQuantity = SimpleQuantityArray( sumValues, targetUnit )
+    sumvalue = sqArray1.value + sqArray2.value
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
     return sumQuantity
 end
 
@@ -231,54 +231,6 @@ function Base.:-(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     return sqArray1 + (-sqArray2)
 end
 
-# method documented as part of the AbstractQuantity interface
-function Base.:*(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    productValues = sqArray1.values * sqArray2.values
-    productUnit = sqArray1.unit * sqArray2.unit
-    productQArray = SimpleQuantityArray(productValues, productUnit)
-    return productQArray
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
-    productValues = sqArray.values * simpleQuantity.value
-    productUnit = sqArray.unit * simpleQuantity.unit
-    productQArray = SimpleQuantityArray(productValues, productUnit)
-    return productQArray
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
-    productValues = simpleQuantity.value * sqArray.values
-    productUnit = sqArray.unit * simpleQuantity.unit
-    productQArray = SimpleQuantityArray(productValues, productUnit)
-    return productQArray
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(sqArray::SimpleQuantityArray, number::Number)
-    productValues = sqArray.values * number
-    productUnit = sqArray.unit
-    productQArray = SimpleQuantityArray(productValues, productUnit)
-    return productQArray
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(number::Number, sqArray::SimpleQuantityArray)
-    productValues = number * sqArray.values
-    productUnit = sqArray.unit
-    productQArray = SimpleQuantityArray(productValues, productUnit)
-    return productQArray
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    quotientValues = sqArray1.values / sqArray2.values
-    quotientUnit = sqArray1.unit / sqArray2.unit
-    quotientQArray = SimpleQuantityArray(quotientValues, quotientUnit)
-    return quotientQArray
-end
-
 ## 3. Numeric comparison
 
 """
@@ -297,7 +249,7 @@ that render `sqArray1` not equal `sqArray2`.
 """
 function Base.:(==)(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     sqArray1 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
-    return ( sqArray1.values == sqArray2.values )
+    return ( sqArray1.value == sqArray2.value )
 end
 
 function _ensureComparedWithSameUnit(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
@@ -331,22 +283,22 @@ function squeezeOutUnits(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQu
     func = bc.f
     args = bc.args
 
-    unitsAndValues = squeezeOutUnits.(args)
-    unitlessArgs = _isolateValues(unitsAndValues)
+    unitsAndvalue = squeezeOutUnits.(args)
+    unitlessArgs = _isolatevalue(unitsAndvalue)
 
-    unit = inferTargetUnit(func, unitsAndValues...)
+    unit = inferTargetUnit(func, unitsAndvalue...)
     unitlessBroadcasted = Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}( func, unitlessArgs )
 
     return (unit, unitlessBroadcasted)
 end
 
-function _isolateValues(unitsAndValues::Tuple)
-    unitlessArgs = Tuple([value for (~,value) in unitsAndValues])
+function _isolatevalue(unitsAndvalue::Tuple)
+    unitlessArgs = Tuple([value for (~,value) in unitsAndvalue])
 end
 
 function squeezeOutUnits(sqArray::SimpleQuantityArray)
     unit = sqArray.unit
-    unitlessArray = sqArray.values
+    unitlessArray = sqArray.value
     return (unit, unitlessArray)
 end
 
@@ -378,8 +330,8 @@ end
 function Broadcast.broadcasted(::typeof(+), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
     sqArray2 = _addition_ConvertQuantityToTargetUnit(sqArray2, targetUnit)
-    sumValues = sqArray1.values .+ sqArray2.values
-    sumQuantity = SimpleQuantityArray( sumValues, targetUnit )
+    sumvalue = sqArray1.value .+ sqArray2.value
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
 
 function Broadcast.broadcasted(::typeof(+), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, sqArray2::SimpleQuantityArray)

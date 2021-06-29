@@ -8,6 +8,7 @@ include("AbstractQuantityArray.jl")
 
 include("SimpleQuantity.jl")
 include("SimpleQuantityArray.jl")
+include("simpleQuantityArithmetics.jl")
 
 include("Dimension.jl")
 include("InternalUnits.jl")

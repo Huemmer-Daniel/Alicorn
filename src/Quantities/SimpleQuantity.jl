@@ -281,27 +281,27 @@ function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
     return simpleQuantity1 + (-simpleQuantity2)
 end
 
-# method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    productValue = simpleQuantity1.value * simpleQuantity2.value
-    productUnit = simpleQuantity1.unit * simpleQuantity2.unit
-    productQuantity = SimpleQuantity(productValue, productUnit)
-    return productQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity::SimpleQuantity, number::Number)
-    productValue = simpleQuantity.value * number
-    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
-    return productQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(number::Number, simpleQuantity::SimpleQuantity)
-    productValue = number * simpleQuantity.value
-    productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
-    return productQuantity
-end
+# # method documented as part of the AbstractQuantity interface
+# function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+#     productValue = simpleQuantity1.value * simpleQuantity2.value
+#     productUnit = simpleQuantity1.unit * simpleQuantity2.unit
+#     productQuantity = SimpleQuantity(productValue, productUnit)
+#     return productQuantity
+# end
+#
+# # method documented as part of the AbstractQuantity interface
+# function Base.:*(simpleQuantity::SimpleQuantity, number::Number)
+#     productValue = simpleQuantity.value * number
+#     productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
+#     return productQuantity
+# end
+#
+# # method documented as part of the AbstractQuantity interface
+# function Base.:*(number::Number, simpleQuantity::SimpleQuantity)
+#     productValue = number * simpleQuantity.value
+#     productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
+#     return productQuantity
+# end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)

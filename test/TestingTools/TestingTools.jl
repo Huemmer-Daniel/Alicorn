@@ -311,14 +311,14 @@ function generateRandomSimpleQuantityArray()
 end
 
 function generateRandomSimpleQuantityArrayWithFields()
-    randomValues = generateRandomReal(dim=(3,3))
+    randomValue = generateRandomReal(dim=(3,3))
     randomUnit = generateRandomUnit()
 
     randomFields = Dict{String,Any}()
-    randomFields["values"] = randomValues
+    randomFields["value"] = randomValue
     randomFields["unit"] = randomUnit
 
-    randomSimpleQuantityArray = SimpleQuantityArray(randomValues, randomUnit)
+    randomSimpleQuantityArray = SimpleQuantityArray(randomValue, randomUnit)
 
 end
 

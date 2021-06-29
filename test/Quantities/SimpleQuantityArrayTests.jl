@@ -44,16 +44,18 @@ function run()
         test_addition_ErrorsForMismatchedDimensions()
         @test subtraction_implemented()
         test_subtraction_ErrorsForMismatchedDimensions()
+        # multiplication
         @test multiplication_implemented()
         @test SimpleQuantityArray_SimpleQuantity_multiplication_implemented()
         @test SimpleQuantity_SimpleQuantityArray_multiplication_implemented()
         @test SimpleQuantityArray_Number_multiplication_implemented()
         @test Number_SimpleQuantityArray_multiplication_implemented()
-        @test division_implemented()
-        @test SimpleQuantityArray_SimpleQuantity_division_implemented()
-        @test SimpleQuantity_SimpleQuantityArray_division_implemented()
-        @test SimpleQuantityArray_Number_division_implemented()
-        @test Number_SimpleQuantityArray_division_implemented()
+
+        # @test division_implemented()
+        # @test SimpleQuantityArray_SimpleQuantity_division_implemented()
+        # @test SimpleQuantity_SimpleQuantityArray_division_implemented()
+        # @test SimpleQuantityArray_Number_division_implemented()
+        # @test Number_SimpleQuantityArray_division_implemented()
 
     end
 end
@@ -61,65 +63,65 @@ end
 ## #- Constructors
 
 function canInstanciateSQArrayWithRealArray()
-    values = TestingTools.generateRandomReal(dim = (2,2))
+    value = TestingTools.generateRandomReal(dim = (2,2))
     unit = TestingTools.generateRandomUnit()
-    sqArray = SimpleQuantityArray(values, unit)
+    sqArray = SimpleQuantityArray(value, unit)
     correctFields = Dict([
-        ("values", values),
+        ("value", value),
         ("unit", unit)
     ])
     return _verifyHasCorrectFields(sqArray, correctFields)
 end
 
 function _verifyHasCorrectFields(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
-    correctValue = (sqArray.values == correctFields["values"])
+    correctValue = (sqArray.value == correctFields["value"])
     correctUnit = (sqArray.unit == correctFields["unit"])
     correct = correctValue && correctUnit
     return correct
 end
 
 function canInstanciateSQArrayWithComplexArray()
-    values = TestingTools.generateRandomComplex(dim = (2,2))
+    value = TestingTools.generateRandomComplex(dim = (2,2))
     unit = TestingTools.generateRandomUnit()
-    sqArray = SimpleQuantityArray(values, unit)
+    sqArray = SimpleQuantityArray(value, unit)
     correctFields = Dict([
-        ("values", values),
+        ("value", value),
         ("unit", unit)
     ])
     return _verifyHasCorrectFields(sqArray, correctFields)
 end
 
 function canInstanciateSQArraWithBaseUnit()
-    values = TestingTools.generateRandomReal(dim = (2,2))
+    value = TestingTools.generateRandomReal(dim = (2,2))
     baseUnit = TestingTools.generateRandomBaseUnit()
     unit = convertToUnit(baseUnit)
 
-    sqArray = SimpleQuantityArray(values, baseUnit)
+    sqArray = SimpleQuantityArray(value, baseUnit)
     correctFields = Dict([
-        ("values", values),
+        ("value", value),
         ("unit", unit)
     ])
     return _verifyHasCorrectFields(sqArray, correctFields)
 end
 
 function canInstanciateSQArraWithUnitFactor()
-    values = TestingTools.generateRandomComplex(dim = (2,2))
+    value = TestingTools.generateRandomComplex(dim = (2,2))
     unitFactor = TestingTools.generateRandomUnitFactor()
     unit = convertToUnit(unitFactor)
 
-    sqArray = SimpleQuantityArray(values, unitFactor)
+    sqArray = SimpleQuantityArray(value, unitFactor)
     correctFields = Dict([
-        ("values", values),
+        ("value", value),
         ("unit", unit)
     ])
     return _verifyHasCorrectFields(sqArray, correctFields)
 end
 
 function canInstanciateSQArraWithoutUnit()
-    values = TestingTools.generateRandomComplex(dim = (2,2))
-    sqArray = SimpleQuantityArray(values)
+    value = TestingTools.generateRandomComplex(dim = (2,2))
+    sqArray = SimpleQuantityArray(value)
     correctFields = Dict([
-        ("values", values),
+        ("value", value),
         ("unit", Alicorn.unitlessUnit)
     ])
     return _verifyHasCorrectFields(sqArray, correctFields)
@@ -346,7 +348,7 @@ function SimpleQuantityArray_AbstractUnit_multiplication()
 end
 
 function _getExamplesFor_SimpleQuantityArray_AbstractUnit_multiplication()
-    values = TestingTools.generateRandomReal(dim=(2,3))
+    value = TestingTools.generateRandomReal(dim=(2,3))
     unit1 = TestingTools.generateRandomUnit()
     baseUnit = TestingTools.generateRandomBaseUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
@@ -355,9 +357,9 @@ function _getExamplesFor_SimpleQuantityArray_AbstractUnit_multiplication()
     # format: factor1, factor2, correct result for factor1 * factor2
     # where factor1 is a SimpleQuanity and factor2 is an AbstractUnit
     examples = [
-        ( SimpleQuantityArray(values, unit1), baseUnit, SimpleQuantityArray( values, unit1 * baseUnit ) ),
-        ( SimpleQuantityArray(values, unit1), unitFactor, SimpleQuantityArray( values, unit1 * unitFactor ) ),
-        ( SimpleQuantityArray(values, unit1), unit2, SimpleQuantityArray( values, unit1 * unit2 ) )
+        ( SimpleQuantityArray(value, unit1), baseUnit, SimpleQuantityArray( value, unit1 * baseUnit ) ),
+        ( SimpleQuantityArray(value, unit1), unitFactor, SimpleQuantityArray( value, unit1 * unitFactor ) ),
+        ( SimpleQuantityArray(value, unit1), unit2, SimpleQuantityArray( value, unit1 * unit2 ) )
     ]
     return examples
 end
@@ -368,7 +370,7 @@ function AbstractUnit_SimpleQuantityArray_multiplication()
 end
 
 function _getExamplesFor_AbstractUnit_SimpleQuantityArray_multiplication()
-    values = TestingTools.generateRandomReal(dim=(2,3))
+    value = TestingTools.generateRandomReal(dim=(2,3))
     unit1 = TestingTools.generateRandomUnit()
     baseUnit = TestingTools.generateRandomBaseUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
@@ -377,9 +379,9 @@ function _getExamplesFor_AbstractUnit_SimpleQuantityArray_multiplication()
     # format: factor1, factor2, correct result for factor1 * factor2
     # where factor1 is an AbstractUnit and factor2 is a SimpleQuanity
     examples = [
-        ( baseUnit, SimpleQuantityArray(values, unit1), SimpleQuantityArray( values, baseUnit * unit1 ) ),
-        ( unitFactor, SimpleQuantityArray(values, unit1), SimpleQuantityArray( values, unitFactor * unit1 ) ),
-        ( unit2, SimpleQuantityArray(values, unit1), SimpleQuantityArray( values, unit2 * unit1 ) )
+        ( baseUnit, SimpleQuantityArray(value, unit1), SimpleQuantityArray( value, baseUnit * unit1 ) ),
+        ( unitFactor, SimpleQuantityArray(value, unit1), SimpleQuantityArray( value, unitFactor * unit1 ) ),
+        ( unit2, SimpleQuantityArray(value, unit1), SimpleQuantityArray( value, unit2 * unit1 ) )
     ]
     return examples
 end
@@ -390,7 +392,7 @@ function SimpleQuantityArray_AbstractUnit_division()
 end
 
 function _getExamplesFor_SimpleQuantityArray_AbstractUnit_division()
-    values = TestingTools.generateRandomReal(dim=(2,3))
+    value = TestingTools.generateRandomReal(dim=(2,3))
     unit1 = TestingTools.generateRandomUnit()
     baseUnit = TestingTools.generateRandomBaseUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
@@ -399,9 +401,9 @@ function _getExamplesFor_SimpleQuantityArray_AbstractUnit_division()
     # format: dividend, divisor, correct result for dividend / divisor
     # where dividend is a SimpleQuanity and divisor is an AbstractUnit
     examples = [
-        ( SimpleQuantityArray(values, unit1), baseUnit, SimpleQuantityArray( values, unit1 / baseUnit ) ),
-        ( SimpleQuantityArray(values, unit1), unitFactor, SimpleQuantityArray( values, unit1 / unitFactor ) ),
-        ( SimpleQuantityArray(values, unit1), unit2, SimpleQuantityArray( values, unit1 / unit2 ) )
+        ( SimpleQuantityArray(value, unit1), baseUnit, SimpleQuantityArray( value, unit1 / baseUnit ) ),
+        ( SimpleQuantityArray(value, unit1), unitFactor, SimpleQuantityArray( value, unit1 / unitFactor ) ),
+        ( SimpleQuantityArray(value, unit1), unit2, SimpleQuantityArray( value, unit1 / unit2 ) )
     ]
     return examples
 end
@@ -416,7 +418,7 @@ function _getExamplesFor_AbstractUnit_SimpleQuantityArray_division()
     # we invert a random matrix:
     # almost all square matrices are invertible,
     # the subset of singular matrices is of zero measure, so we are mostly fine
-    values = TestingTools.generateRandomReal(dim=(2,2))
+    value = TestingTools.generateRandomReal(dim=(2,2))
     unit1 = TestingTools.generateRandomUnit()
     baseUnit = TestingTools.generateRandomBaseUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
@@ -425,9 +427,9 @@ function _getExamplesFor_AbstractUnit_SimpleQuantityArray_division()
     # format: dividend, divisor, correct result for dividend / divisor
     # where dividend is an AbstractUnit and divisor is a SimpleQuanity
     examples = [
-        ( baseUnit, SimpleQuantityArray(values, unit1), SimpleQuantityArray( inv(values), baseUnit / unit1  ) ),
-        ( unitFactor, SimpleQuantityArray(values, unit1), SimpleQuantityArray( inv(values), unitFactor / unit1  ) ),
-        ( unit2, SimpleQuantityArray(values, unit1), SimpleQuantityArray( inv(values), unit2 / unit1  ) )
+        ( baseUnit, SimpleQuantityArray(value, unit1), SimpleQuantityArray( inv(value), baseUnit / unit1  ) ),
+        ( unitFactor, SimpleQuantityArray(value, unit1), SimpleQuantityArray( inv(value), unitFactor / unit1  ) ),
+        ( unit2, SimpleQuantityArray(value, unit1), SimpleQuantityArray( inv(value), unit2 / unit1  ) )
     ]
     return examples
 end
@@ -479,9 +481,9 @@ function _generateDimensionMismatchedQuantityArrays()
     unit = TestingTools.generateRandomUnit()
     mismatchedUnit = unit * Alicorn.meter
 
-    values = TestingTools.generateRandomReal(dim=(3,2))
-    mismatchedAddend1 = values * unit
-    mismatchedAddend2 = (2*values) * mismatchedUnit
+    value = TestingTools.generateRandomReal(dim=(3,2))
+    mismatchedAddend1 = value * unit
+    mismatchedAddend2 = (2*value) * mismatchedUnit
 
     return (mismatchedAddend1, mismatchedAddend2)
 end
@@ -622,7 +624,22 @@ function _getExamplesFor_division()
 end
 
 function SimpleQuantityArray_SimpleQuantity_division_implemented()
-    return false
+    examples = _getExamplesFor_SimpleQuantityArray_SimpleQuantity_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_SimpleQuantityArray_SimpleQuantity_division()
+    # format: factor1, factor2, correct quotient factor1 / factor2
+    examples = [
+        ( [1; 2] * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, [1; 2] * Alicorn.unitlessUnit ),
+        ( [1, 1] * Alicorn.unitlessUnit, 2 * ucat.second, [0.5, 0.5] / ucat.second ),
+        ( [2] * ucat.second, 4 * Alicorn.unitlessUnit, [0.5]  * ucat.second ),
+        ( [12] * ucat.meter,  2 * ucat.second, [6] * ucat.meter / ucat.second ),
+        ( [5, 2] * ucat.second, 2 * ucat.meter, [2.5, 1] * ucat.second / ucat.meter ),
+        ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second),  2 * (ucat.pico * ucat.second) , [-3.5; 0.5] * ucat.lumen * (ucat.nano * ucat.second) / (ucat.pico * ucat.second) ),
+        ( [2] * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, [0.5] * (ucat.milli * ucat.candela)^-6 )
+    ]
+    return examples
 end
 
 function SimpleQuantity_SimpleQuantityArray_division_implemented()
