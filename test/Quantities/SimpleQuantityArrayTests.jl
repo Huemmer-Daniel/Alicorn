@@ -49,6 +49,11 @@ function run()
         @test SimpleQuantity_SimpleQuantityArray_multiplication_implemented()
         @test SimpleQuantityArray_Number_multiplication_implemented()
         @test Number_SimpleQuantityArray_multiplication_implemented()
+        @test division_implemented()
+        @test SimpleQuantityArray_SimpleQuantity_division_implemented()
+        @test SimpleQuantity_SimpleQuantityArray_division_implemented()
+        @test SimpleQuantityArray_Number_division_implemented()
+        @test Number_SimpleQuantityArray_division_implemented()
 
     end
 end
@@ -522,15 +527,113 @@ function _getExamplesFor_multiplication()
 end
 
 function SimpleQuantityArray_SimpleQuantity_multiplication_implemented()
-    return false
+    examples = _getExamplesFor_SimpleQuantityArray_SimpleQuantity_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
 end
+
+function _getExamplesFor_SimpleQuantityArray_SimpleQuantity_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( [1 1] * Alicorn.unitlessUnit, 2 * ucat.second, [2 2] * ucat.second ),
+        ( [2, 2] * ucat.second, 1 * Alicorn.unitlessUnit, [2, 2] * ucat.second ),
+        ( [2.5 3.5] * ucat.meter,  2 * ucat.second, [5 7] * ucat.meter * ucat.second ),
+        ( [2] * ucat.second, 2.5 * ucat.meter, [5.0] * ucat.second * ucat.meter ),
+        ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second),  2.5 * (ucat.pico * ucat.second) , [-17.5 ; 2.5 ] * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
+        ( [2 2] * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, [8 8] * (ucat.milli * ucat.candela)^-2 )
+    ]
+    return examples
+end
+
 function SimpleQuantity_SimpleQuantityArray_multiplication_implemented()
-    return false
+    examples = _getExamplesFor_SimpleQuantity_SimpleQuantityArray_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
 end
+
+function _getExamplesFor_SimpleQuantity_SimpleQuantityArray_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( 2 * ucat.second, [1 1] * Alicorn.unitlessUnit, [2 2] * ucat.second ),
+        ( 1 * Alicorn.unitlessUnit, [2, 2] * ucat.second, [2, 2] * ucat.second ),
+        ( 2 * ucat.second, [2.5 3.5] * ucat.meter, [5 7] * ucat.meter * ucat.second ),
+        ( 2.5 * ucat.meter, [2] * ucat.second, [5.0] * ucat.second * ucat.meter ),
+        ( 2.5 * (ucat.pico * ucat.second), [-7; 1] * ucat.lumen * (ucat.nano * ucat.second), [-17.5 ; 2.5 ] * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
+        ( 4 * (ucat.milli * ucat.candela)^2, [2 2] * (ucat.milli * ucat.candela)^-4, [8 8] * (ucat.milli * ucat.candela)^-2 )
+    ]
+    return examples
+end
+
 function SimpleQuantityArray_Number_multiplication_implemented()
+    examples = _getExamplesFor_SimpleQuantityArray_Number_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_SimpleQuantityArray_Number_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, 1, ones(2,2) * Alicorn.unitlessUnit ),
+        ( [1 1] * Alicorn.unitlessUnit, 2, [2 2] * Alicorn.unitlessUnit ),
+        ( [2, 2] * ucat.second, 1, [2, 2] * ucat.second ),
+        ( [2.5 3.5] * ucat.meter,  2, [5 7] * ucat.meter ),
+        ( [2] * ucat.second, 2.5, [5.0] * ucat.second ),
+        ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second), 2.5 , [-17.5 ; 2.5 ] * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( [2 2] * (ucat.milli * ucat.candela)^-4, 4, [8 8] * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function Number_SimpleQuantityArray_multiplication_implemented()
+    examples = _getExamplesFor_Number_SimpleQuantityArray_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_Number_SimpleQuantityArray_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( 1, ones(2,2) * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( 2, [1 1] * Alicorn.unitlessUnit, [2 2] * Alicorn.unitlessUnit ),
+        ( 1, [2, 2] * ucat.second, [2, 2] * ucat.second ),
+        ( 2, [2.5 3.5] * ucat.meter, [5 7] * ucat.meter ),
+        ( 2.5, [2] * ucat.second, [5.0] * ucat.second ),
+        ( 2.5 , [-7; 1] * ucat.lumen * (ucat.nano * ucat.second), [-17.5 ; 2.5 ] * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( 4, [2 2] * (ucat.milli * ucat.candela)^-4, [8 8] * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function division_implemented()
+    examples = _getExamplesFor_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_division()
+    # format: factor1, factor2, correct quotient factor1 / factor2
+    examples = [
+        ( [1; 2] * Alicorn.unitlessUnit, [1; 1]  * Alicorn.unitlessUnit, [ 0.5 0.5; 1.0 1.0 ]* Alicorn.unitlessUnit ),
+        ( [1, 1] * Alicorn.unitlessUnit, [2, 2] * ucat.second, 0.25 * ones(2,2) / ucat.second ),
+        ( [2] * ucat.second, [1] * Alicorn.unitlessUnit, ([2] / [1]) * ucat.second ),
+        ( [12] * ucat.meter,  [2, 2] * ucat.second, [3.0 3.0] * ucat.meter / ucat.second ),
+        ( [5, 2] * ucat.second, [2]* ucat.meter, ([5, 2] / [2]) * ucat.second / ucat.meter ),
+        ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second),  [2] * (ucat.pico * ucat.second) , [-3.5; 0.5] * ucat.lumen * (ucat.nano * ucat.second) / (ucat.pico * ucat.second) ),
+        ( [2] * (ucat.milli * ucat.candela)^-4, [4] * (ucat.milli * ucat.candela)^2, [0.5] * (ucat.milli * ucat.candela)^-6 )
+    ]
+    return examples
+end
+
+function SimpleQuantityArray_SimpleQuantity_division_implemented()
     return false
 end
-function Number_SimpleQuantityArray_multiplication_implemented()
+
+function SimpleQuantity_SimpleQuantityArray_division_implemented()
+    return false
+end
+
+function SimpleQuantityArray_Number_division_implemented()
+    return false
+end
+
+function Number_SimpleQuantityArray_division_implemented()
     return false
 end
 

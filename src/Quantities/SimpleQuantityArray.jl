@@ -239,6 +239,76 @@ function Base.:*(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     return productQArray
 end
 
+# method documented as part of the AbstractQuantity interface
+function Base.:*(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
+    productValues = sqArray.values * simpleQuantity.value
+    productUnit = sqArray.unit * simpleQuantity.unit
+    productQArray = SimpleQuantityArray(productValues, productUnit)
+    return productQArray
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
+    productValues = simpleQuantity.value * sqArray.values
+    productUnit = sqArray.unit * simpleQuantity.unit
+    productQArray = SimpleQuantityArray(productValues, productUnit)
+    return productQArray
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(sqArray::SimpleQuantityArray, number::Number)
+    productValues = sqArray.values * number
+    productUnit = sqArray.unit
+    productQArray = SimpleQuantityArray(productValues, productUnit)
+    return productQArray
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:*(number::Number, sqArray::SimpleQuantityArray)
+    productValues = number * sqArray.values
+    productUnit = sqArray.unit
+    productQArray = SimpleQuantityArray(productValues, productUnit)
+    return productQArray
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.:/(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    quotientValues = sqArray1.values / sqArray2.values
+    quotientUnit = sqArray1.unit / sqArray2.unit
+    quotientQArray = SimpleQuantityArray(quotientValues, quotientUnit)
+    return quotientQArray
+end
+
+## 3. Numeric comparison
+
+"""
+    Base.:(==)(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+
+Returns `true` if `sqArray1` and `sqArray2` are of equal value and dimension.
+
+If necessary, `sqArray2` is expressed in units of `sqArray1.unit`
+before the comparison. Note that the conversion oftens lead to rounding errors
+that render `sqArray1` not equal `sqArray2`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and
+`sqArray2` are not of the same dimension
+```
+"""
+function Base.:(==)(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    sqArray1 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
+    return ( sqArray1.values == sqArray2.values )
+end
+
+function _ensureComparedWithSameUnit(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    try
+        targetUnit = sqArray1.unit
+        sqArray2 = inUnitsOf(sqArray2, targetUnit)
+    catch exception
+        _handleExceptionIn_ensureComparedWithSameUnit(exception)
+    end
+    return sqArray2
+end
 
 ## ## Broadcasting
 
@@ -335,13 +405,4 @@ function _addition_ConvertQuantityToTargetUnit(sqArray::SimpleQuantityArray, tar
         _handleExceptionInArrayAddition(exception)
     end
     return sqArray
-end
-
-function _handleExceptionInArrayAddition(exception::Exception)
-    if isa(exception, Exceptions.DimensionMismatchError)
-        newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
-        throw(newException)
-    else
-        rethrow()
-    end
 end
