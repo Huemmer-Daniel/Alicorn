@@ -46,6 +46,8 @@ function run()
         test_subtraction_ErrorsForMismatchedDimensions()
         # multiplication
         @test multiplication_implemented()
+        @test SimpleQuantityArray_Array_multiplication_implemented()
+        @test Array_SimpleQuantityArray_multiplication_implemented()
         @test SimpleQuantityArray_SimpleQuantity_multiplication_implemented()
         @test SimpleQuantity_SimpleQuantityArray_multiplication_implemented()
         @test SimpleQuantityArray_Number_multiplication_implemented()
@@ -524,6 +526,45 @@ function _getExamplesFor_multiplication()
         ( [2] * ucat.second, [2.5 2.5]* ucat.meter, [5.0 5.0] * ucat.second * ucat.meter ),
         ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second),  [2.5 2.5] * (ucat.pico * ucat.second) , [-17.5 -17.5; 2.5 2.5] * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
         ( [2 2] * (ucat.milli * ucat.candela)^-4, [4; 4] * (ucat.milli * ucat.candela)^2, [16] * (ucat.milli * ucat.candela)^-2 )
+    ]
+    return examples
+end
+
+function SimpleQuantityArray_Array_multiplication_implemented()
+    examples = _getExamplesFor_SimpleQuantityArray_Array_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_SimpleQuantityArray_Array_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, ones(2,2), ( 2 * ones(2,2) ) * Alicorn.unitlessUnit ),
+        ( [1 1] * ucat.second, [2, 2], [4] * ucat.second ),
+        ( [2, 2] * ucat.meter, [1 1], ( 2 * ones(2,2) ) * ucat.meter ),
+        ( [2.5 3.5] * ucat.meter,  [2, 2], [12.0] * ucat.meter ),
+        ( [2] * ucat.second, [2.5 2.5], [5.0 5.0] * ucat.second ),
+        ( [-7; 1] * ucat.lumen * (ucat.nano * ucat.second),  [2.5 2.5] , [-17.5 -17.5; 2.5 2.5] * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( [2 2] * (ucat.milli * ucat.candela)^-4, [4; 4], [16] * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function Array_SimpleQuantityArray_multiplication_implemented()
+    examples = _getExamplesFor_Array_SimpleQuantityArray_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+
+function _getExamplesFor_Array_SimpleQuantityArray_multiplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        (  ones(2,2), ones(2,2) * Alicorn.unitlessUnit, ( 2 * ones(2,2) ) * Alicorn.unitlessUnit ),
+        ( [1 1] , [2, 2] * ucat.second, [4] * ucat.second ),
+        ( [2, 2] , [1 1] * ucat.meter, ( 2 * ones(2,2) ) * ucat.meter ),
+        ( [2.5 3.5],  [2, 2] * ucat.meter, [12.0] * ucat.meter ),
+        ( [2], [2.5 2.5] * ucat.second, [5.0 5.0] * ucat.second ),
+        ( [-7; 1],  [2.5 2.5] * ucat.lumen * (ucat.nano * ucat.second), [-17.5 -17.5; 2.5 2.5] * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( [2 2] , [4; 4] * (ucat.milli * ucat.candela)^-4, [16] * (ucat.milli * ucat.candela)^-4 )
     ]
     return examples
 end

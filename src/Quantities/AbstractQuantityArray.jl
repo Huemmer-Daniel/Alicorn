@@ -126,6 +126,22 @@ function Base.:*(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
 end
 
 """
+    Base.:*(qArray::AbstractQuantityArray, array::Array)
+
+Multiply an array of physical quantities with a dimensionless array or vice versa.
+"""
+function Base.:*(qArray::AbstractQuantityArray, array::Array)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::AbstractQuantityArray, ::Array) for subtype $subtype")
+end
+
+function Base.:*(array::Array, qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:*(::Array, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+
+"""
     Base.:*(qArray::AbstractQuantityArray, quantity::AbstractQuantity)
     Base.:*(quantity::AbstractQuantity, qArray::AbstractQuantityArray)
 

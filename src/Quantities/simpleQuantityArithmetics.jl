@@ -8,8 +8,10 @@ Base.:*(a::SimpleQuantity, b::Number) = multiplication(a, b)
 Base.:*(a::Number, b::SimpleQuantity) = multiplication(a, b)
 
 Base.:*(a::SimpleQuantityArray, b::SimpleQuantityArray) = multiplication(a, b)
-Base.:*(a::SimpleQuantity, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::Array) = multiplication(a, b)
+Base.:*(a::Array, b::SimpleQuantityArray) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantity, b::SimpleQuantityArray) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::Number) = multiplication(a, b)
 Base.:*(a::Number, b::SimpleQuantityArray) = multiplication(a, b)
 
@@ -29,7 +31,7 @@ end
 
 # method documented as part of the AbstractQuantity interface
 function multiplication(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    productvalue = sQuantity.value * dimless
+    productvalue = dimless * sQuantity.value 
     productUnit = sQuantity.unit
     return productvalue * productUnit
 end
