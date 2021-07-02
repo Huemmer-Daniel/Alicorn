@@ -554,7 +554,6 @@ function Array_SimpleQuantityArray_multiplication_implemented()
     return TestingTools.testDyadicFunction(Base.:*, examples)
 end
 
-
 function _getExamplesFor_Array_SimpleQuantityArray_multiplication()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [

@@ -124,14 +124,14 @@ end
 function test_AbstractQuantityArray_Array_multiplication_required()
     mockQArray = MockQuantityArrayStub{Any,2}()
     array = TestingTools.generateRandomReal(dim=(2,3))
-    expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractQuantityArray, ::Array) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::AbstractQuantityArray, ::Array{<:Number}) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
     @test_throws expectedError mockQArray * array
 end
 
 function test_Array_AbstractQuantityArray_multiplication_required()
     mockQArray = MockQuantityArrayStub{Any,2}()
     array = TestingTools.generateRandomReal(dim=(2,3))
-    expectedError = Core.ErrorException("missing specialization of Base.:*(::Array, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    expectedError = Core.ErrorException("missing specialization of Base.:*(::Array{<:Number}, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
     @test_throws expectedError array * mockQArray
 end
 

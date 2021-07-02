@@ -40,7 +40,10 @@ function run()
         @test subtraction_implemented()
         test_subtraction_ErrorsForMismatchedDimensions()
         @test multiplication_implemented()
-        @test multiplicationWithDimensionless_implemented()
+        @test SimpleQuantity_Number_mutliplication_implemented()
+        @test Number_SimpleQuantity_mutliplication_implemented()
+        @test SimpleQuantity_Array_mutliplication_implemented()
+        @test Array_SimpleQuantity_mutliplication_implemented()
         @test division_implemented()
         @test divisionByDimensionless_implemented()
         @test inverseDivision_implemented()
@@ -461,20 +464,74 @@ function _getExamplesFor_multiplication()
     return examples
 end
 
-function multiplicationWithDimensionless_implemented()
-    examples = _getExamplesFor_multiplicationWithDimensionless()
+
+function SimpleQuantity_Number_mutliplication_implemented()
+    examples = _getExamplesFor_SimpleQuantity_Number_mutliplication_()
     return TestingTools.testDyadicFunction(Base.:*, examples)
 end
 
-function _getExamplesFor_multiplicationWithDimensionless()
+function _getExamplesFor_SimpleQuantity_Number_mutliplication_()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [
         ( 1 * Alicorn.unitlessUnit, 1, 1 * Alicorn.unitlessUnit ),
-        ( 1, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
         ( 2 * ucat.second, 2.5, 5 * ucat.second ),
-        ( 2.5, 2 * ucat.second, 5 * ucat.second ),
         ( -7 * ucat.lumen * (ucat.nano * ucat.second),  2.5 , -17.5 * ucat.lumen * (ucat.nano * ucat.second) ),
         ( 2 * (ucat.milli * ucat.candela)^-4, 4, 8 * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function Number_SimpleQuantity_mutliplication_implemented()
+    examples = _getExamplesFor_Number_SimpleQuantity_mutliplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_Number_SimpleQuantity_mutliplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( 1, 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 2.5, 2 * ucat.second, 5 * ucat.second ),
+        ( 2.5, -7 * ucat.lumen * (ucat.nano * ucat.second),   -17.5 * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( 4, 2 * (ucat.milli * ucat.candela)^-4, 8 * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function SimpleQuantity_Array_mutliplication_implemented()
+    examples = _getExamplesFor_SimpleQuantity_Array_mutliplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_SimpleQuantity_Array_mutliplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, ones(2,2), ones(2,2) * Alicorn.unitlessUnit ),
+        ( 3 * ucat.second, [2, 2], [6, 6] * ucat.second ),
+        ( 2 * ucat.meter, [1 1], [2 2] * ucat.meter ),
+        ( 3.5 * ucat.meter, [2, 2], [7, 7] * ucat.meter ),
+        ( 2 * ucat.second, [2.5; 2.5], [5.0; 5.0] * ucat.second ),
+        ( -7 * ucat.lumen * (ucat.nano * ucat.second), [2.5 2.5] , [-17.5 -17.5] * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( 2 * (ucat.milli * ucat.candela)^-4, [4; 4], [8; 8] * (ucat.milli * ucat.candela)^-4 )
+    ]
+    return examples
+end
+
+function Array_SimpleQuantity_mutliplication_implemented()
+    examples = _getExamplesFor_Array_SimpleQuantity_mutliplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_Array_SimpleQuantity_mutliplication()
+    # format: factor1, factor2, correct product factor1 * factor2
+    examples = [
+        ( ones(2,2), 1 * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( ones(2,2), 1 * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( [2, 2], 3 * ucat.second, [6, 6] * ucat.second ),
+        ( [1 1], 2 * ucat.meter, [2 2] * ucat.meter ),
+        ( [2, 2], 3.5 * ucat.meter, [7, 7] * ucat.meter ),
+        ( [2.5; 2.5], 2 * ucat.second, [5.0; 5.0] * ucat.second ),
+        ( [2.5 2.5] , -7 * ucat.lumen * (ucat.nano * ucat.second), [-17.5 -17.5] * ucat.lumen * (ucat.nano * ucat.second) ),
+        ( [4; 4], 2 * (ucat.milli * ucat.candela)^-4, [8; 8] * (ucat.milli * ucat.candela)^-4 )
     ]
     return examples
 end
@@ -596,7 +653,7 @@ function _getExamplesFor_equality()
     baseUnit = TestingTools.generateRandomBaseUnit()
 
     sQuantity1 = SimpleQuantity(7, baseUnit)
-    sQuantity1Copy = deepcopy(sQuantity1)
+    sQuantity1Copy = SimpleQuantity(7, baseUnit)
 
     sQuantity2 = SimpleQuantity(0.7, ucat.deca * baseUnit)
     sQuantity3 = SimpleQuantity(pi, baseUnit)

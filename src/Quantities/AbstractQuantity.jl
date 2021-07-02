@@ -135,6 +135,23 @@ function Base.:*(quantity::AbstractQuantity, number::Number)
     error("missing specialization of Base.:*(::AbstractQuantity, ::Number) for subtype $subtype")
 end
 
+"""
+    Base.:*(quantity::AbstractQuantity, array::Array{<:Number})
+    Base.:*(number::Number, quantity::AbstractQuantity)
+
+Multiply a physical quantity with a dimensionless number.
+"""
+function Base.:*(quantity::AbstractQuantity, array::Array{<:Number})
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:*(::AbstractQuantity, ::Array{<:Number}) for subtype $subtype")
+end
+
+function Base.:*(array::Array{<:Number}, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:*(::Array{<:Number}, ::AbstractQuantity) for subtype $subtype")
+end
+
+
 function Base.:*(number::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.:*(::Number, ::AbstractQuantity) for subtype $subtype")

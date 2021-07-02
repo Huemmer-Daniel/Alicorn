@@ -6,10 +6,12 @@ DimensionlessType = Union{Number, AbstractArray{<:Number}}
 Base.:*(a::SimpleQuantity, b::SimpleQuantity) = multiplication(a, b)
 Base.:*(a::SimpleQuantity, b::Number) = multiplication(a, b)
 Base.:*(a::Number, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantity, b::Array{<:Number}) = multiplication(a, b)
+Base.:*(a::Array{<:Number}, b::SimpleQuantity) = multiplication(a, b)
 
 Base.:*(a::SimpleQuantityArray, b::SimpleQuantityArray) = multiplication(a, b)
-Base.:*(a::SimpleQuantityArray, b::Array) = multiplication(a, b)
-Base.:*(a::Array, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::Array{<:Number}) = multiplication(a, b)
+Base.:*(a::Array{<:Number}, b::SimpleQuantityArray) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::SimpleQuantity) = multiplication(a, b)
 Base.:*(a::SimpleQuantity, b::SimpleQuantityArray) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::Number) = multiplication(a, b)
@@ -31,7 +33,7 @@ end
 
 # method documented as part of the AbstractQuantity interface
 function multiplication(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    productvalue = dimless * sQuantity.value 
+    productvalue = dimless * sQuantity.value
     productUnit = sQuantity.unit
     return productvalue * productUnit
 end

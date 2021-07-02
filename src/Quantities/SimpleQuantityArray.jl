@@ -193,19 +193,19 @@ The resulting quantity is expressed in units of `sqArray1`.
 """
 function Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
-    sqArray2 = _addition_ConvertQuantityToTargetUnit(sqArray2, targetUnit)
+    sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
     sumvalue = sqArray1.value + sqArray2.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
     return sumQuantity
 end
 
-function _addition_ConvertQuantityToTargetUnit(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
+function _addition_ConvertQuantityArrayToTargetUnit(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
     try
         sqArray = inUnitsOf(sqArray, targetUnit)
     catch exception
         _handleExceptionInArrayAddition(exception)
     end
-    return simpleQuantsqArrayity
+    return sqArray
 end
 
 function _handleExceptionInArrayAddition(exception::Exception)
@@ -248,7 +248,7 @@ that render `sqArray1` not equal `sqArray2`.
 ```
 """
 function Base.:(==)(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    sqArray1 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
+    sqArray2 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
     return ( sqArray1.value == sqArray2.value )
 end
 
@@ -329,7 +329,7 @@ end
 
 function Broadcast.broadcasted(::typeof(+), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
-    sqArray2 = _addition_ConvertQuantityToTargetUnit(sqArray2, targetUnit)
+    sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
     sumvalue = sqArray1.value .+ sqArray2.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
@@ -348,13 +348,4 @@ function Broadcast.broadcasted(::typeof(+), bc1::Broadcast.Broadcasted{Broadcast
     sqArray1 = Broadcast.materialize(bc1)
     sqArray2 = Broadcast.materialize(bc2)
     Broadcast.broadcasted(+, sqArray1, sqArray2)
-end
-
-function _addition_ConvertQuantityToTargetUnit(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
-    try
-        sqArray = inUnitsOf(sqArray, targetUnit)
-    catch exception
-        _handleExceptionInArrayAddition(exception)
-    end
-    return sqArray
 end
