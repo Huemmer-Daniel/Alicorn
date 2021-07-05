@@ -135,6 +135,11 @@ function Base.:*(quantity::AbstractQuantity, number::Number)
     error("missing specialization of Base.:*(::AbstractQuantity, ::Number) for subtype $subtype")
 end
 
+function Base.:*(number::Number, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:*(::Number, ::AbstractQuantity) for subtype $subtype")
+end
+
 """
     Base.:*(quantity::AbstractQuantity, array::Array{<:Number})
     Base.:*(number::Number, quantity::AbstractQuantity)
@@ -149,12 +154,6 @@ end
 function Base.:*(array::Array{<:Number}, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error("missing specialization of Base.:*(::Array{<:Number}, ::AbstractQuantity) for subtype $subtype")
-end
-
-
-function Base.:*(number::Number, quantity::AbstractQuantity)
-    subtype = typeof(quantity)
-    error("missing specialization of Base.:*(::Number, ::AbstractQuantity) for subtype $subtype")
 end
 
 """
@@ -183,6 +182,22 @@ function Base.:/(number::Number, quantity::AbstractQuantity)
     error("missing specialization of Base.:/(::Number, ::AbstractQuantity) for subtype $subtype")
 end
 
+"""
+    Base.:/(quantity::AbstractQuantity, array::Array{<:Number})
+    Base.:/(array::Array{<:Number}, quantity::AbstractQuantity)
+
+Divide a physical quantity by a dimensionless array (or vice versa).
+"""
+function Base.:/(quantity::AbstractQuantity, array::Array{<:Number})
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:/(::AbstractQuantity, ::Array{<:Number}) for subtype $subtype")
+end
+
+function Base.:/(array::Array{<:Number}, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:/(::Array{<:Number}, ::AbstractQuantity) for subtype $subtype")
+end
+
 raw"
     Base.:\(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
 
@@ -207,6 +222,22 @@ end
 function Base.:\(number::Number, quantity::AbstractQuantity)
     subtype = typeof(quantity)
     error(raw"missing specialization of Base.:\(::Number, ::AbstractQuantity) for subtype " * "$subtype")
+end
+
+raw"""
+    Base.:\(quantity::AbstractQuantity, array::Array{<:Number})
+    Base.:\(array::Array{<:Number}, quantity::AbstractQuantity)
+
+Inverse divide a physical quantity by a dimensionless array (or vice versa).
+"""
+function Base.:\(quantity::AbstractQuantity, array::Array{<:Number})
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:/(::AbstractQuantity, ::Array{<:Number}) for subtype $subtype")
+end
+
+function Base.:\(array::Array{<:Number}, quantity::AbstractQuantity)
+    subtype = typeof(quantity)
+    error("missing specialization of Base.:/(::Array{<:Number}, ::AbstractQuantity) for subtype $subtype")
 end
 
 """

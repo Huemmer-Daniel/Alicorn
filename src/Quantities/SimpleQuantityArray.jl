@@ -10,7 +10,8 @@ mutable struct SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
     unit::Unit
 
-    function SimpleQuantityArray(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    function SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+        value = Array(value)
         unit = convertToUnit(abstractUnit)
         sqArray = new{T,N}(value, unit)
         return sqArray
@@ -28,7 +29,7 @@ end
 ## ## Methods for creating a SimpleQuantityArray
 
 """
-    Base.:*(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    Base.:*(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
 
 Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
@@ -42,12 +43,12 @@ julia> [3.5, 4.6] * ucat.tesla
  4.6
 ```
 """
-function Base.:*(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+function Base.:*(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
     return SimpleQuantityArray(value, abstractUnit)
 end
 
 """
-    Base.:/(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    Base.:/(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
 
 Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
@@ -61,7 +62,7 @@ julia> [3.5, 4.6] / ucat.second
  4.6
 ```
 """
-function Base.:/(value::Array{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+function Base.:/(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantityArray(value, inverseAbstractUnit)
 end

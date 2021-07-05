@@ -19,45 +19,79 @@ Base.:*(a::Number, b::SimpleQuantityArray) = multiplication(a, b)
 
 # method documented as part of the AbstractQuantity interface
 function multiplication(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
-    productvalue = sQuantity1.value * sQuantity2.value
+    productValue = sQuantity1.value * sQuantity2.value
     productUnit = sQuantity1.unit * sQuantity2.unit
-    return  productvalue * productUnit
+    return  productValue * productUnit
 end
 
 # method documented as part of the AbstractQuantity interface
 function multiplication(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
-    productvalue = sQuantity.value * dimless
+    productValue = sQuantity.value * dimless
     productUnit = sQuantity.unit
-    return productvalue * productUnit
+    return productValue * productUnit
 end
 
 # method documented as part of the AbstractQuantity interface
 function multiplication(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    productvalue = dimless * sQuantity.value
+    productValue = dimless * sQuantity.value
     productUnit = sQuantity.unit
-    return productvalue * productUnit
+    return productValue * productUnit
 end
 
-# # method documented as part of the AbstractQuantity interface
-# function Base.:*(number::Number, sqArray::SimpleQuantityArray)
-#     productvalue = number * sqArray.value
-#     productUnit = sqArray.unit
-#     productQArray = SimpleQuantityArray(productvalue, productUnit)
-#     return productQArray
-# end
-#
-# # method documented as part of the AbstractQuantity interface
-# function Base.:/(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-#     quotientvalue = sqArray1.value / sqArray2.value
-#     quotientUnit = sqArray1.unit / sqArray2.unit
-#     quotientQArray = SimpleQuantityArray(quotientvalue, quotientUnit)
-#     return quotientQArray
-# end
-#
-# # method documented as part of the AbstractQuantity interface
-# function Base.:/(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
-#     quotientvalue = sqArray.value / simpleQuantity.value
-#     quotientUnit = sqArray.unit / simpleQuantity.unit
-#     quotientQArray = SimpleQuantityArray(quotientvalue, quotientUnit)
-#     return quotientQArray
-# end
+## Division
+
+Base.:/(a::SimpleQuantity, b::SimpleQuantity) = division(a, b)
+Base.:/(a::SimpleQuantity, b::Number) = division(a, b)
+Base.:/(a::Number, b::SimpleQuantity) = division(a, b)
+Base.:/(a::SimpleQuantity, b::Array{<:Number}) = division(a, b)
+Base.:/(a::Array{<:Number}, b::SimpleQuantity) = division(a, b)
+
+# method documented as part of the AbstractQuantity interface
+function division(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
+    quotientValue = sQuantity1.value / sQuantity2.value
+    quotientUnit = sQuantity1.unit / sQuantity2.unit
+    return  quotientValue * quotientUnit
+end
+
+# method documented as part of the AbstractQuantity interface
+function division(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
+    quotientValue = sQuantity.value / dimless
+    quotientUnit = sQuantity.unit
+    return quotientValue * quotientUnit
+end
+
+# method documented as part of the AbstractQuantity interface
+function division(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
+    quotientValue = dimless / sQuantity.value
+    quotientUnit = inv(sQuantity.unit)
+    return quotientValue * quotientUnit
+end
+
+## Inverse division
+
+Base.:\(a::SimpleQuantity, b::SimpleQuantity) = inverseDivision(a, b)
+Base.:\(a::SimpleQuantity, b::Number) = inverseDivision(a, b)
+Base.:\(a::Number, b::SimpleQuantity) = inverseDivision(a, b)
+Base.:\(a::SimpleQuantity, b::Array{<:Number}) = inverseDivision(a, b)
+Base.:\(a::Array{<:Number}, b::SimpleQuantity) = inverseDivision(a, b)
+
+# method documented as part of the AbstractQuantity interface
+function inverseDivision(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
+    quotientValue = sQuantity1.value \ sQuantity2.value
+    quotientUnit = sQuantity2.unit / sQuantity1.unit
+    return  quotientValue * quotientUnit
+end
+
+# method documented as part of the AbstractQuantity interface
+function inverseDivision(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
+    quotientValue = dimless / sQuantity.value
+    quotientUnit = inv(sQuantity.unit)
+    return quotientValue * quotientUnit
+end
+
+# method documented as part of the AbstractQuantity interface
+function inverseDivision(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
+    quotientValue = sQuantity.value / dimless
+    quotientUnit = sQuantity.unit
+    return quotientValue * quotientUnit
+end

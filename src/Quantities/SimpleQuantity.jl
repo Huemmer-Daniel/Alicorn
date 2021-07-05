@@ -281,67 +281,6 @@ function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantit
     return simpleQuantity1 + (-simpleQuantity2)
 end
 
-# # method documented as part of the AbstractQuantity interface
-# function Base.:*(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-#     productValue = simpleQuantity1.value * simpleQuantity2.value
-#     productUnit = simpleQuantity1.unit * simpleQuantity2.unit
-#     productQuantity = SimpleQuantity(productValue, productUnit)
-#     return productQuantity
-# end
-#
-# # method documented as part of the AbstractQuantity interface
-# function Base.:*(simpleQuantity::SimpleQuantity, number::Number)
-#     productValue = simpleQuantity.value * number
-#     productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
-#     return productQuantity
-# end
-#
-# # method documented as part of the AbstractQuantity interface
-# function Base.:*(number::Number, simpleQuantity::SimpleQuantity)
-#     productValue = number * simpleQuantity.value
-#     productQuantity = SimpleQuantity(productValue, simpleQuantity.unit)
-#     return productQuantity
-# end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    quotientValue = simpleQuantity1.value / simpleQuantity2.value
-    quotientUnit = simpleQuantity1.unit / simpleQuantity2.unit
-    quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
-    return quotientQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(simpleQuantity::SimpleQuantity, number::Number)
-    quotientValue = simpleQuantity.value / number
-    quotientUnit = simpleQuantity.unit
-    quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
-    return quotientQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(number::Number, simpleQuantity::SimpleQuantity)
-    quotientValue = number / simpleQuantity.value
-    quotientUnit = inv(simpleQuantity.unit)
-    quotientQuantity = SimpleQuantity(quotientValue, quotientUnit)
-    return quotientQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:\(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    return simpleQuantity2 / simpleQuantity1
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:\(simpleQuantity::SimpleQuantity, number::Number)
-    return number / simpleQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:\(number::Number, simpleQuantity::SimpleQuantity)
-    return simpleQuantity / number
-end
-
 # method documented as part of the AbstractQuantity interface
 function Base.:^(simpleQuantity::SimpleQuantity, exponent::Real)
     exponentiatedValue = (simpleQuantity.value)^exponent

@@ -31,9 +31,15 @@ function run()
         test_AbstractQuantity_Array_multiplication_required()
         test_Array_AbstractQuantity_multiplication_required()
         test_division_required()
-        test_divisionByDimensionless_required()
+        test_AbstractQuantity_Array_division_required()
+        test_Array_AbstractQuantity_division_required()
+        test_AbstractQuantity_Number_division_required()
+        test_Number_AbstractQuantity_division_required()
         test_inverseDivision_required()
-        test_inverseDivisionByDimensionless_required()
+        test_AbstractQuantity_Array_inverseDivision_required()
+        test_Array_AbstractQuantity_inverseDivision_required()
+        test_AbstractQuantity_Number_inverseDivision_required()
+        test_Number_AbstractQuantity_inverseDivision_required()
         test_exponentiation_required()
         test_inv_required()
 
@@ -185,10 +191,28 @@ function test_division_required()
     @test_throws expectedError mockQuantity / mockQuantity
 end
 
-function test_divisionByDimensionless_required()
+function test_AbstractQuantity_Array_division_required()
+    mockQuantity = MockQuantityStub{Any}()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    expectedError = Core.ErrorException("missing specialization of Base.:/(::AbstractQuantity, ::Array{<:Number}) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError mockQuantity / array
+end
+
+function test_Array_AbstractQuantity_division_required()
+    mockQuantity = MockQuantityStub{Any}()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    expectedError = Core.ErrorException("missing specialization of Base.:/(::Array{<:Number}, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError array / mockQuantity
+end
+
+function test_AbstractQuantity_Number_division_required()
     mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException("missing specialization of Base.:/(::AbstractQuantity, ::Number) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError mockQuantity / 2
+end
+
+function test_Number_AbstractQuantity_division_required()
+    mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException("missing specialization of Base.:/(::Number, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError 2 / mockQuantity
 end
@@ -199,10 +223,28 @@ function test_inverseDivision_required()
     @test_throws expectedError mockQuantity \ mockQuantity
 end
 
-function test_inverseDivisionByDimensionless_required()
+function test_AbstractQuantity_Array_inverseDivision_required()
+    mockQuantity = MockQuantityStub{Any}()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    expectedError = Core.ErrorException("missing specialization of Base.:/(::AbstractQuantity, ::Array{<:Number}) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError mockQuantity \ array
+end
+
+function test_Array_AbstractQuantity_inverseDivision_required()
+    mockQuantity = MockQuantityStub{Any}()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    expectedError = Core.ErrorException("missing specialization of Base.:/(::Array{<:Number}, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
+    @test_throws expectedError array \ mockQuantity
+end
+
+function test_AbstractQuantity_Number_inverseDivision_required()
     mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException(raw"missing specialization of Base.:\(::AbstractQuantity, ::Number) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError mockQuantity \ 2
+end
+
+function test_Number_AbstractQuantity_inverseDivision_required()
+    mockQuantity = MockQuantityStub{Any}()
     expectedError = Core.ErrorException(raw"missing specialization of Base.:\(::Number, ::AbstractQuantity) for subtype Main.QuantitiesTests.AbstractQuantityTests.MockQuantityStub{Any}")
     @test_throws expectedError 2 \ mockQuantity
 end
