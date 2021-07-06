@@ -3,12 +3,13 @@ DimensionlessType = Union{Number, AbstractArray{<:Number}}
 
 ## Multiplication
 
+# salar quantity
 Base.:*(a::SimpleQuantity, b::SimpleQuantity) = multiplication(a, b)
 Base.:*(a::SimpleQuantity, b::Number) = multiplication(a, b)
 Base.:*(a::Number, b::SimpleQuantity) = multiplication(a, b)
 Base.:*(a::SimpleQuantity, b::Array{<:Number}) = multiplication(a, b)
 Base.:*(a::Array{<:Number}, b::SimpleQuantity) = multiplication(a, b)
-
+# array quantity
 Base.:*(a::SimpleQuantityArray, b::SimpleQuantityArray) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::Array{<:Number}) = multiplication(a, b)
 Base.:*(a::Array{<:Number}, b::SimpleQuantityArray) = multiplication(a, b)
@@ -40,11 +41,20 @@ end
 
 ## Division
 
+# scalar quantity
 Base.:/(a::SimpleQuantity, b::SimpleQuantity) = division(a, b)
 Base.:/(a::SimpleQuantity, b::Number) = division(a, b)
 Base.:/(a::Number, b::SimpleQuantity) = division(a, b)
 Base.:/(a::SimpleQuantity, b::Array{<:Number}) = division(a, b)
 Base.:/(a::Array{<:Number}, b::SimpleQuantity) = division(a, b)
+# array quantity
+Base.:/(a::SimpleQuantityArray, b::SimpleQuantityArray) = division(a, b)
+Base.:/(a::SimpleQuantityArray, b::Array{<:Number}) = division(a, b)
+Base.:/(a::Array{<:Number}, b::SimpleQuantityArray) = division(a, b)
+Base.:/(a::SimpleQuantityArray, b::SimpleQuantity) = division(a, b)
+Base.:/(a::SimpleQuantity, b::SimpleQuantityArray) = division(a, b)
+Base.:/(a::SimpleQuantityArray, b::Number) = division(a, b)
+Base.:/(a::Number, b::SimpleQuantityArray) = division(a, b)
 
 # method documented as part of the AbstractQuantity interface
 function division(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
