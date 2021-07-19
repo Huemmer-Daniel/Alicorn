@@ -115,7 +115,7 @@ function Base.:*(unitPrefix::UnitPrefix, abstractUnit::AbstractUnit)
 end
 
 """
-    Base.:inv(abstractUnit::AbstractUnit)
+    Base.inv(abstractUnit::AbstractUnit)
 
 Return the (multiplicative) inverse of a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
 """

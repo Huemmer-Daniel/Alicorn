@@ -560,10 +560,9 @@ end
 
 # method documented as part of the AbstractQuantity interface
 function Base.getindex(simpleQuantity::SimpleQuantity, index...)
-    value = getindex(simpleQuantity.value, index...)
     unit = simpleQuantity.unit
-    simpleQuantity = SimpleQuantity(value, unit)
-    return simpleQuantity
+    value = getindex(simpleQuantity.value, index...)
+    return SimpleQuantity(value, unit)
 end
 
 ## ## Additional Methods
@@ -578,6 +577,12 @@ Strips the unit from a dimensionless quantity and returns its bare value.
 - `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity` is not dimensionless
 """
 function valueOfDimensionless(simpleQuantity::SimpleQuantity)
+    simpleQuantity =_convertToUnitless(simpleQuantity)
+    value = simpleQuantity.value
+    return value
+end
+
+function _convertToUnitless(simpleQuantity::SimpleQuantity)
     try
         simpleQuantity = inUnitsOf(simpleQuantity, unitlessUnit)
     catch exception
@@ -587,13 +592,5 @@ function valueOfDimensionless(simpleQuantity::SimpleQuantity)
             rethrow()
         end
     end
-    value = simpleQuantity.value
-    return value
-end
-
-function _assertIsUnitless(simpleQuantity)
-    unit = simpleQuantity.unit
-    if !(unit == unitlessUnit)
-        throw(Exceptions.UnitMismatchError("quantity is not dimensionless"))
-    end
+    return simpleQuantity
 end

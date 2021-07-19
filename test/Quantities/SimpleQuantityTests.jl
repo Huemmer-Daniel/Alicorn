@@ -740,7 +740,7 @@ function equality_implemented()
 end
 
 function _getExamplesFor_equality()
-    baseUnit = TestingTools.generateRandomBaseUnit()
+    baseUnit = ucat.ampere
 
     sQuantity1 = SimpleQuantity(7, baseUnit)
     sQuantity1Copy = SimpleQuantity(7, baseUnit)

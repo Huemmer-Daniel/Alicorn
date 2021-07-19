@@ -73,9 +73,25 @@ Base.size(sqArray::SimpleQuantityArray) = size(sqArray.value)
 
 Base.IndexStyle(::Type{<:SimpleQuantityArray}) = IndexLinear()
 
-Base.getindex(sqArray::SimpleQuantityArray, inds...) = getindex(sqArray.value, inds...)
+function Base.getindex(sqArray::SimpleQuantityArray, inds...)
+    unit = sqArray.unit
+    array = sqArray.value
 
-Base.setindex!(sqArray::SimpleQuantityArray, X::Union{AbstractArray{T,N}, Number}, inds...) where {T <: Number, N}= setindex!(sqArray.value, X, inds...)
+    subarray = getindex(array, inds...)
+
+    return subarray * unit # can return both a SimpleQuantity and a SimpleQuantityArray
+end
+
+function Base.setindex!(sqArray::SimpleQuantityArray, sqSubarray::Union{SimpleQuantityArray, SimpleQuantity}, inds...)
+    targetUnit = sqArray.unit
+    array = sqArray.value
+
+    sqSubarray = inUnitsOf(sqSubarray, targetUnit)
+    subarray = sqSubarray.value
+    setindex!(array, subarray, inds...)
+
+    return array * targetUnit
+end
 
 ## ## Methods implementing the interface of AbstractQuantityArray
 ## 1. Unit conversion
@@ -263,9 +279,68 @@ function _ensureComparedWithSameUnit(sqArray1::SimpleQuantityArray, sqArray2::Si
     return sqArray2
 end
 
-## ## Broadcasting
+## Additional array methods
+
+function Base.transpose(sqArray::SimpleQuantityArray)
+    unit = sqArray.unit
+    value = transpose(sqArray.value)
+    return SimpleQuantityArray(value, unit)
+end
+
+function Base.repeat(sqArray::SimpleQuantityArray; inner=nothing, outer=nothing)
+    unit = sqArray.unit
+    array = sqArray.value
+
+    repeatedArray = repeat(array; inner=inner, outer=outer)
+
+    return repeatedArray * unit
+end
+
+function Base.repeat(sqArray::SimpleQuantityArray, counts...)
+    return repeat(sqArray, outer=counts)
+end
+
+
+## ## Additional Methods
+
+export valueOfDimensionless
+"""
+    valueOfDimensionless(sqArray::SimpleQuantityArray)
+
+Strips the unit from a dimensionless quantity array and returns its bare value.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray` is not dimensionless
+"""
+function valueOfDimensionless(sqArray::SimpleQuantityArray)
+    sqArray = _convertToUnitless(sqArray)
+    value = sqArray.value
+    return value
+end
+
+function _convertToUnitless(sqArray::SimpleQuantityArray)
+    try
+        sqArray = inUnitsOf(sqArray, unitlessUnit)
+    catch exception
+        if typeof(exception) == Exceptions.DimensionMismatchError
+            throw(Exceptions.DimensionMismatchError("quantity array is not dimensionless"))
+        else
+            rethrow()
+        end
+    end
+    return sqArray
+end
+
 
 ## TODO BELOW
+
+function Base.inv(sqArray::SimpleQuantityArray)
+    unit = inv(sqArray.unit)
+    value = inv(sqArray.value)
+    return SimpleQuantityArray(value, unit)
+end
+
+## ## Broadcasting
 
 # Broadcasting style
 Base.BroadcastStyle(::Type{<:SimpleQuantityArray}) = Broadcast.ArrayStyle{SimpleQuantityArray}()
@@ -273,10 +348,8 @@ Base.BroadcastStyle(::Type{<:SimpleQuantityArray}) = Broadcast.ArrayStyle{Simple
 # contruct destination array
 function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, ::Type{ElType}) where ElType
     # we do not want to convert any units here, if necessary this was already done upstream
-    (targetUnit, bc) = squeezeOutUnits(bc)
-    println(targetUnit)
-    println(bc)
-    targetSqArray = SimpleQuantityArray( similar(Array{ElType}, axes(bc)) , targetUnit)
+    (targetUnit, unitlessBroadcasted) = squeezeOutUnits(bc)
+    targetSqArray = SimpleQuantityArray( similar(Array{ElType}, axes(unitlessBroadcasted)) , targetUnit)
     return targetSqArray
 end
 
@@ -284,17 +357,17 @@ function squeezeOutUnits(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQu
     func = bc.f
     args = bc.args
 
-    unitsAndvalue = squeezeOutUnits.(args)
-    unitlessArgs = _isolatevalue(unitsAndvalue)
+    unitsAndValue = squeezeOutUnits.(args)
+    unitlessArgs = _isolatevalue(unitsAndValue)
 
-    unit = inferTargetUnit(func, unitsAndvalue...)
-    unitlessBroadcasted = Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}( func, unitlessArgs )
+    unit = inferTargetUnit(func, unitsAndValue...)
+    unitlessBroadcasted = Broadcast.Broadcasted{Broadcast.ArrayStyle}( func, unitlessArgs )
 
     return (unit, unitlessBroadcasted)
 end
 
-function _isolatevalue(unitsAndvalue::Tuple)
-    unitlessArgs = Tuple([value for (~,value) in unitsAndvalue])
+function _isolatevalue(unitsAndValue::Tuple)
+    unitlessArgs = Tuple([value for (~,value) in unitsAndValue])
 end
 
 function squeezeOutUnits(sqArray::SimpleQuantityArray)
@@ -314,6 +387,22 @@ function squeezeOutUnits(any::Any)
 end
 
 # infer target units for different broadcastable operations on SimpleQuantityArrays
+
+inferTargetUnit(::typeof(abs), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
+
+inferTargetUnit(::typeof(/), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple) = arg1[1]
+
+inferTargetUnit(::typeof(/), arg1::Tuple, arg2::Tuple{<:AbstractUnit, <:Any}) = inv(arg2[1])
+
+function inferTargetUnit(::typeof(/), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple{<:AbstractUnit, <:Any})
+    unit1 = arg1[1]
+    unit2 = arg2[1]
+    return unit1 / unit2
+end
+
+inferTargetUnit(::typeof(*), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple) = arg1[1]
+
+inferTargetUnit(::typeof(*), arg1::Tuple, arg2::Tuple{<:AbstractUnit, <:Any}) = arg2[1]
 
 function inferTargetUnit(::typeof(*), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple{<:AbstractUnit, <:Any})
     unit1 = arg1[1]

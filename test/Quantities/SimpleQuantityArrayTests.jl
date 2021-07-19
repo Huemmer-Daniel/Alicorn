@@ -69,6 +69,14 @@ function run()
         # @test SimpleQuantityArray_Number_inverseDivision_implemented()
         # @test Number_SimpleQuantityArray_inverseDivision_implemented()
 
+        #- additional array methods
+        @test transpose_implemented()
+        @test repeat_implemented()
+        @test repeat_withInnerOuter_implemented()
+
+        #- additional methods
+        @test valueOfDimensionless_implemented()
+        test_valueOfDimensionless_ErrorsIfNotUnitless()
     end
 end
 
@@ -238,15 +246,15 @@ end
 
 function _getExamplesFor_getindex()
     unit = TestingTools.generateRandomUnit()
-
     array = TestingTools.generateRandomReal(dim=(3,4))
     sqArray = SimpleQuantityArray(array, unit )
 
     # format: ::SimpleQuantityArray, indices, correct result for getindex(::SimpleQuantityArray, indices)
     examples = [
-        ( sqArray, 1, array[1] ),
-        ( sqArray, 6, array[6] ),
-        ( sqArray, (2,3), array[2,3] )
+        ( sqArray, 1, SimpleQuantity(array[1], unit) ),
+        ( sqArray, 6, SimpleQuantity(array[6], unit) ),
+        ( sqArray, (2,3), SimpleQuantity(array[2,3], unit) ),
+        ( sqArray, (1:3,4), SimpleQuantityArray(array[1:3,4], unit) )
     ]
 end
 
@@ -256,25 +264,30 @@ function setindex!_implemented()
 end
 
 function _getExamplesFor_setindex!()
-    unit = TestingTools.generateRandomUnit()
-
     array = zeros(3,4)
-    sqArray = SimpleQuantityArray(array, unit )
+    unit =  ucat.second
+    sqArray = SimpleQuantityArray(array, unit)
 
     array1 = deepcopy(array)
+    vector1 = 7
+    unit1 = ucat.second
     array1[1] = 7
 
     array2 = deepcopy(array)
-    array2[2,3] = 9
+    vector2 = 9
+    unit2 = (ucat.deci * ucat.second )
+    array2[2,3] = 0.9
 
     array3 = deepcopy(array)
+    vector3 = [7, 8, 9]
+    unit3 = ucat.second
     array3[1:3] = [7, 8, 9]
 
     # format: ::SimpleQuantityArray, vector, indices, correct result for setindex!(::SimpleQuantityArray, vector, indices)
     examples = [
-        ( deepcopy(sqArray), 7, 1, SimpleQuantityArray(array1, unit ) ),
-        ( deepcopy(sqArray), 9, (2,3), SimpleQuantityArray(array2, unit ) ),
-        ( deepcopy(sqArray), [7, 8, 9], 1:3, SimpleQuantityArray(array3, unit ) )
+        ( deepcopy(sqArray), vector1*unit1, 1, SimpleQuantityArray(array1, unit) ),
+        ( deepcopy(sqArray), vector2*unit2, (2,3), SimpleQuantityArray(array2, unit) ),
+        ( deepcopy(sqArray), vector3*unit3, 1:3, SimpleQuantityArray(array3, unit) )
     ]
 end
 
@@ -811,6 +824,101 @@ end
 
 function Number_SimpleQuantityArray_inverseDivision_implemented()
     return false
+end
+
+## Additional array methods
+
+function transpose_implemented()
+    examples = _getExamplesFor_transpose()
+    return TestingTools.testMonadicFunction(Base.transpose, examples)
+end
+
+function _getExamplesFor_transpose()
+    # format: sqArray::SimpleQuantityArray, correct result for transpose(sqArray)
+
+    sqArray1 = [2, 3] * ucat.second
+    sqArray2 = [2.0 3.0; 1.0 5.7] * ucat.meter
+
+    examples = [
+        (sqArray1, [2 3] * ucat.second),
+        (sqArray2, [2.0 1.0; 3.0 5.7 ] * ucat.meter)
+    ]
+    return examples
+end
+
+function repeat_implemented()
+    examples = _getExamplesFor_repeat()
+    return _test_repeat(examples)
+end
+
+function _getExamplesFor_repeat()
+    # format: sqArray::SimpleQuantityArray, counts, correct result for repeat(sqArray, counts)
+
+    sqArray = [1, 2] * ucat.second
+
+    examples = [
+        (sqArray, 2, [1, 2, 1, 2] * ucat.second),
+        (sqArray, (2 ,3), repeat([1, 2], 2, 3) * ucat.second)
+    ]
+    return examples
+end
+
+function _test_repeat(examples)
+    correct = true
+    for (sqArray, counts, correctResult) in examples
+        returnedResult = repeat(sqArray, counts...)
+        correct &= (returnedResult == correctResult)
+    end
+    return true
+end
+
+function repeat_withInnerOuter_implemented()
+    examples = _getExamplesFor_repeat_withInnerOuter()
+    return _test_repeat_withInnerOuter(examples)
+end
+
+function _getExamplesFor_repeat_withInnerOuter()
+    # format: sqArray::SimpleQuantityArray, tuple1, tuple2, correct result for repeat(sqArray, tuple1, tuple2)
+
+    sqArray = [2, 3] * ucat.second
+
+    examples = [
+        (sqArray, 2, nothing, [2, 2, 3, 3] * ucat.second),
+        (sqArray, nothing, 3, [2, 3, 2, 3, 2, 3] * ucat.second),
+        (sqArray, 2, 3, [2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3] * ucat.second),
+    ]
+    return examples
+end
+
+function _test_repeat_withInnerOuter(examples)
+    correct = true
+    for (sqArray, inner, outer, correctResult) in examples
+        returnedResult = repeat(sqArray, inner=inner, outer=outer)
+        correct &= (returnedResult == correctResult)
+    end
+    return true
+end
+
+## Additional methods
+
+function valueOfDimensionless_implemented()
+    examples = _getExamplesFor_valueOfDimensionless()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
+end
+
+function _getExamplesFor_valueOfDimensionless()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantityArray([2, 3]), [2, 3]),
+        (SimpleQuantityArray([2, 3], ucat.meter * (ucat.centi * ucat.meter)^-1 ), [200, 300])
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless()
+    sqArray = [2, 3] * Alicorn.meter
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity array is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(sqArray)
 end
 
 end # module

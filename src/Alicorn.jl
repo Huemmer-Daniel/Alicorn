@@ -32,6 +32,8 @@ export providesBaseUnit
 export remove!
 export add!
 
+export inv
+
 include("Quantities/Quantities.jl")
 using .Quantities
 

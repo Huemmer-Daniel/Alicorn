@@ -18,7 +18,7 @@ function run()
         # AbstractQuantityTests.run() TODO
         # AbstractQuantityArrayTests.run()
         #
-        # SimpleQuantityTests.run()
+        SimpleQuantityTests.run()
         SimpleQuantityArrayTests.run()
 
         # InternalUnitsTests.run()

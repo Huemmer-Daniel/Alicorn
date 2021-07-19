@@ -289,15 +289,3 @@ function Base.:\(number::Number, qArray::AbstractQuantityArray)
     subtype = typeof(qArray)
     error(raw"missing specialization of Base.:\(::Number, ::AbstractQuantityArray) for subtype " * "$subtype")
 end
-
-## TODO below
-
-"""
-    Base.transpose(quantity::AbstractQuantityArray)
-
-Transpose `quantity`.
-"""
-function Base.transpose(quantity::AbstractQuantityArray)
-    subtype = typeof(quantity)
-    error("subtype $subtype of AbstractQuantityArray misses an implementation of the transpose function")
-end
