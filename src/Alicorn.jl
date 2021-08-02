@@ -38,7 +38,9 @@ include("Quantities/Quantities.jl")
 using .Quantities
 
 export AbstractQuantity
+export AbstractQuantityArray
 export SimpleQuantity
+export SimpleQuantityArray
 export valueOfDimensionless
 export inUnitsOf
 export inBasicSIUnits

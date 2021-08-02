@@ -93,6 +93,15 @@ function Base.setindex!(sqArray::SimpleQuantityArray, sqSubarray::Union{SimpleQu
     return array * targetUnit
 end
 
+function Base.setindex!(sqArray::SimpleQuantityArray, subarray::Union{AbstractArray{<:Number}, Number}, inds...)
+    if iszero(subarray)
+        setindex!(sqArray.value, subarray, inds...)
+    else
+        throw( Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree") )
+    end
+    return sqArray
+end
+
 ## ## Methods implementing the interface of AbstractQuantityArray
 ## 1. Unit conversion
 
@@ -414,6 +423,10 @@ function inferTargetUnit(::typeof(Base.literal_pow), arg1::Tuple{<:Any, <:Any}, 
     unit = arg2[1]
     return unit^exponent
 end
+
+inferTargetUnit(::typeof(real), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
+
+inferTargetUnit(::typeof(imag), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
 # broadcastable operations on SimpleQuantityArrays that require eager evaluation
 

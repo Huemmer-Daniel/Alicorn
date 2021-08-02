@@ -25,6 +25,8 @@ function run()
         @test size_withDim_implemented()
         @test getindex_implemented()
         @test setindex!_implemented()
+        test_setindex!_ErrorsForMismatchedUnits()
+        @test setindex!_canSetToDimensionlessZero()
 
         #- AbstractQuantity interface
         # 1. Unit conversion
@@ -302,6 +304,39 @@ function _test_setindex!(examples::Array)
         correct &= (returnedOutput == correctOutput)
     end
     return correct
+end
+
+function test_setindex!_ErrorsForMismatchedUnits()
+    sqArray = [7, 2] * Alicorn.meter
+    mismatchedUnit = Alicorn.second
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError setindex!(sqArray, 2*mismatchedUnit, 1)
+    @test_throws expectedError setindex!(sqArray, 2, 1)
+end
+
+function setindex!_canSetToDimensionlessZero()
+    examples = _getExamplesFor_setindex!_canSetToDimensionlessZero()
+    return _test_setindex!(examples)
+end
+
+function _getExamplesFor_setindex!_canSetToDimensionlessZero()
+    array = ones(3,4)
+    unit =  ucat.second
+    sqArray = SimpleQuantityArray(array, unit)
+
+    array1 = deepcopy(array)
+    vector1 = 0
+    array1[1] = 0
+
+    array2 = deepcopy(array)
+    vector2 = [0, 0, 0]
+    array2[1:3] =  [0, 0, 0]
+
+    # format: ::SimpleQuantityArray, vector, indices, correct result for setindex!(::SimpleQuantityArray, vector, indices)
+    examples = [
+        ( deepcopy(sqArray), vector1, 1, SimpleQuantityArray(array1, unit) ),
+        ( deepcopy(sqArray), vector2, (1:3), SimpleQuantityArray(array2, unit) )
+    ]
 end
 
 ## #- AbstractQuantityArray interface
