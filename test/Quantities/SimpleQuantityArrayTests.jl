@@ -63,8 +63,8 @@ function run()
         @test SimpleQuantityArray_Number_division_implemented()
         @test Number_SimpleQuantityArray_division_implemented()
         # # inverse division
-        # @test inverseDivision_implemented()
-        # @test SimpleQuantityArray_Array_inverseDivision_implemented()
+        @test inverseDivision_implemented()
+        @test SimpleQuantityArray_Array_inverseDivision_implemented()
         # @test Array_SimpleQuantityArray_inverseDivision_implemented()
         # @test SimpleQuantityArray_SimpleQuantity_inverseDivision_implemented()
         # @test SimpleQuantity_SimpleQuantityArray_inverseDivision_implemented()
@@ -834,11 +834,33 @@ function _getExamplesFor_Number_SimpleQuantityArray_division()
 end
 
 function inverseDivision_implemented()
-    return false
+    examples = _getExamplesFor_inverseDivision()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
+end
+
+function _getExamplesFor_inverseDivision()
+    # format: factor1, factor2, correct quotient factor1 \ factor2
+    examples = [
+        ( [4 3; 2 1] * Alicorn.unitlessUnit, [5, 6] * Alicorn.unitlessUnit, [6.5; -7] * Alicorn.unitlessUnit ),
+        ( [4 3; 2 1] * ucat.second, [5, 6] * Alicorn.unitlessUnit, [6.5; -7] / ucat.second ),
+        ( [4 3; 2 1] * Alicorn.unitlessUnit, [5, 6] * ucat.second, [6.5; -7] * ucat.second ),
+        ( [4 3; 2 1] * ucat.second, [5, 6] * ucat.meter, [6.5; -7] * ucat.meter / ucat.second )
+    ]
+    return examples
 end
 
 function SimpleQuantityArray_Array_inverseDivision_implemented()
-    return false
+    examples = _getExamplesFor_SimpleQuantityArray_Array_inverseDivision()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
+end
+
+function _getExamplesFor_SimpleQuantityArray_Array_inverseDivision()
+    # format: factor1, factor2, correct quotient factor1 \ factor2
+    examples = [
+        ( [4 3; 2 1] * Alicorn.unitlessUnit, [5, 6], [6.5; -7] * Alicorn.unitlessUnit ),
+        ( [4 3; 2 1] * ucat.second, [5, 6], [6.5; -7] / ucat.second )
+    ]
+    return examples
 end
 
 function Array_SimpleQuantityArray_inverseDivision_implemented()

@@ -225,7 +225,7 @@ function Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     return sumQuantity
 end
 
-function _addition_ConvertQuantityArrayToTargetUnit(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
+function _addition_ConvertQuantityArrayToTargetUnit(sqArray::Union{SimpleQuantityArray, SimpleQuantity}, targetUnit::AbstractUnit)
     try
         sqArray = inUnitsOf(sqArray, targetUnit)
     catch exception
@@ -430,6 +430,7 @@ inferTargetUnit(::typeof(imag), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
 # broadcastable operations on SimpleQuantityArrays that require eager evaluation
 
+# addition of two SimpleQuantityArray
 function Broadcast.broadcasted(::typeof(+), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
     sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
@@ -451,4 +452,30 @@ function Broadcast.broadcasted(::typeof(+), bc1::Broadcast.Broadcasted{Broadcast
     sqArray1 = Broadcast.materialize(bc1)
     sqArray2 = Broadcast.materialize(bc2)
     Broadcast.broadcasted(+, sqArray1, sqArray2)
+end
+
+# addition of a SimpleQuantityArray and a SimpleQuantity
+
+function Broadcast.broadcasted(::typeof(+), sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
+    targetUnit = sqArray.unit
+    simpleQuantity = _addition_ConvertQuantityArrayToTargetUnit(simpleQuantity, targetUnit)
+    sumvalue = sqArray.value .+ simpleQuantity
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
+end
+
+function Broadcast.broadcasted(::typeof(+), simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
+    targetUnit = simpleQuantity.unit
+    sqArray = _addition_ConvertQuantityArrayToTargetUnit(sqArray, targetUnit)
+    sumvalue = simpleQuantity .+ sqArray.value
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
+end
+
+function Broadcast.broadcasted(::typeof(+), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, simpleQuantity::SimpleQuantity)
+    sqArray = Broadcast.materialize(bc)
+    Broadcast.broadcasted(+, sqArray, simpleQuantity)
+end
+
+function Broadcast.broadcasted(::typeof(+), simpleQuantity::SimpleQuantity, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}})
+    sqArray = Broadcast.materialize(bc)
+    Broadcast.broadcasted(+, simpleQuantity, sqArray)
 end

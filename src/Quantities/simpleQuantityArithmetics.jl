@@ -79,11 +79,15 @@ end
 
 ## Inverse division
 
+# scalar quantity
 Base.:\(a::SimpleQuantity, b::SimpleQuantity) = inverseDivision(a, b)
 Base.:\(a::SimpleQuantity, b::Number) = inverseDivision(a, b)
 Base.:\(a::Number, b::SimpleQuantity) = inverseDivision(a, b)
 Base.:\(a::SimpleQuantity, b::Array{<:Number}) = inverseDivision(a, b)
 Base.:\(a::Array{<:Number}, b::SimpleQuantity) = inverseDivision(a, b)
+# array quantity
+Base.:\(a::SimpleQuantityArray, b::SimpleQuantityArray) = inverseDivision(a, b)
+Base.:\(a::SimpleQuantityArray, b::Array{<:Number}) = inverseDivision(a, b)
 
 # method documented as part of the AbstractQuantity interface
 function inverseDivision(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
@@ -94,14 +98,14 @@ end
 
 # method documented as part of the AbstractQuantity interface
 function inverseDivision(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
-    quotientValue = dimless / sQuantity.value
+    quotientValue = sQuantity.value \ dimless
     quotientUnit = inv(sQuantity.unit)
     return quotientValue * quotientUnit
 end
 
 # method documented as part of the AbstractQuantity interface
 function inverseDivision(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    quotientValue = sQuantity.value / dimless
+    quotientValue = dimless \ sQuantity.value
     quotientUnit = sQuantity.unit
     return quotientValue * quotientUnit
 end
