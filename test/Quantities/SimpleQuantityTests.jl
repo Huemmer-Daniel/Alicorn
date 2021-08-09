@@ -677,9 +677,9 @@ end
 function _getExamplesFor_SimpleQuantity_Array_inverseDivision()
     # format: factor1, factor2, correct result factor1 \ factor2
     examples = [
-        ( 2 * Alicorn.unitlessUnit, [1; 2], ([1; 2] / 2) * Alicorn.unitlessUnit ),
-        ( 8 * ucat.second, [2; 2], ([2; 2] / 8) / ucat.second ),
-        ( 2 * (ucat.milli * ucat.candela)^2, [-4], ([-4]/2) * (ucat.milli * ucat.candela)^-2 )
+        ( 2 * Alicorn.unitlessUnit, [1; 2], (2 \ [1; 2] ) * Alicorn.unitlessUnit ),
+        ( 8 * ucat.second, [2; 2], (8 \ [2; 2] ) / ucat.second ),
+        ( 2 * (ucat.milli * ucat.candela)^2, [-4], (2 \ [-4]) * (ucat.milli * ucat.candela)^-2 )
     ]
     return examples
 end

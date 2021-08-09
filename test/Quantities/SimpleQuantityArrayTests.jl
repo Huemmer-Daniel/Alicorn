@@ -65,11 +65,11 @@ function run()
         # # inverse division
         @test inverseDivision_implemented()
         @test SimpleQuantityArray_Array_inverseDivision_implemented()
-        # @test Array_SimpleQuantityArray_inverseDivision_implemented()
-        # @test SimpleQuantityArray_SimpleQuantity_inverseDivision_implemented()
-        # @test SimpleQuantity_SimpleQuantityArray_inverseDivision_implemented()
-        # @test SimpleQuantityArray_Number_inverseDivision_implemented()
-        # @test Number_SimpleQuantityArray_inverseDivision_implemented()
+        @test Array_SimpleQuantityArray_inverseDivision_implemented()
+        # SimpleQuantityArray \ SimpleQuantity not required, since there is no function Base.\(::Array, ::Number)
+        @test SimpleQuantity_SimpleQuantityArray_inverseDivision_implemented()
+        # SimpleQuantityArray \ Number not required, since there is no function Base.\(::Array, ::Number)
+        @test Number_SimpleQuantityArray_inverseDivision_implemented()
 
         #- additional array methods
         @test transpose_implemented()
@@ -864,23 +864,47 @@ function _getExamplesFor_SimpleQuantityArray_Array_inverseDivision()
 end
 
 function Array_SimpleQuantityArray_inverseDivision_implemented()
-    return false
+    examples = _getExamplesFor_Array_SimpleQuantityArray_inverseDivision()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
 end
 
-function SimpleQuantityArray_SimpleQuantity_inverseDivision_implemented()
-    return false
+function _getExamplesFor_Array_SimpleQuantityArray_inverseDivision()
+    # format: factor1, factor2, correct quotient factor1 \ factor2
+    examples = [
+        ( [4 3; 2 1], [5, 6] * Alicorn.unitlessUnit, [6.5; -7] / Alicorn.unitlessUnit ),
+        ( [4 3; 2 1], [5, 6] * ucat.second, [6.5; -7] * ucat.second )
+    ]
+    return examples
 end
 
 function SimpleQuantity_SimpleQuantityArray_inverseDivision_implemented()
-    return false
+    examples = _getExamplesFor_SimpleQuantity_SimpleQuantityArray_inverseDivision()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
 end
 
-function SimpleQuantityArray_Number_inverseDivision_implemented()
-    return false
+function _getExamplesFor_SimpleQuantity_SimpleQuantityArray_inverseDivision()
+    # format: factor1, factor2, correct quotient factor1 \ factor2
+    examples = [
+        ( 2 * Alicorn.unitlessUnit, [1; 2] * Alicorn.unitlessUnit, (2 \ [1; 2]) * Alicorn.unitlessUnit ),
+        ( 8 * ucat.second, [2; 2] * Alicorn.unitlessUnit, (8 \ [2; 2]) / ucat.second ),
+        ( 2 * (ucat.milli * ucat.candela)^2, [-4] * ucat.meter, (2\[-4]) * (ucat.meter * (ucat.milli * ucat.candela)^-2) )
+    ]
+    return examples
 end
 
 function Number_SimpleQuantityArray_inverseDivision_implemented()
-    return false
+    examples = _getExamplesFor_Number_SimpleQuantityArray_inverseDivision()
+    return TestingTools.testDyadicFunction(Base.:\, examples)
+end
+
+function _getExamplesFor_Number_SimpleQuantityArray_inverseDivision()
+    # format: factor1, factor2, correct quotient factor1 \ factor2
+    examples = [
+        ( 2, [1; 2] * Alicorn.unitlessUnit, (2 \ [1; 2]) * Alicorn.unitlessUnit ),
+        ( 8, [2; 2] * ucat.second, (8 \ [2; 2]) * ucat.second ),
+        ( 2, [-4] * (ucat.milli * ucat.candela)^2, (2\[-4]) * (ucat.milli * ucat.candela)^2 )
+    ]
+    return examples
 end
 
 ## Additional array methods

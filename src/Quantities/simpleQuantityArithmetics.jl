@@ -88,6 +88,9 @@ Base.:\(a::Array{<:Number}, b::SimpleQuantity) = inverseDivision(a, b)
 # array quantity
 Base.:\(a::SimpleQuantityArray, b::SimpleQuantityArray) = inverseDivision(a, b)
 Base.:\(a::SimpleQuantityArray, b::Array{<:Number}) = inverseDivision(a, b)
+Base.:\(a::Array{<:Number}, b::SimpleQuantityArray) = inverseDivision(a, b)
+Base.:\(a::SimpleQuantity, b::SimpleQuantityArray) = inverseDivision(a, b)
+Base.:\(a::Number, b::SimpleQuantityArray) = inverseDivision(a, b)
 
 # method documented as part of the AbstractQuantity interface
 function inverseDivision(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
