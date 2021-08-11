@@ -15,9 +15,9 @@ include("QuantityTests.jl")
 
 function run()
     @testset "Quantities" begin
-        # AbstractQuantityTests.run() TODO
-        # AbstractQuantityArrayTests.run()
-        #
+        AbstractQuantityTests.run()
+        AbstractQuantityArrayTests.run()
+
         SimpleQuantityTests.run()
         SimpleQuantityArrayTests.run()
 

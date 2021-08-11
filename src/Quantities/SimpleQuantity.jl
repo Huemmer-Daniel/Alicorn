@@ -219,18 +219,6 @@ end
 
 ## 2. Arithmetic unary and binary operators
 
-# method documented as part of the AbstractQuantity interface
-function Base.:+(simpleQuantity::SimpleQuantity)
-    return simpleQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:-(simpleQuantity::SimpleQuantity)
-    value = -simpleQuantity.value
-    unit = simpleQuantity.unit
-    return SimpleQuantity( value, unit )
-end
-
 """
     Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
 
@@ -279,22 +267,6 @@ The resulting quantity is expressed in units of `simpleQuantity1`.
 """
 function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     return simpleQuantity1 + (-simpleQuantity2)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:^(simpleQuantity::SimpleQuantity, exponent::Real)
-    exponentiatedValue = (simpleQuantity.value)^exponent
-    exponentiatedUnit = (simpleQuantity.unit)^exponent
-    exponentiatedQuantity = SimpleQuantity(exponentiatedValue, exponentiatedUnit)
-    return exponentiatedQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.inv(simpleQuantity::SimpleQuantity)
-    inverseValue = inv(simpleQuantity.value)
-    inverseUnit = inv(simpleQuantity.unit)
-    inverseQuantity = SimpleQuantity(inverseValue, inverseUnit)
-    return inverseQuantity
 end
 
 ## 3. Numeric comparison

@@ -55,6 +55,9 @@ function run()
         test_AbstractQuantity_AbstractQuantityArray_inverseDivision_required()
         # AbstractQuantityArray  \ Number not required, since there is no function Base.\(::Array, ::Number)
         test_Number_AbstractQuantityArray_inverseDivision_required()
+        test_exponentiation_required()
+        test_inv_required()
+
     end
 end
 
@@ -250,6 +253,19 @@ function test_Number_AbstractQuantityArray_inverseDivision_required()
     mockQArray = MockQuantityArrayStub{Any,2}()
     expectedError = Core.ErrorException(raw"missing specialization of Base.:\(::Number, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
     @test_throws expectedError 2 \ mockQArray
+end
+
+function test_exponentiation_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    exponent = TestingTools.generateRandomExponent()
+    expectedError = Core.ErrorException(raw"missing specialization of Base.:^(::AbstractQuantityArray, ::Number) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError mockQArray^exponent
+end
+
+function test_inv_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.inv(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError inv(mockQArray)
 end
 
 end # module

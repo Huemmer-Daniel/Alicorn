@@ -70,6 +70,8 @@ function run()
         @test SimpleQuantity_SimpleQuantityArray_inverseDivision_implemented()
         # SimpleQuantityArray \ Number not required, since there is no function Base.\(::Array, ::Number)
         @test Number_SimpleQuantityArray_inverseDivision_implemented()
+        @test exponentiation_implemented()
+        @test inv_implemented()
 
         #- additional array methods
         @test transpose_implemented()
@@ -903,6 +905,36 @@ function _getExamplesFor_Number_SimpleQuantityArray_inverseDivision()
         ( 2, [1; 2] * Alicorn.unitlessUnit, (2 \ [1; 2]) * Alicorn.unitlessUnit ),
         ( 8, [2; 2] * ucat.second, (8 \ [2; 2]) * ucat.second ),
         ( 2, [-4] * (ucat.milli * ucat.candela)^2, (2\[-4]) * (ucat.milli * ucat.candela)^2 )
+    ]
+    return examples
+end
+
+function exponentiation_implemented()
+    examples = _getExamplesFor_exponentiation()
+    return TestingTools.testDyadicFunction(Base.:^, examples)
+end
+
+function _getExamplesFor_exponentiation()
+    # format: ::SimpleQuantityArray, exponent, correct result for ::SimpleQuantityArray^exponent
+    examples = [
+        ( [1 0;0 1] * Alicorn.unitlessUnit, 1, [1 0;0 1] * Alicorn.unitlessUnit ),
+        ( [2 0;0 2] * ucat.meter, 0, [1 0;0 1] * Alicorn.unitlessUnit),
+        ( [2 0;0 2] * ucat.meter, 2.0, [4 0;0 4] * (ucat.meter^2) ),
+        ( [2 0;0 2.0] * ucat.meter, -1, [0.5 0; 0 0.5] / ucat.meter)
+    ]
+    return examples
+end
+
+function inv_implemented()
+    examples = _getExamplesFor_inv()
+    return TestingTools.testMonadicFunction(Base.inv, examples)
+end
+
+function _getExamplesFor_inv()
+    # format: ::SimpleQuantityArray, correct result for inv(::SimpleQuantityArray)
+    examples = [
+        ( [1 0 ; 0 1] * Alicorn.unitlessUnit, [1 0 ; 0 1]* Alicorn.unitlessUnit),
+        ( [2 4; 8 12] * ucat.meter, [-1.5 0.5; 1 -0.25] * ucat.meter^-1)
     ]
     return examples
 end

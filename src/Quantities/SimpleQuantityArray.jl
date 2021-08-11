@@ -194,19 +194,6 @@ end
 
 ## 2. Arithmetic unary and binary operators
 
-# method documented as part of the AbstractQuantity interface
-function Base.:+(sqArray::SimpleQuantityArray)
-    return sqArray
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:-(sqArray::SimpleQuantityArray)
-    value = -sqArray.value
-    unit = sqArray.unit
-    return SimpleQuantityArray( value, unit )
-end
-
-
 """
     Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
 
@@ -342,12 +329,6 @@ end
 
 
 ## TODO BELOW
-
-function Base.inv(sqArray::SimpleQuantityArray)
-    unit = inv(sqArray.unit)
-    value = inv(sqArray.value)
-    return SimpleQuantityArray(value, unit)
-end
 
 ## ## Broadcasting
 

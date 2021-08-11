@@ -259,33 +259,41 @@ function Base.:\(array::Array{<:Number}, qArray::AbstractQuantityArray)
 end
 
 raw"""
-    Base.:\(qArray::AbstractQuantityArray, quantity::AbstractQuantity)
     Base.:\(quantity::AbstractQuantity, qArray::AbstractQuantityArray)
 
-Inverse divide an array of physical quantities by a physical quantity or vice versa.
+Inverse divide a physical quantity by an array of physical quantities.
 """
-function Base.:\(qArray::AbstractQuantityArray, quantity::AbstractQuantity)
-    subtype = typeof(qArray)
-    error(raw"missing specialization of Base.:\(::AbstractQuantityArray, ::AbstractQuantity) for subtype " * "$subtype")
-end
-
 function Base.:\(quantity::AbstractQuantity, qArray::AbstractQuantityArray)
     subtype = typeof(qArray)
     error(raw"missing specialization of Base.:\(::AbstractQuantity, ::AbstractQuantityArray) for subtype " * "$subtype")
 end
 
 raw"""
-    Base.:\(qArray::AbstractQuantityArray, number::Number)
     Base.:\(number::Number, qArray::AbstractQuantityArray)
 
-Inverse divide an array of physical quantities by a dimensionless number or vice versa.
+Inverse divide a dimensionless number by an array of physical quantities.
 """
-function Base.:\(qArray::AbstractQuantityArray, number::Number)
-    subtype = typeof(qArray)
-    error(raw"missing specialization of Base.:\(::AbstractQuantityArray, ::Number) for subtype " * "$subtype")
-end
-
 function Base.:\(number::Number, qArray::AbstractQuantityArray)
     subtype = typeof(qArray)
     error(raw"missing specialization of Base.:\(::Number, ::AbstractQuantityArray) for subtype " * "$subtype")
+end
+
+"""
+    Base.:^(qArray::AbstractQuantityArray, exponent::Real)
+
+Raise `qArray` to the power of `exponent`.
+"""
+function Base.:^(qArray::AbstractQuantityArray, exponent::Real)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.:^(::AbstractQuantityArray, ::Number) for subtype $subtype")
+end
+
+"""
+    Base.:inv(qArray::AbstractQuantityArray)
+
+Matrix inverse.
+"""
+function Base.:inv(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.inv(::AbstractQuantityArray) for subtype $subtype")
 end
