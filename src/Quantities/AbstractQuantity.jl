@@ -267,7 +267,7 @@ end
 
 Returns `true` if `quantity1` is equal to `quantity2`.
 
-The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
+The behavior of the comparison depends on the concrete subtype of `AbstractQuantity`.
 """
 function Base.:(==)(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
@@ -279,7 +279,7 @@ end
 
 Returns `true` if `quantity1` is less than `quantity2`.
 
-The behavior of the comparison depends on the concrete subtype of `AbstractUnit`.
+The behavior of the comparison depends on the concrete subtype of `AbstractQuantity`.
 """
 function Base.isless(quantity1::AbstractQuantity, quantity2::AbstractQuantity)
     subtype = typeof(quantity1)
@@ -317,9 +317,11 @@ function Base.isnan(quantity::AbstractQuantity)
 end
 
 """
-    Base.isapprox(quantity1::AbstractQuantity, quantity2::AbstractQuantity; rtol::Real = sqrt(eps()))
+    Base.isapprox(quantity1::AbstractQuantity, quantity2::AbstractQuantity; rtol::Real = sqrt(eps()) )
 
-Returns `true` if `abs(x-y) <= rtol*max(abs(x), abs(y))
+Tests if the value of `quantity1` is approximately equal to the value of `quantity2`.
+
+The behavior of the comparison depends on the concrete subtype of `AbstractQuantity`.
 """
 function Base.isapprox(quantity1::AbstractQuantity, quantity2::AbstractQuantity; rtol::Real = sqrt(eps()))
     subtype = typeof(quantity1)

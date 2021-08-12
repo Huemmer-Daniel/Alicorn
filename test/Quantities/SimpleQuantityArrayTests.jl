@@ -73,6 +73,13 @@ function run()
         @test exponentiation_implemented()
         @test inv_implemented()
 
+        # 3. Numeric comparison
+        @test equality_implemented()
+        test_equality_ErrorsForMismatchedDimensions()
+        @test isapprox_implemented()
+        test_isapprox_ErrorsForMismatchedDimensions()
+
+
         #- additional array methods
         @test transpose_implemented()
         @test repeat_implemented()
@@ -939,6 +946,69 @@ function _getExamplesFor_inv()
     return examples
 end
 
+
+## 3. Numeric comparison
+
+function equality_implemented()
+    examples = _getExamplesFor_equality()
+    return TestingTools.testDyadicFunction(Base.:(==), examples)
+end
+
+function _getExamplesFor_equality()
+    baseUnit = ucat.ampere
+
+    sqArray1 = SimpleQuantityArray([2], baseUnit)
+    sqArray1Copy = SimpleQuantityArray([2], baseUnit)
+
+    sqArray2 = SimpleQuantityArray([0.2], ucat.deca * baseUnit)
+    sqArray3 = SimpleQuantityArray([7.1 6; 2.0 3], baseUnit)
+    sqArray4 = SimpleQuantityArray([7 6; 2.0 3], ucat.deca * baseUnit)
+    sqArray5 = SimpleQuantityArray([7 6; 2.0 3], baseUnit)
+
+    # format: sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray, correct result for sqArray1 == sqArray2
+    examples = [
+        ( sqArray1, sqArray1Copy, true ),
+        ( sqArray1, sqArray2, true ),
+        ( sqArray5, sqArray3, false ),
+        ( sqArray5, sqArray4, false )
+    ]
+    return examples
+end
+
+function test_equality_ErrorsForMismatchedDimensions()
+    (mismatchedSQArray1, mismatchedSQArray2) = _generateDimensionMismatchedQuantityArrays()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+    @test_throws expectedError (mismatchedSQArray1 == mismatchedSQArray2)
+end
+
+function isapprox_implemented()
+    examples = _getExamplesFor_isapprox()
+    return _test_isapprox_examples(examples)
+end
+
+function _getExamplesFor_isapprox()
+    examples = [
+        ( [7, 2] * ucat.meter, [71, 21] * (ucat.deci * ucat.meter), 0.01, false ),
+        ( [7, 2] * ucat.meter, [71, 21] * (ucat.deci * ucat.meter), 0.02, true )
+    ]
+    return examples
+end
+
+function _test_isapprox_examples(examples::Array)
+    pass = true
+    for (sq1, sq2, rtol, correctResult) in examples
+        pass &= ( isapprox(sq1, sq2, rtol=rtol) == correctResult )
+    end
+    return pass
+end
+
+function test_isapprox_ErrorsForMismatchedDimensions()
+    (mismatchedSQArray1, mismatchedSQArray2) = _generateDimensionMismatchedQuantityArrays()
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+    @test_throws expectedError isapprox(mismatchedSQArray1, mismatchedSQArray2)
+end
+
+
 ## Additional array methods
 
 function transpose_implemented()
@@ -1035,135 +1105,3 @@ function test_valueOfDimensionless_ErrorsIfNotUnitless()
 end
 
 end # module
-
-# # TODO: Examples copied from SimpleQuantityTests
-#
-# function _getMatrixExamplesFor_addition()
-#     # format: addend1, addend2, correct sum
-#     examples = [
-#         ( [2, 1] * Alicorn.unitlessUnit, [1, 2] * Alicorn.unitlessUnit, [3, 3] * Alicorn.unitlessUnit ),
-#         ( [7; 2] * ucat.siemens, [2; 7] * (ucat.milli * ucat.siemens), [7.002; 2.007] * ucat.siemens ),
-#         ( [2; 7] * (ucat.milli * ucat.second), [7; 2] * ucat.second , [7.002e3; 2.007e3] * (ucat.milli * ucat.second) )
-#     ]
-#     return examples
-# end
-#
-# function _getMatrixExamplesFor_subtraction()
-#     # format: addend1, addend2, correct sum
-#     examples = [
-#         ( [2, 1] * Alicorn.unitlessUnit, [1, 2] * Alicorn.unitlessUnit, [1, -1] * Alicorn.unitlessUnit ),
-#         ( [7; 2] * ucat.siemens, [2; 7] * (ucat.milli * ucat.siemens), [6.998; 1.993] * ucat.siemens ),
-#         ( [2; 7] * (ucat.milli * ucat.second), [7; 2] * ucat.second , [-6.998e3; -1.993e3] * (ucat.milli * ucat.second) )
-#     ]
-#     return examples
-# end
-#
-# function _getMatrixExamplesFor_multiplication()
-#     # format: factor1, factor2, correct product factor1 * factor2
-#     examples = [
-#         ( [1 1] * Alicorn.unitlessUnit, [1; 1] * Alicorn.unitlessUnit, [2] * Alicorn.unitlessUnit ),
-#         ( [1 0; 2 0] * Alicorn.unitlessUnit, [2 3; 4 5] * ucat.second, [2 3; 4 6] * ucat.second ),
-#         ( [2 3; 4 5] * ucat.second, [1 0; 2 0] * Alicorn.unitlessUnit, [8 0; 14 0] * ucat.second ),
-#         ( [2.5] * ucat.meter, [2 3] * ucat.second, [5 7.5] * ucat.meter * ucat.second ),
-#         ( [2.5] * ucat.second, [2 3] * ucat.meter, [5 7.5] * ucat.second * ucat.meter )
-#     ]
-#     return examples
-# end
-#
-#
-# function _getMatrixExamplesFor_multiplicationWithDimensionless()
-#     # format: factor1, factor2, correct product factor1 * factor2
-#     examples = [
-#         ( [1 1] * Alicorn.unitlessUnit, [1; 1], [2] * Alicorn.unitlessUnit ),
-#         ( [1 1], [1; 1] * Alicorn.unitlessUnit, [2] * Alicorn.unitlessUnit ),
-#         ( [1 0; 2 0] * ucat.second, [2 3; 4 5] , [2 3; 4 6] * ucat.second ),
-#         ( [2 3; 4 5], [1 0; 2 0] * ucat.second, [8 0; 14 0] * ucat.second )
-#     ]
-#     return examples
-# end
-#
-# function _getMixedExamplesFor_multiplicationWithDimensionless()
-#     # format: factor1, factor2, correct product factor1 * factor2
-#     examples = [
-#         ( [1 1] * Alicorn.unitlessUnit, 2, [2 2] * Alicorn.unitlessUnit ),
-#         ( 2, [1 1] * Alicorn.unitlessUnit, [2 2] * Alicorn.unitlessUnit ),
-#         ( [1 0; 2 0] * ucat.second, 3, [3 0; 6 0] * ucat.second ),
-#         ( 3, [1 0; 2 0] * ucat.second, [3 0; 6 0] * ucat.second ),
-#         ( 2.5 * ucat.meter, [2 3] , [5 7.5] * ucat.meter  ),
-#         ( [2 3], 2.5 * ucat.meter, [5 7.5] * ucat.meter  )
-#     ]
-#     return examples
-# end
-#
-# function _getMixedExamplesFor_division()
-#     # format: factor1, factor2, correct product factor1 * factor2
-#     examples = [
-#         ( [1 1] * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit, [1 1] * Alicorn.unitlessUnit ),
-#         ( [2, 3] * Alicorn.unitlessUnit, 2 * ucat.second, [1, 1.5] * ucat.second^-1 ),
-#         ( [2; 10] * ucat.second, 5 * Alicorn.unitlessUnit, [0.4; 2] * ucat.second ),
-#         ( [4 4] * ucat.meter,  2 * ucat.second, [2 2] * ucat.meter / ucat.second ),
-#         ( [4 4] * ucat.second, 2 * ucat.meter, [2 2] * ucat.second / ucat.meter ),
-#         ( [-7 -7] * ucat.lumen * (ucat.nano * ucat.second),  2 * (ucat.pico * ucat.second) , [-3.5 -3.5] * ucat.lumen * (ucat.nano * ucat.second) / (ucat.pico * ucat.second) ),
-#         ( [2 2; 2 2] * (ucat.milli * ucat.candela)^-4, 4 * (ucat.milli * ucat.candela)^2, [0.5 0.5; 0.5 0.5] * (ucat.milli * ucat.candela)^-6 )
-#     ]
-#     return examples
-# end
-#
-# function _getMixedExamplesFor_divisionByDimensionless()
-#     # format: factor1, factor2, correct product factor1 * factor2
-#     examples = [
-#         ( [1 1] * Alicorn.unitlessUnit, 1, [1 1] * Alicorn.unitlessUnit ),
-#         ( [1 1], 1 * Alicorn.unitlessUnit, [1 1] * Alicorn.unitlessUnit ),
-#         ( [2, 3] * ucat.second, 2 , [1, 1.5] * ucat.second ),
-#         ( [2, 3] , 2 * ucat.second , [1, 1.5] / ucat.second ),
-#     ]
-#     return examples
-# end
-#
-# function _getMatrixExamplesFor_inv()
-#     # format: SimpleQuantity, correct result for SimpleQuantity^-1
-#     examples = [
-#         ( [1 0 ; 0 1] * Alicorn.unitlessUnit, [1 0 ; 0 1] * Alicorn.unitlessUnit),
-#         ( [2 4; 2 8] * ucat.meter, [1 -0.5; -0.25 0.25] * ucat.meter^-1),
-#         ( -[2 4; 2 8] * (ucat.femto * ucat.meter)^-1 * ucat.joule, -[1 -0.5; -0.25 0.25] * (ucat.femto * ucat.meter) * ucat.joule^-1 )
-#     ]
-#     return examples
-# end
-#
-# function _getMatrixExamplesFor_exponentiation()
-#     # format: SimpleQuantity, exponent, correct result for SimpleQuantity^exponent
-#     examples = [
-#         ( [1 0; 0 1] * Alicorn.unitlessUnit, 1, [1 0; 0 1] * Alicorn.unitlessUnit ),
-#         ( [1 0; 0 1] * Alicorn.unitlessUnit, 2, [1 0; 0 1] * Alicorn.unitlessUnit ),
-#         ( [1 2; 3 4] * ucat.meter, 0, [1 0; 0 1] * Alicorn.unitlessUnit ),
-#     ]
-#     return examples
-# end
-#
-#
-# function _getMatrixExamplesFor_sqrt()
-#     # format: SimpleQuantity, correct result for sqrt(SimpleQuantity)
-#     examples = [
-#         ( [1 0; 0 1] * Alicorn.unitlessUnit, [1 0; 0 1] * Alicorn.unitlessUnit),
-#         ( [4 0; 0 4] * (ucat.pico * ucat.meter)^-3, [2 0; 0 2] * (ucat.pico * ucat.meter)^-1.5 )
-#     ]
-#     return examples
-# end
-#
-# function _getMatrixExamplesFor_size()
-#     # format: SimpleQuantity, correct result for size(SimpleQuantity)
-#     examples = [
-#         ( [1 0; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, (3, 2) ),
-#         ( [1 0 2; 0 1 3] * (ucat.pico * ucat.meter)^-3, (2, 3) )
-#     ]
-#     return examples
-# end
-#
-#
-# function _getMatrixExamplesFor_length()
-#     # format: SimpleQuantity, correct result for sqrt(SimpleQuantity)
-#     examples = [
-#         ( [1 0; 0 1; 2 3] * (ucat.pico * ucat.meter)^-3, 6)
-#     ]
-#     return examples
-# end

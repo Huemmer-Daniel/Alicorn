@@ -297,3 +297,30 @@ function Base.:inv(qArray::AbstractQuantityArray)
     subtype = typeof(qArray)
     error("missing specialization of Base.inv(::AbstractQuantityArray) for subtype $subtype")
 end
+
+
+## 3. Numeric comparison
+
+"""
+    Base.:==(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+
+Returns `true` if `qArray1` and `qArray2` are of equal value.
+
+The behavior of the comparison depends on the concrete subtype of `AbstractQuantityArray`.
+"""
+function Base.:(==)(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+    subtype = typeof(qArray1)
+    error("missing specialization of Base.:==(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.isapprox(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray; rtol::Real = sqrt(eps()) )
+
+Returns `true` if `qArray1` and `qArray2` are of approximately equal value.
+
+The behavior of the comparison depends on the concrete subtype of `AbstractQuantityArray`.
+"""
+function Base.isapprox(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray; rtol::Real = sqrt(eps()))
+    subtype = typeof(qArray1)
+    error("missing specialization of Base.isapprox(::AbstractQuantityArray, ::AbstractQuantityArray, ::Real) for subtype $subtype")
+end

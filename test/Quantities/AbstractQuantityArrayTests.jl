@@ -58,6 +58,10 @@ function run()
         test_exponentiation_required()
         test_inv_required()
 
+        # 3. Numeric comparison
+        test_equality_required()
+        test_isapprox_required()
+
     end
 end
 
@@ -266,6 +270,21 @@ function test_inv_required()
     mockQArray = MockQuantityArrayStub{Any,2}()
     expectedError = Core.ErrorException("missing specialization of Base.inv(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
     @test_throws expectedError inv(mockQArray)
+end
+
+## 3. Numeric comparison
+
+function test_equality_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.:==(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError (mockQArray == mockQArray)
+end
+
+function test_isapprox_required()
+    mockQArray1 = MockQuantityArrayStub{Any,2}()
+    mockQArray2 = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.isapprox(::AbstractQuantityArray, ::AbstractQuantityArray, ::Real) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError isapprox(mockQArray1, mockQArray2)
 end
 
 end # module

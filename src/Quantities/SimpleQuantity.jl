@@ -356,7 +356,18 @@ function Base.isnan(simpleQuantity::SimpleQuantity)
     return isnan(simpleQuantity.value)
 end
 
-# method documented as part of the AbstractQuantity interface
+"""
+    Base.isapprox(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity; rtol::Real = sqrt(eps()) )
+
+Returns `isapprox(simpleQuantity1.value, simpleQuantity2.value, rtol=rtol)`.
+
+If necessary, `simpleQuantity2` is expressed in units of `simpleQuantity1.unit`
+before the comparison. Note that the conversion often leads to rounding errors.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and
+`simpleQuantity2` are not of the same dimension
+"""
 function Base.isapprox(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity; rtol::Real = sqrt(eps()))
     simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
     return isapprox(simpleQuantity1.value, simpleQuantity2.value, rtol=rtol)

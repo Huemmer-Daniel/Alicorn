@@ -275,6 +275,23 @@ function _ensureComparedWithSameUnit(sqArray1::SimpleQuantityArray, sqArray2::Si
     return sqArray2
 end
 
+"""
+    Base.isapprox(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray; rtol::Real = sqrt(eps()) )
+
+Returns `isapprox(sqArray1.value, sqArray2.value, rtol=rtol)`.
+
+If necessary, `sqArray2` is expressed in units of `sqArray1.unit`
+before the comparison. Note that the conversion often leads to rounding errors.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and
+`sqArray2` are not of the same dimension
+"""
+function Base.isapprox(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray; rtol::Real = sqrt(eps()))
+    sqArray2 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
+    return isapprox(sqArray1.value, sqArray2.value, rtol=rtol)
+end
+
 ## Additional array methods
 
 function Base.transpose(sqArray::SimpleQuantityArray)

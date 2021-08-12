@@ -731,12 +731,14 @@ function _getExamplesFor_equality()
 
     sQuantity2 = SimpleQuantity(0.7, ucat.deca * baseUnit)
     sQuantity3 = SimpleQuantity(pi, baseUnit)
+    sQuantity4 = SimpleQuantity(7, ucat.deca * baseUnit)
 
     # format: quantity1, quantity2, correct result for quantity1 == quantity2
     examples = [
         ( sQuantity1, sQuantity1Copy, true ),
         ( sQuantity1, sQuantity2, true ),
-        ( sQuantity1, sQuantity3, false )
+        ( sQuantity1, sQuantity3, false ),
+        ( sQuantity1, sQuantity4, false )
     ]
     return examples
 end
@@ -856,6 +858,7 @@ function _getExamplesFor_isapprox()
         ( 7 * ucat.meter, 71 * (ucat.deci * ucat.meter), 0.01, false ),
         ( 7 * ucat.meter, 71 * (ucat.deci * ucat.meter), 0.015, true )
     ]
+    return examples
 end
 
 function _test_isapprox_examples(examples::Array)
