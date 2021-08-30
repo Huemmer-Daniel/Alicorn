@@ -79,8 +79,14 @@ function run()
         @test isapprox_implemented()
         test_isapprox_ErrorsForMismatchedDimensions()
 
+        # 4. Complex numbers
 
-        #- additional array methods
+        # 5. additional array methods
+        @test findmax_implemented()
+        @test findmax_withDims_implemented()
+        @test findmin_implemented()
+        @test findmin_withDims_implemented()
+
         @test transpose_implemented()
         @test repeat_implemented()
         @test repeat_withInnerOuter_implemented()
@@ -1008,8 +1014,99 @@ function test_isapprox_ErrorsForMismatchedDimensions()
     @test_throws expectedError isapprox(mismatchedSQArray1, mismatchedSQArray2)
 end
 
+## 4. Complex numbers
 
-## Additional array methods
+function findmax_implemented()
+    examples = _getExamplesFor_findmax()
+    return TestingTools.testMonadicFunction(Base.findmax, examples)
+end
+
+function _getExamplesFor_findmax()
+    # format: sqArray::SimpleQuantityArray, correct result for findmax(sqArray)
+    examples = [
+        ( [3 2.1 2.0 4.5] * ucat.unitless, ( 4.5 * ucat.unitless, CartesianIndex(1, 4) ) ),
+        ( [3 2.1 2.0 4.5] * ucat.ampere, ( 4.5 * ucat.ampere, CartesianIndex(1, 4) ) ),
+        ( [3 2.1 2.0 4.5; 1 -1 7 -2] * ucat.ampere, ( 7 * ucat.ampere, CartesianIndex(2, 3) ) )
+    ]
+    return examples
+end
+
+function findmax_withDims_implemented()
+    examples = _getExamplesFor_findmax_withDims()
+    return _test_findmax_findmin_withDims(findmax, examples)
+end
+
+function _getExamplesFor_findmax_withDims()
+    # format: sqArray::SimpleQuantityArray, dims::Integer, correct result for findmax(sqArray, dims=dims)
+
+    dimlessA = [3 2.1 2.0 4.5]
+    dimlessB = [3 2.1 2.0 4.5; 1 -1 7 -2]
+
+    maxA1 = findmax(dimlessA, dims=1)
+    maxA2 = findmax(dimlessA, dims=2)
+    maxB1 = findmax(dimlessB, dims=1)
+    maxB2 = findmax(dimlessB, dims=2)
+
+    examples = [
+        ( dimlessA * ucat.unitless, 1, ( maxA1[1] * ucat.unitless, CartesianIndex{2}[CartesianIndex(1, 1) CartesianIndex(1, 2) CartesianIndex(1, 3) CartesianIndex(1, 4)] ) ),
+        ( dimlessA * ucat.unitless, 2, ( maxA2[1] * ucat.unitless,  maxA2[2] ) ),
+        ( dimlessB * ucat.ampere, 1, ( maxB1[1] * ucat.ampere, CartesianIndex{2}[CartesianIndex(1, 1) CartesianIndex(1, 2) CartesianIndex(2, 3) CartesianIndex(1, 4)] ) ),
+        ( dimlessB * ucat.ampere, 2, ( maxB2[1] * ucat.ampere, maxB2[2] ) )
+    ]
+    return examples
+end
+
+function _test_findmax_findmin_withDims(func, examples)
+    correct = true
+    for (sqArray, dims, correctResult) in examples
+        returnedResult = func(sqArray, dims=dims)
+        correct &= (returnedResult == correctResult)
+    end
+    return correct
+end
+
+function findmin_implemented()
+    examples = _getExamplesFor_findmin()
+    return TestingTools.testMonadicFunction(Base.findmin, examples)
+end
+
+function _getExamplesFor_findmin()
+    # format: sqArray::SimpleQuantityArray, correct result for findmin(sqArray)
+    examples = [
+        ( [3 2.1 2.0 4.5] * ucat.unitless, ( 2.0 * ucat.unitless, CartesianIndex(1, 3) ) ),
+        ( [3 2.1 2.0 4.5] * ucat.ampere, ( 2.0 * ucat.ampere, CartesianIndex(1, 3) ) ),
+        ( [3 2.1 2.0 4.5; 1 -1 7 -2] * ucat.ampere, ( -2 * ucat.ampere, CartesianIndex(2, 4) ) )
+    ]
+    return examples
+end
+
+function findmin_withDims_implemented()
+    examples = _getExamplesFor_findmin_withDims()
+    return _test_findmax_findmin_withDims(findmin, examples)
+end
+
+function _getExamplesFor_findmin_withDims()
+    # format: sqArray::SimpleQuantityArray, dims::Integer, correct result for findmax(sqArray, dims=dims)
+
+    dimlessA = [3 2.1 2.0 4.5]
+    dimlessB = [3 2.1 2.0 4.5; 1 -1 7 -2]
+
+    minA1 = findmin(dimlessA, dims=1)
+    minA2 = findmin(dimlessA, dims=2)
+    minB1 = findmin(dimlessB, dims=1)
+    minB2 = findmin(dimlessB, dims=2)
+
+    examples = [
+        ( dimlessA * ucat.unitless, 1, ( minA1[1] * ucat.unitless, CartesianIndex{2}[CartesianIndex(1, 1) CartesianIndex(1, 2) CartesianIndex(1, 3) CartesianIndex(1, 4)] ) ),
+        ( dimlessA * ucat.unitless, 2, ( minA2[1] * ucat.unitless,  minA2[2] ) ),
+        ( dimlessB * ucat.ampere, 1, ( minB1[1] * ucat.ampere, CartesianIndex{2}[CartesianIndex(2, 1) CartesianIndex(2, 2) CartesianIndex(1, 3) CartesianIndex(2, 4)] ) ),
+        ( dimlessB * ucat.ampere, 2, ( minB2[1] * ucat.ampere, minB2[2] ) )
+    ]
+    return examples
+end
+
+
+## 5. Additional array methods
 
 function transpose_implemented()
     examples = _getExamplesFor_transpose()

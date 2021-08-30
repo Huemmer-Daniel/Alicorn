@@ -15,10 +15,10 @@ include("QuantityTests.jl")
 
 function run()
     @testset "Quantities" begin
-        AbstractQuantityTests.run()
+        # AbstractQuantityTests.run()
         AbstractQuantityArrayTests.run()
 
-        SimpleQuantityTests.run()
+        # SimpleQuantityTests.run()
         SimpleQuantityArrayTests.run()
 
         # InternalUnitsTests.run()

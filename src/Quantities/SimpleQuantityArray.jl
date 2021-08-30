@@ -26,6 +26,13 @@ function SimpleQuantityArray(value::Array{T,N}) where {T<:Number, N}
     return sqArray
 end
 
+function SimpleQuantityArray(simpleQuantity::SimpleQuantity)
+    unit = simpleQuantity.unit
+    value = [simpleQuantity.value]
+    sqArray = SimpleQuantityArray(value, unit)
+    return sqArray
+end
+
 ## ## Methods for creating a SimpleQuantityArray
 
 """
@@ -292,7 +299,27 @@ function Base.isapprox(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityAr
     return isapprox(sqArray1.value, sqArray2.value, rtol=rtol)
 end
 
-## Additional array methods
+## 5. Additional array methods
+
+# method documented as part of the AbstractQuantity interface
+function Base.findmax(sqArray::SimpleQuantityArray; dims=:)
+    unit = sqArray.unit
+    array = sqArray.value
+
+    (maxVal, maxIndex) = findmax(array, dims=dims)
+
+    return (maxVal * unit, maxIndex)
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.findmin(sqArray::SimpleQuantityArray; dims=:)
+    unit = sqArray.unit
+    array = sqArray.value
+
+    (minVal, minIndex) = findmin(array, dims=dims)
+
+    return (minVal * unit, minIndex)
+end
 
 function Base.transpose(sqArray::SimpleQuantityArray)
     unit = sqArray.unit
@@ -452,19 +479,42 @@ function Broadcast.broadcasted(::typeof(+), bc1::Broadcast.Broadcasted{Broadcast
     Broadcast.broadcasted(+, sqArray1, sqArray2)
 end
 
-# addition of a SimpleQuantityArray and a SimpleQuantity
+# subtraction of two SimpleQuantityArray
+function Broadcast.broadcasted(::typeof(-), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
+    targetUnit = sqArray1.unit
+    sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
+    sumvalue = sqArray1.value .- sqArray2.value
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
+end
 
+function Broadcast.broadcasted(::typeof(-), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, sqArray2::SimpleQuantityArray)
+    sqArray1 = Broadcast.materialize(bc)
+    Broadcast.broadcasted(-, sqArray1, sqArray2)
+end
+
+function Broadcast.broadcasted(::typeof(-), sqArray1::SimpleQuantityArray, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}})
+    sqArray2 = Broadcast.materialize(bc)
+    Broadcast.broadcasted(-, sqArray1, sqArray2)
+end
+
+function Broadcast.broadcasted(::typeof(-), bc1::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, bc2::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}})
+    sqArray1 = Broadcast.materialize(bc1)
+    sqArray2 = Broadcast.materialize(bc2)
+    Broadcast.broadcasted(-, sqArray1, sqArray2)
+end
+
+# addition of a SimpleQuantityArray and a SimpleQuantity
 function Broadcast.broadcasted(::typeof(+), sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
     targetUnit = sqArray.unit
     simpleQuantity = _addition_ConvertQuantityArrayToTargetUnit(simpleQuantity, targetUnit)
-    sumvalue = sqArray.value .+ simpleQuantity
+    sumvalue = sqArray.value .+ simpleQuantity.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
 
 function Broadcast.broadcasted(::typeof(+), simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
     targetUnit = simpleQuantity.unit
     sqArray = _addition_ConvertQuantityArrayToTargetUnit(sqArray, targetUnit)
-    sumvalue = simpleQuantity .+ sqArray.value
+    sumvalue = simpleQuantity.value .+ sqArray.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
 
@@ -476,4 +526,30 @@ end
 function Broadcast.broadcasted(::typeof(+), simpleQuantity::SimpleQuantity, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}})
     sqArray = Broadcast.materialize(bc)
     Broadcast.broadcasted(+, simpleQuantity, sqArray)
+end
+
+# subtraction of a SimpleQuantityArray and a SimpleQuantity
+
+function Broadcast.broadcasted(::typeof(-), sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
+    targetUnit = sqArray.unit
+    simpleQuantity = _addition_ConvertQuantityArrayToTargetUnit(simpleQuantity, targetUnit)
+    sumvalue = sqArray.value .- simpleQuantity.value
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
+end
+
+function Broadcast.broadcasted(::typeof(-), simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
+    targetUnit = simpleQuantity.unit
+    sqArray = _addition_ConvertQuantityArrayToTargetUnit(sqArray, targetUnit)
+    sumvalue = simpleQuantity.value .- sqArray.value
+    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
+end
+
+function Broadcast.broadcasted(::typeof(-), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, simpleQuantity::SimpleQuantity)
+    sqArray = Broadcast.materialize(bc)
+    Broadcast.broadcasted(-, sqArray, simpleQuantity)
+end
+
+function Broadcast.broadcasted(::typeof(-), simpleQuantity::SimpleQuantity, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}})
+    sqArray = Broadcast.materialize(bc)
+    Broadcast.broadcasted(-, simpleQuantity, sqArray)
 end

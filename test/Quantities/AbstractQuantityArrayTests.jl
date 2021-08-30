@@ -62,6 +62,12 @@ function run()
         test_equality_required()
         test_isapprox_required()
 
+        # 4. Complex numbers
+
+        # 5. Array methods
+        test_findmax_required()
+        test_findmin_required()
+
     end
 end
 
@@ -285,6 +291,23 @@ function test_isapprox_required()
     mockQArray2 = MockQuantityArrayStub{Any,2}()
     expectedError = Core.ErrorException("missing specialization of Base.isapprox(::AbstractQuantityArray, ::AbstractQuantityArray, ::Real) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
     @test_throws expectedError isapprox(mockQArray1, mockQArray2)
+end
+
+
+## 4. Complex numbers
+
+## 5. Additional array methods
+
+function test_findmax_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.findmax(::AbstractQuantityArray; dims) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError findmax(mockQArray)
+end
+
+function test_findmin_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.findmin(::AbstractQuantityArray; dims) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError findmin(mockQArray)
 end
 
 end # module

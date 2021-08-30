@@ -324,3 +324,51 @@ function Base.isapprox(qArray1::AbstractQuantityArray, qArray2::AbstractQuantity
     subtype = typeof(qArray1)
     error("missing specialization of Base.isapprox(::AbstractQuantityArray, ::AbstractQuantityArray, ::Real) for subtype $subtype")
 end
+
+## 4. Complex numbers
+
+## 5. Additional array methods
+
+# """
+#     Base.findmax(qArray::AbstractQuantityArray)
+#
+# Returns the value and index of the maximum. If there are multiple maximum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
+# """
+# function Base.findmax(qArray::AbstractQuantityArray)
+#     subtype = typeof(qArray)
+#     error("missing specialization of Base.findmax(::AbstractQuantityArray) for subtype $subtype")
+# end
+
+"""
+    Base.findmax(qArray::AbstractQuantityArray; dims=:)
+
+Returns the value and index of the maximum along dimension `dims`.
+
+If `dims` is omitted, all dimensions are included. If there are multiple maximum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
+"""
+function Base.findmax(qArray::AbstractQuantityArray; dims=:)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.findmax(::AbstractQuantityArray; dims) for subtype $subtype")
+end
+
+# """
+#     Base.findmin(qArray::AbstractQuantityArray)
+#
+# Returns the value and index of the minimum. If there are multiple minimum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
+# """
+# function Base.findmin(qArray::AbstractQuantityArray)
+#     subtype = typeof(qArray)
+#     error("missing specialization of Base.findmin(::AbstractQuantityArray) for subtype $subtype")
+# end
+
+"""
+    Base.findmin(qArray::AbstractQuantityArray; dims=:)
+
+Returns the value and index of the minimum along dimension `dims`.
+
+If `dims` is omitted, all dimensions are included. If there are multiple minimum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
+"""
+function Base.findmin(qArray::AbstractQuantityArray; dims=:)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.findmin(::AbstractQuantityArray; dims) for subtype $subtype")
+end
