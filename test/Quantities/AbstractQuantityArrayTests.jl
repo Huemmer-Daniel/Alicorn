@@ -63,6 +63,9 @@ function run()
         test_isapprox_required()
 
         # 4. Complex numbers
+        test_real_required()
+        test_imag_required()
+        test_conj_required()
 
         # 5. Array methods
         test_findmax_required()
@@ -295,6 +298,24 @@ end
 
 
 ## 4. Complex numbers
+
+function test_real_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.real(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError real(mockQArray)
+end
+
+function test_imag_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.imag(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError imag(mockQArray)
+end
+
+function test_conj_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.conj(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError conj(mockQArray)
+end
 
 ## 5. Additional array methods
 

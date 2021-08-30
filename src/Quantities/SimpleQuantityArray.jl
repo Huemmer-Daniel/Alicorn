@@ -299,6 +299,29 @@ function Base.isapprox(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityAr
     return isapprox(sqArray1.value, sqArray2.value, rtol=rtol)
 end
 
+## 4. Complex numbers
+
+# method documented as part of the AbstractQuantity interface
+function Base.real(sqArray::SimpleQuantityArray)
+    value = real(sqArray.value)
+    unit = sqArray.unit
+    return value * unit
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.imag(sqArray::SimpleQuantityArray)
+    value = imag(sqArray.value)
+    unit = sqArray.unit
+    return value * unit
+end
+
+# method documented as part of the AbstractQuantity interface
+function Base.conj(sqArray::SimpleQuantityArray)
+    value = conj(sqArray.value)
+    unit = sqArray.unit
+    return value * unit
+end
+
 ## 5. Additional array methods
 
 # method documented as part of the AbstractQuantity interface

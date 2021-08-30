@@ -327,6 +327,36 @@ end
 
 ## 4. Complex numbers
 
+"""
+    Base.real(qArray::AbstractQuantityArray)
+
+Apply `real` to all entries of `qArray` without changing its unit.
+"""
+function Base.real(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.real(::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.imag(qArray::AbstractQuantityArray)
+
+Apply `imag` to all entries of `qArray` without changing its unit.
+"""
+function Base.imag(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.imag(::AbstractQuantityArray) for subtype $subtype")
+end
+
+"""
+    Base.conj(qArray::AbstractQuantityArray)
+
+Apply `conj` to all entries of `qArray` without changing its unit.
+"""
+function Base.conj(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.conj(::AbstractQuantityArray) for subtype $subtype")
+end
+
 ## 5. Additional array methods
 
 # """

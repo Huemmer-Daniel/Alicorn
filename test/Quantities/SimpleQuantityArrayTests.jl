@@ -80,6 +80,9 @@ function run()
         test_isapprox_ErrorsForMismatchedDimensions()
 
         # 4. Complex numbers
+        @test real_implemented()
+        @test imag_implemented()
+        @test conj_implemented()
 
         # 5. additional array methods
         @test findmax_implemented()
@@ -1016,6 +1019,53 @@ end
 
 ## 4. Complex numbers
 
+function real_implemented()
+    examples = _getExamplesFor_real()
+    return TestingTools.testMonadicFunction(Base.real, examples)
+end
+
+function _getExamplesFor_real()
+    # format: sqArray::SimpleQuantityArray, correct result for real(sqArray)
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit ),
+        ( [1im] * Alicorn.unitlessUnit, [0] * Alicorn.unitlessUnit ),
+        ( [4.0+2im 3+7im; -5-6im 12-6im] * (ucat.pico * ucat.meter)^-3, [4.0 3; -5 12] * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function imag_implemented()
+    examples = _getExamplesFor_imag()
+    return TestingTools.testMonadicFunction(Base.imag, examples)
+end
+
+function _getExamplesFor_imag()
+    # format: sqArray::SimpleQuantityArray, correct result for imag(sqArray)
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, [0] * Alicorn.unitlessUnit ),
+        ( [1im] * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit ),
+        ( [4.0+2im 3+7im; -5-6im 12-6im] * (ucat.pico * ucat.meter)^-3, [2 7; -6 -6] * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+function conj_implemented()
+    examples = _getExamplesFor_conj()
+    return TestingTools.testMonadicFunction(Base.conj, examples)
+end
+
+function _getExamplesFor_conj()
+    # format: sqArray::SimpleQuantityArray, correct result for conj(sqArray)
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit ),
+        ( [1im] * Alicorn.unitlessUnit, [-1im] * Alicorn.unitlessUnit ),
+        ( [4.0+2im 3+7im; -5-6im 12-6im] * (ucat.pico * ucat.meter)^-3, [4.0-2im 3-7im; -5+6im 12+6im]  * (ucat.pico * ucat.meter)^-3 )
+    ]
+    return examples
+end
+
+## 5. Additional array methods
+
 function findmax_implemented()
     examples = _getExamplesFor_findmax()
     return TestingTools.testMonadicFunction(Base.findmax, examples)
@@ -1104,9 +1154,6 @@ function _getExamplesFor_findmin_withDims()
     ]
     return examples
 end
-
-
-## 5. Additional array methods
 
 function transpose_implemented()
     examples = _getExamplesFor_transpose()
