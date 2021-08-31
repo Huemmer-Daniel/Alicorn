@@ -322,9 +322,15 @@ function Base.conj(sqArray::SimpleQuantityArray)
     return value * unit
 end
 
-## 5. Additional array methods
+## 5. Array methods
 
-# method documented as part of the AbstractQuantity interface
+# method documented in Base
+Base.eltype(sqArray::SimpleQuantityArray{T}) where T = SimpleQuantity{T}
+
+# method documented in Base
+Base.length(sqArray::SimpleQuantityArray) = length(sqArray.value)
+
+# method documented in Base
 function Base.findmax(sqArray::SimpleQuantityArray; dims=:)
     unit = sqArray.unit
     array = sqArray.value
@@ -334,7 +340,7 @@ function Base.findmax(sqArray::SimpleQuantityArray; dims=:)
     return (maxVal * unit, maxIndex)
 end
 
-# method documented as part of the AbstractQuantity interface
+# method documented in Base
 function Base.findmin(sqArray::SimpleQuantityArray; dims=:)
     unit = sqArray.unit
     array = sqArray.value

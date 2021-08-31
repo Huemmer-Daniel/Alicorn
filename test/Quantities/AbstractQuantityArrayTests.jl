@@ -68,6 +68,8 @@ function run()
         test_conj_required()
 
         # 5. Array methods
+        test_eltype_required()
+        test_length_required()
         test_findmax_required()
         test_findmin_required()
 
@@ -317,7 +319,19 @@ function test_conj_required()
     @test_throws expectedError conj(mockQArray)
 end
 
-## 5. Additional array methods
+## 5. Array methods
+
+function test_eltype_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.eltype(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError eltype(mockQArray)
+end
+
+function test_length_required()
+    mockQArray = MockQuantityArrayStub{Any,2}()
+    expectedError = Core.ErrorException("missing specialization of Base.length(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+    @test_throws expectedError length(mockQArray)
+end
 
 function test_findmax_required()
     mockQArray = MockQuantityArrayStub{Any,2}()

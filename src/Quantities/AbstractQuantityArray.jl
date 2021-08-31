@@ -357,47 +357,23 @@ function Base.conj(qArray::AbstractQuantityArray)
     error("missing specialization of Base.conj(::AbstractQuantityArray) for subtype $subtype")
 end
 
-## 5. Additional array methods
+## 5. Array methods
 
-# """
-#     Base.findmax(qArray::AbstractQuantityArray)
-#
-# Returns the value and index of the maximum. If there are multiple maximum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
-# """
-# function Base.findmax(qArray::AbstractQuantityArray)
-#     subtype = typeof(qArray)
-#     error("missing specialization of Base.findmax(::AbstractQuantityArray) for subtype $subtype")
-# end
+function Base.eltype(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.eltype(::AbstractQuantityArray) for subtype $subtype")
+end
 
-"""
-    Base.findmax(qArray::AbstractQuantityArray; dims=:)
+function Base.length(qArray::AbstractQuantityArray)
+    subtype = typeof(qArray)
+    error("missing specialization of Base.length(::AbstractQuantityArray) for subtype $subtype")
+end
 
-Returns the value and index of the maximum along dimension `dims`.
-
-If `dims` is omitted, all dimensions are included. If there are multiple maximum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
-"""
 function Base.findmax(qArray::AbstractQuantityArray; dims=:)
     subtype = typeof(qArray)
     error("missing specialization of Base.findmax(::AbstractQuantityArray; dims) for subtype $subtype")
 end
 
-# """
-#     Base.findmin(qArray::AbstractQuantityArray)
-#
-# Returns the value and index of the minimum. If there are multiple minimum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
-# """
-# function Base.findmin(qArray::AbstractQuantityArray)
-#     subtype = typeof(qArray)
-#     error("missing specialization of Base.findmin(::AbstractQuantityArray) for subtype $subtype")
-# end
-
-"""
-    Base.findmin(qArray::AbstractQuantityArray; dims=:)
-
-Returns the value and index of the minimum along dimension `dims`.
-
-If `dims` is omitted, all dimensions are included. If there are multiple minimum elements, then the first one will be returned. If any element is `NaN`, this element is returned.
-"""
 function Base.findmin(qArray::AbstractQuantityArray; dims=:)
     subtype = typeof(qArray)
     error("missing specialization of Base.findmin(::AbstractQuantityArray; dims) for subtype $subtype")

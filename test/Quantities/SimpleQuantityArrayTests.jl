@@ -28,7 +28,7 @@ function run()
         test_setindex!_ErrorsForMismatchedUnits()
         @test setindex!_canSetToDimensionlessZero()
 
-        #- AbstractQuantity interface
+        #- AbstractQuantityArray interface
         # 1. Unit conversion
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
@@ -84,7 +84,9 @@ function run()
         @test imag_implemented()
         @test conj_implemented()
 
-        # 5. additional array methods
+        # 5. Array methods
+        @test eltype_implemented()
+        @test length_implemented()
         @test findmax_implemented()
         @test findmax_withDims_implemented()
         @test findmin_implemented()
@@ -1064,7 +1066,35 @@ function _getExamplesFor_conj()
     return examples
 end
 
-## 5. Additional array methods
+## 5. Array methods
+
+function eltype_implemented()
+    examples = _getExamplesFor_eltype()
+    return TestingTools.testMonadicFunction(Base.eltype, examples)
+end
+
+function _getExamplesFor_eltype()
+    # format: sqArray::SimpleQuantityArray, correct result for eltype(sqArray)
+    A = SimpleQuantityArray([1,2], ucat.meter)
+    examples = [
+        (A, typeof(A[1]))
+    ]
+    return examples
+end
+
+function length_implemented()
+    examples = _getExamplesFor_length()
+    return TestingTools.testMonadicFunction(Base.length, examples)
+end
+
+function _getExamplesFor_length()
+    # format: sqArray::SimpleQuantityArray, correct result for length(sqArray)
+    examples = [
+        ([1, 2, 7] * ucat.meter, 3),
+        ([1 2 7; 5 6 -0.3] * ucat.meter / ucat.second, 6)
+    ]
+    return examples
+end
 
 function findmax_implemented()
     examples = _getExamplesFor_findmax()
