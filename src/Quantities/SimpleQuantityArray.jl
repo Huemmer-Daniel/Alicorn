@@ -18,6 +18,12 @@ mutable struct SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
     end
 end
 
+export SimpleQuantityVector
+SimpleQuantityVector{T} = SimpleQuantityArray{T,1}
+
+export SimpleQuantityMatrix
+SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
+
 ## ## External constructors
 
 function SimpleQuantityArray(value::Array{T,N}) where {T<:Number, N}
@@ -32,6 +38,8 @@ function SimpleQuantityArray(simpleQuantity::SimpleQuantity)
     sqArray = SimpleQuantityArray(value, unit)
     return sqArray
 end
+
+SimpleQuantityArray(sqArray::SimpleQuantityArray) = sqArray
 
 ## ## Methods for creating a SimpleQuantityArray
 
@@ -112,42 +120,6 @@ end
 ## ## Methods implementing the interface of AbstractQuantityArray
 ## 1. Unit conversion
 
-export inUnitsOf
-# method documented as part of the AbstractQuantityArray interface
-function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
-    originalvalue = sqArray.value
-    originalUnit = sqArray.unit
-
-    if originalUnit == targetUnit
-        resultingQuantityArray = sqArray
-    else
-
-        (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
-        (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
-
-        _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
-        conversionFactor = originalUnitPrefactor / targetUnitPrefactor
-
-        resultingvalue = originalvalue .* conversionFactor
-        resultingQuantityArray = SimpleQuantityArray( resultingvalue, targetUnit )
-    end
-    return resultingQuantityArray
-end
-
-export inBasicSIUnits
-# method documented as part of the AbstractQuantityArray interface
-function inBasicSIUnits(sqArray::SimpleQuantityArray)
-    originalvalue = sqArray.value
-    originalUnit = sqArray.unit
-
-    ( conversionFactor, resultingBasicSIUnit ) = convertToBasicSI(originalUnit)
-
-    resultingvalue = originalvalue * conversionFactor
-    resultingQuantity = SimpleQuantityArray( resultingvalue, resultingBasicSIUnit )
-    return resultingQuantity
-end
-
-export inUnitsOf
 """
     inUnitsOf(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
 
@@ -327,8 +299,15 @@ end
 # method documented in Base
 Base.eltype(sqArray::SimpleQuantityArray{T}) where T = SimpleQuantity{T}
 
+# # method documented in Base
+# Base.length(sqArray::SimpleQuantityArray) = length(sqArray.value)
+#
+# # method documented in Base
+# Base.ndims(sqArray::SimpleQuantityArray) = ndims(sqArray.value)
+
 # method documented in Base
-Base.length(sqArray::SimpleQuantityArray) = length(sqArray.value)
+# Base.axes(sqArray::SimpleQuantityArray) = axes(sqArray.value)
+# Base.axes(sqArray::SimpleQuantityArray, d) = axes(sqArray.value, d)
 
 # method documented in Base
 function Base.findmax(sqArray::SimpleQuantityArray; dims=:)
@@ -372,36 +351,11 @@ end
 
 ## ## Additional Methods
 
-export valueOfDimensionless
-"""
-    valueOfDimensionless(sqArray::SimpleQuantityArray)
-
-Strips the unit from a dimensionless quantity array and returns its bare value.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray` is not dimensionless
-"""
-function valueOfDimensionless(sqArray::SimpleQuantityArray)
-    sqArray = _convertToUnitless(sqArray)
-    value = sqArray.value
-    return value
-end
-
-function _convertToUnitless(sqArray::SimpleQuantityArray)
-    try
-        sqArray = inUnitsOf(sqArray, unitlessUnit)
-    catch exception
-        if typeof(exception) == Exceptions.DimensionMismatchError
-            throw(Exceptions.DimensionMismatchError("quantity array is not dimensionless"))
-        else
-            rethrow()
-        end
-    end
-    return sqArray
-end
-
-
 ## TODO BELOW
+
+Base.circshift(sqArray::SimpleQuantityArray, shifts::Real) = circshift(sqArray.value, shifts) * sqArray.unit
+Base.circshift(sqArray::SimpleQuantityArray, shifts::Base.DimsInteger) = circshift(sqArray.value, shifts) * sqArray.unit
+Base.circshift(sqArray::SimpleQuantityArray, shifts) = circshift(sqArray.value, shifts) * sqArray.unit
 
 ## ## Broadcasting
 
@@ -409,7 +363,7 @@ end
 Base.BroadcastStyle(::Type{<:SimpleQuantityArray}) = Broadcast.ArrayStyle{SimpleQuantityArray}()
 
 # contruct destination array
-function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, ::Type{ElType}) where ElType
+function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, ::Type{SimpleQuantity{ElType}}) where ElType
     # we do not want to convert any units here, if necessary this was already done upstream
     (targetUnit, unitlessBroadcasted) = squeezeOutUnits(bc)
     targetSqArray = SimpleQuantityArray( similar(Array{ElType}, axes(unitlessBroadcasted)) , targetUnit)
@@ -452,6 +406,8 @@ end
 # infer target units for different broadcastable operations on SimpleQuantityArrays
 
 inferTargetUnit(::typeof(abs), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
+
+inferTargetUnit(::typeof(angle), arg::Tuple{<:AbstractUnit, <:Any}) = unitlessUnit
 
 inferTargetUnit(::typeof(/), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple) = arg1[1]
 

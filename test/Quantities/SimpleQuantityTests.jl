@@ -27,6 +27,10 @@ function run()
         test_inUnitsOf_ErrorsForMismatchedUnits()
         @test inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
         @test inBasicSIUnits_implemented()
+        @test valueOfDimensionless_implemented()
+        test_valueOfDimensionless_ErrorsIfNotUnitless()
+        @test valueInUnitsOf_implemented()
+        test_valueInUnitsOf_ErrorsForMismatchedUnits()
         @test SimpleQuantity_AbstractUnit_multiplication()
         @test AbstractUnit_SimpleQuantity_multiplication()
         @test SimpleQuantity_AbstractUnit_division()
@@ -99,10 +103,6 @@ function run()
         @test ndims_implemented()
         @test getindex_implemented()
         test_getindex_errorsForIndexGreaterOne()
-
-        #- additional methods
-        @test valueOfDimensionless_implemented()
-        test_valueOfDimensionless_ErrorsIfNotUnitless()
     end
 end
 
@@ -285,6 +285,48 @@ function _getExamplesFor_inBasicSIUnits()
         ( 1 * ucat.hour, 3600 * Alicorn.second )
     ]
     return examples
+end
+
+function valueOfDimensionless_implemented()
+    examples = _getExamplesFor_valueOfDimensionless()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
+end
+
+function _getExamplesFor_valueOfDimensionless()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantity(7), 7),
+        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless()
+    simpleQuantity = 7 * Alicorn.meter
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(simpleQuantity)
+end
+
+function valueInUnitsOf_implemented()
+    examples = _getExamplesFor_valueInUnitsOf()
+    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
+end
+
+function _getExamplesFor_valueInUnitsOf()
+    # format: SimpleQuantity, Unit, value of SimpleQuantity expressed in units of Unit
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 1),
+        ( 7 * ucat.meter, ucat.milli*ucat.meter, 7000 ),
+        ( 2 * (ucat.milli * ucat.second)^2, ucat.second^2, 2e-6 ),
+        ( 5 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 5 )
+    ]
+end
+
+function test_valueInUnitsOf_ErrorsForMismatchedUnits()
+    simpleQuantity = 7 * Alicorn.meter
+    mismatchedUnit = Alicorn.second
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError valueInUnitsOf(simpleQuantity, mismatchedUnit)
 end
 
 function SimpleQuantity_AbstractUnit_multiplication()
@@ -1180,28 +1222,6 @@ function test_getindex_errorsForIndexGreaterOne()
     example = 7.6 * ucat.ampere
     expectedError = Core.BoundsError
     @test_throws expectedError getindex(example, 2)
-end
-
-## Additional methods
-
-function valueOfDimensionless_implemented()
-    examples = _getExamplesFor_valueOfDimensionless()
-    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
-end
-
-function _getExamplesFor_valueOfDimensionless()
-    # format: quantity, correct result for valueOfDimensionless(quantity)
-    examples = [
-        (SimpleQuantity(7), 7),
-        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
-    ]
-    return examples
-end
-
-function test_valueOfDimensionless_ErrorsIfNotUnitless()
-    simpleQuantity = 7 * Alicorn.meter
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
-    @test_throws expectedError valueOfDimensionless(simpleQuantity)
 end
 
 end # module

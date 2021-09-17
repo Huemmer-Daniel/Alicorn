@@ -8,33 +8,17 @@ Currently the only concrete subtype of `AbstractQuantityArray` is [`AbstractQuan
 """
 abstract type AbstractQuantityArray{T,N} <: AbstractArray{T,N} end
 
+export AbstractQuantityVector
+AbstractQuantityVector{T} = AbstractQuantityArray{T,1}
+
+export AbstractQuantityMatrix
+AbstractQuantityMatrix{T} = AbstractQuantityArray{T,2}
+
 ## ## Interface
 # the following functions need to be extended for concrete implementations of
 # AbstractQuantity
 
 ## 1. Unit conversion
-
-export inUnitsOf
-"""
-    inUnitsOf(qArray::AbstractQuantityArray, targetUnit::AbstractUnit)::SimpleQuantityArray
-
-Express `qArray` as an object of type `SimpleQuantityArray` in terms of the unit specified by `targetUnit`.
-"""
-function inUnitsOf(qArray::AbstractQuantityArray, targetUnit::AbstractUnit)::SimpleQuantityArray
-    subtype = typeof(qArray)
-    error("missing specialization of inUnitsOf(::AbstractQuantityArray, ::AbstractUnit) for subtype $subtype")
-end
-
-export inBasicSIUnits
-"""
-    inBasicSIUnits(qArray::AbstractQuantity)::SimpleQuantityArray
-
-Express `qArray` as an object of type `SimpleQuantityArray` using the seven basic SI units.
-"""
-function inBasicSIUnits(qArray::AbstractQuantityArray)::SimpleQuantityArray
-    subtype = typeof(qArray)
-    error("missing specialization of inBasicSIUnits(::AbstractQuantityArray) for subtype $subtype")
-end
 
 """
     Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
@@ -364,10 +348,25 @@ function Base.eltype(qArray::AbstractQuantityArray)
     error("missing specialization of Base.eltype(::AbstractQuantityArray) for subtype $subtype")
 end
 
-function Base.length(qArray::AbstractQuantityArray)
-    subtype = typeof(qArray)
-    error("missing specialization of Base.length(::AbstractQuantityArray) for subtype $subtype")
-end
+# function Base.length(qArray::AbstractQuantityArray)
+#     subtype = typeof(qArray)
+#     error("missing specialization of Base.length(::AbstractQuantityArray) for subtype $subtype")
+# end
+#
+# function Base.ndims(qArray::AbstractQuantityArray)
+#     subtype = typeof(qArray)
+#     error("missing specialization of Base.ndims(::AbstractQuantityArray) for subtype $subtype")
+# end
+
+# function Base.axes(qArray::AbstractQuantityArray)
+#     subtype = typeof(qArray)
+#     error("missing specialization of Base.axes(::AbstractQuantityArray) for subtype $subtype")
+# end
+#
+# function Base.axes(qArray::AbstractQuantityArray, d)
+#     subtype = typeof(qArray)
+#     error("missing specialization of Base.axes(::AbstractQuantityArray, d) for subtype $subtype")
+# end
 
 function Base.findmax(qArray::AbstractQuantityArray; dims=:)
     subtype = typeof(qArray)

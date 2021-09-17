@@ -34,6 +34,10 @@ function run()
         test_inUnitsOf_ErrorsForMismatchedUnits()
         @test inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
         @test inBasicSIUnits_implemented()
+        @test valueOfDimensionless_implemented()
+        test_valueOfDimensionless_ErrorsIfNotUnitless()
+        @test valueInUnitsOf_implemented()
+        test_valueInUnitsOf_ErrorsForMismatchedUnits()
         @test SimpleQuantityArray_AbstractUnit_multiplication()
         @test AbstractUnit_SimpleQuantityArray_multiplication()
         @test SimpleQuantityArray_AbstractUnit_division()
@@ -87,6 +91,9 @@ function run()
         # 5. Array methods
         @test eltype_implemented()
         @test length_implemented()
+        @test ndims_implemented()
+        @test axes_implemented()
+        @test axes_withDims_implemented()
         @test findmax_implemented()
         @test findmax_withDims_implemented()
         @test findmin_implemented()
@@ -96,9 +103,6 @@ function run()
         @test repeat_implemented()
         @test repeat_withInnerOuter_implemented()
 
-        #- additional methods
-        @test valueOfDimensionless_implemented()
-        test_valueOfDimensionless_ErrorsIfNotUnitless()
     end
 end
 
@@ -420,6 +424,51 @@ function _getExamplesFor_inBasicSIUnits()
         ( [1 2] * ucat.hour, [3600 7200]* Alicorn.second )
     ]
     return examples
+end
+
+function valueOfDimensionless_implemented()
+    examples = _getExamplesFor_valueOfDimensionless()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
+end
+
+function _getExamplesFor_valueOfDimensionless()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantityArray([2, 3]), [2, 3]),
+        (SimpleQuantityArray([2, 3], ucat.meter * (ucat.centi * ucat.meter)^-1 ), [200, 300])
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless()
+    sqArray = [2, 3] * Alicorn.meter
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(sqArray)
+end
+
+
+function valueInUnitsOf_implemented()
+    examples = _getExamplesFor_valueInUnitsOf()
+    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
+end
+
+function _getExamplesFor_valueInUnitsOf()
+    electronvoltInBasicSI = ucat.electronvolt.prefactor
+
+    # format: SimpleQuantityArray, Unit, SimpleQuantityArray expressed in units of Unit
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, Alicorn.unitlessUnit, ones(2,2) ),
+        ( [7; 3] * ucat.meter, ucat.milli*ucat.meter, [7000; 3000] ),
+        ( [2] * (ucat.milli * ucat.second)^2, ucat.second^2, [2e-6] ),
+        ( [5 2] * Alicorn.unitlessUnit, Alicorn.unitlessUnit, [5 2] )
+    ]
+end
+
+function test_valueInUnitsOf_ErrorsForMismatchedUnits()
+    sqArray = [7, 2] * Alicorn.meter
+    mismatchedUnit = Alicorn.second
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError valueInUnitsOf(sqArray, mismatchedUnit)
 end
 
 function SimpleQuantityArray_AbstractUnit_multiplication()
@@ -1096,6 +1145,55 @@ function _getExamplesFor_length()
     return examples
 end
 
+function ndims_implemented()
+    examples = _getExamplesFor_ndims()
+    return TestingTools.testMonadicFunction(Base.ndims, examples)
+end
+
+function _getExamplesFor_ndims()
+    # format: sqArray::SimpleQuantityArray, correct result for ndims(sqArray)
+    examples = [
+        ([1, 2, 7] * ucat.meter, 1),
+        ([1 2 7; 5 6 -0.3] * ucat.meter / ucat.second, 2),
+        (fill(1, (2,3,4))  * ucat.meter , 3)
+    ]
+    return examples
+end
+
+function axes_implemented()
+    examples = _getExamplesFor_axes()
+    return TestingTools.testMonadicFunction(Base.axes, examples)
+end
+
+function _getExamplesFor_axes()
+    # format: sqArray::SimpleQuantityArray, correct result for axes(sqArray)
+    examples = [
+        ([1, 2, 7] * ucat.meter, axes([1, 2, 7])),
+        ([1 2 7; 5 6 -0.3] * ucat.meter / ucat.second, axes([1 2 7; 5 6 -0.3])),
+        (fill(1, (2,3,4))  * ucat.meter , axes(fill(1, (2,3,4))))
+    ]
+    return examples
+end
+
+function axes_withDims_implemented()
+    examples = _getExamplesFor_axes_withDims()
+    return TestingTools.testDyadicFunction(Base.axes, examples)
+end
+
+function _getExamplesFor_axes_withDims()
+    # format: sqArray::SimpleQuantityArray, d::Integer, correct result for axes(sqArray,d)
+    examples = [
+        ([1, 2, 7] * ucat.meter, 1, axes([1, 2, 7],1) ),
+        ([1, 2, 7] * ucat.meter, 3, axes([1, 2, 7],3) ),
+        ([1 2 7; 5 6 -0.3] * ucat.meter / ucat.second, 1, axes([1 2 7; 5 6 -0.3],1) ),
+        ([1 2 7; 5 6 -0.3] * ucat.meter / ucat.second, 2, axes([1 2 7; 5 6 -0.3],2) ),
+        (fill(1, (2,3,4))  * ucat.meter , 1, axes(fill(1, (2,3,4)),1) ),
+        (fill(1, (2,3,4))  * ucat.meter , 2, axes(fill(1, (2,3,4)),2) ),
+        (fill(1, (2,3,4))  * ucat.meter , 3, axes(fill(1, (2,3,4)),3) ),
+    ]
+    return examples
+end
+
 function findmax_implemented()
     examples = _getExamplesFor_findmax()
     return TestingTools.testMonadicFunction(Base.findmax, examples)
@@ -1254,28 +1352,6 @@ function _test_repeat_withInnerOuter(examples)
         correct &= (returnedResult == correctResult)
     end
     return true
-end
-
-## Additional methods
-
-function valueOfDimensionless_implemented()
-    examples = _getExamplesFor_valueOfDimensionless()
-    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
-end
-
-function _getExamplesFor_valueOfDimensionless()
-    # format: quantity, correct result for valueOfDimensionless(quantity)
-    examples = [
-        (SimpleQuantityArray([2, 3]), [2, 3]),
-        (SimpleQuantityArray([2, 3], ucat.meter * (ucat.centi * ucat.meter)^-1 ), [200, 300])
-    ]
-    return examples
-end
-
-function test_valueOfDimensionless_ErrorsIfNotUnitless()
-    sqArray = [2, 3] * Alicorn.meter
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity array is not dimensionless")
-    @test_throws expectedError valueOfDimensionless(sqArray)
 end
 
 end # module

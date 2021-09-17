@@ -84,6 +84,8 @@ function SimpleQuantity(abstractUnit::AbstractUnit)
     return simpleQuantity
 end
 
+SimpleQuantity(simpleQuantity::SimpleQuantity) = simpleQuantity
+
 ## ## Methods for creating a SimpleQuantity
 
 """
@@ -124,58 +126,6 @@ end
 ## ## Methods implementing the interface of AbstractQuantity
 
 ## 1. Unit conversion
-
-export inUnitsOf
-# method documented as part of the AbstractQuantity interface
-function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
-    originalValue = simpleQuantity.value
-    originalUnit = simpleQuantity.unit
-
-    if originalUnit == targetUnit
-        resultingQuantity = simpleQuantity
-    else
-
-        (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
-        (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
-
-        _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
-        conversionFactor = originalUnitPrefactor / targetUnitPrefactor
-
-        resultingValue = originalValue * conversionFactor
-        resultingQuantity = SimpleQuantity( resultingValue, targetUnit )
-    end
-    return resultingQuantity
-end
-
-function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitExponents2::BaseUnitExponents)
-    if baseUnitExponents1 != baseUnitExponents2
-        throw( Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree") )
-    end
-end
-
-export inUnitsOf
-"""
-    inUnitsOf(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-
-Express `simpleQuantity1` in units of `simpleQuantity2`.
-"""
-function inUnitsOf(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    targetUnit = simpleQuantity2.unit
-    return inUnitsOf(simpleQuantity1, targetUnit)
-end
-
-export inBasicSIUnits
-# method documented as part of the AbstractQuantity interface
-function inBasicSIUnits(simpleQuantity::SimpleQuantity)
-    originalValue = simpleQuantity.value
-    originalUnit = simpleQuantity.unit
-
-    ( conversionFactor, resultingBasicSIUnit ) = convertToBasicSI(originalUnit)
-
-    resultingValue = originalValue * conversionFactor
-    resultingQuantity = SimpleQuantity( resultingValue, resultingBasicSIUnit )
-    return resultingQuantity
-end
 
 # method documented as part of the AbstractQuantity interface
 function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)
@@ -546,34 +496,4 @@ function Base.getindex(simpleQuantity::SimpleQuantity, index...)
     unit = simpleQuantity.unit
     value = getindex(simpleQuantity.value, index...)
     return SimpleQuantity(value, unit)
-end
-
-## ## Additional Methods
-
-export valueOfDimensionless
-"""
-    valueOfDimensionless(simpleQuantity::SimpleQuantity)
-
-Strips the unit from a dimensionless quantity and returns its bare value.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity` is not dimensionless
-"""
-function valueOfDimensionless(simpleQuantity::SimpleQuantity)
-    simpleQuantity =_convertToUnitless(simpleQuantity)
-    value = simpleQuantity.value
-    return value
-end
-
-function _convertToUnitless(simpleQuantity::SimpleQuantity)
-    try
-        simpleQuantity = inUnitsOf(simpleQuantity, unitlessUnit)
-    catch exception
-        if typeof(exception) == Exceptions.DimensionMismatchError
-            throw(Exceptions.DimensionMismatchError("quantity is not dimensionless"))
-        else
-            rethrow()
-        end
-    end
-    return simpleQuantity
 end

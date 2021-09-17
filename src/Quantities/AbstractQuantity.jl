@@ -14,28 +14,6 @@ abstract type AbstractQuantity{T} end
 
 ## 1. Unit conversion
 
-export inUnitsOf
-"""
-    inUnitsOf(quantity::AbstractQuantity, targetUnit::AbstractUnit)::SimpleQuantity
-
-Express `quantity` as an object of type `SimpleQuantity` in terms of the unit specified by `targetUnit`.
-"""
-function inUnitsOf(quantity::AbstractQuantity, targetUnit::AbstractUnit)::SimpleQuantity
-    subtype = typeof(quantity)
-    error("missing specialization of inUnitsOf(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
-end
-
-export inBasicSIUnits
-"""
-    inBasicSIUnits(quantity::AbstractQuantity)::SimpleQuantity
-
-Express `quantity` as an object of type `SimpleQuantity` using the seven basic SI units.
-"""
-function inBasicSIUnits(quantity::AbstractQuantity)::SimpleQuantity
-    subtype = typeof(quantity)
-    error("missing specialization of inBasicSIUnits(::AbstractQuantity) for subtype $subtype")
-end
-
 """
     Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
     Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)

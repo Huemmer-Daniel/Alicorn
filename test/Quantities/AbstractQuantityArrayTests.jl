@@ -69,7 +69,6 @@ function run()
 
         # 5. Array methods
         test_eltype_required()
-        test_length_required()
         test_findmax_required()
         test_findmin_required()
 
@@ -327,11 +326,25 @@ function test_eltype_required()
     @test_throws expectedError eltype(mockQArray)
 end
 
-function test_length_required()
-    mockQArray = MockQuantityArrayStub{Any,2}()
-    expectedError = Core.ErrorException("missing specialization of Base.length(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
-    @test_throws expectedError length(mockQArray)
-end
+# function test_length_required()
+#     mockQArray = MockQuantityArrayStub{Any,2}()
+#     expectedError = Core.ErrorException("missing specialization of Base.length(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+#     @test_throws expectedError length(mockQArray)
+# end
+#
+# function test_ndims_required()
+#     mockQArray = MockQuantityArrayStub{Any,2}()
+#     expectedError = Core.ErrorException("missing specialization of Base.ndims(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+#     @test_throws expectedError ndims(mockQArray)
+# end
+#
+# function test_axes_required()
+#     mockQArray = MockQuantityArrayStub{Any,2}()
+#     expectedError = Core.ErrorException("missing specialization of Base.axes(::AbstractQuantityArray) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+#     @test_throws expectedError axes(mockQArray)
+#     expectedError = Core.ErrorException("missing specialization of Base.axes(::AbstractQuantityArray, d) for subtype Main.QuantitiesTests.AbstractQuantityArrayTests.MockQuantityArrayStub{Any, 2}")
+#     @test_throws expectedError axes(mockQArray, 2)
+# end
 
 function test_findmax_required()
     mockQArray = MockQuantityArrayStub{Any,2}()
