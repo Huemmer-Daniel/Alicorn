@@ -18,41 +18,6 @@ AbstractQuantityMatrix{T} = AbstractQuantityArray{T,2}
 # the following functions need to be extended for concrete implementations of
 # AbstractQuantity
 
-## 1. Unit conversion
-
-"""
-    Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
-    Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
-
-Modify the unit of `qArray` by multiplying it with `unit`.
-"""
-function Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
-    subtype = typeof(qArray)
-    error("missing specialization of Base.:*(::AbstractQuantityArray, ::AbstractUnit) for subtype $subtype")
-end
-
-function Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
-    subtype = typeof(qArray)
-    error("missing specialization of Base.:*(::AbstractUnit, ::AbstractQuantityArray) for subtype $subtype")
-end
-
-"""
-    Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit)
-    Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray)
-
-Modify the unit of `qArray` by dividing it by `unit`, or vice versa.
-"""
-function Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit)
-    subtype = typeof(qArray)
-    error("missing specialization of Base.:/(::AbstractQuantityArray, ::AbstractUnit) for subtype $subtype")
-end
-
-function Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray)
-    subtype = typeof(qArray)
-    error("missing specialization of Base.:/(::AbstractUnit, ::AbstractQuantityArray) for subtype $subtype")
-end
-
-
 ## 2. Arithmetic unary and binary operators
 
 """

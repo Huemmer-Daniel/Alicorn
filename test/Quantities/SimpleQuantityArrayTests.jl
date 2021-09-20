@@ -33,11 +33,15 @@ function run()
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
         @test inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
+        @test inUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
+        @test valueInUnitsOf_implemented()
+        test_valueInUnitsOf_ErrorsForMismatchedUnits()
+        @test valueInUnitsOf_implemented()
+        @test valueInUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
+        @test valueInUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
         @test inBasicSIUnits_implemented()
         @test valueOfDimensionless_implemented()
         test_valueOfDimensionless_ErrorsIfNotUnitless()
-        @test valueInUnitsOf_implemented()
-        test_valueInUnitsOf_ErrorsForMismatchedUnits()
         @test SimpleQuantityArray_AbstractUnit_multiplication()
         @test AbstractUnit_SimpleQuantityArray_multiplication()
         @test SimpleQuantityArray_AbstractUnit_division()
@@ -409,6 +413,76 @@ function _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
     ]
 end
 
+function inUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
+    examples = _getExamplesFor_inUnitsOf_forSimpleQuantityArrayAsTargetUnit()
+    return TestingTools.testDyadicFunction(inUnitsOf, examples)
+end
+
+function _getExamplesFor_inUnitsOf_forSimpleQuantityArrayAsTargetUnit()
+    electronvoltInBasicSI = ucat.electronvolt.prefactor
+
+    # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, [3] * Alicorn.unitlessUnit, [1] * Alicorn.unitlessUnit ),
+        ( [7] * ucat.meter, [8.9] * (ucat.milli*ucat.meter), [7000] * (ucat.milli*ucat.meter) ),
+        ( [2] * (ucat.milli * ucat.second)^2, [pi] * ucat.second^2, [2e-6] * ucat.second^2 ),
+        ( [1] * ucat.joule, [-8.0] * ucat.electronvolt, [(1/electronvoltInBasicSI)] * ucat.electronvolt ),
+        ( [5; 5] * Alicorn.unitlessUnit, [-9] * Alicorn.unitlessUnit, [5; 5] * Alicorn.unitlessUnit)
+    ]
+end
+
+function valueInUnitsOf_implemented()
+    examples = _getExamplesFor_valueInUnitsOf()
+    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
+end
+
+function _getExamplesFor_valueInUnitsOf()
+    # format: SimpleQuantityArray, Unit, SimpleQuantityArray expressed in units of Unit
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, Alicorn.unitlessUnit, ones(2,2) ),
+        ( [7; 3] * ucat.meter, ucat.milli*ucat.meter, [7000; 3000] ),
+        ( [2] * (ucat.milli * ucat.second)^2, ucat.second^2, [2e-6] ),
+        ( [5 2] * Alicorn.unitlessUnit, Alicorn.unitlessUnit, [5 2] )
+    ]
+end
+
+function test_valueInUnitsOf_ErrorsForMismatchedUnits()
+    sqArray = [7, 2] * Alicorn.meter
+    mismatchedUnit = Alicorn.second
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
+    @test_throws expectedError valueInUnitsOf(sqArray, mismatchedUnit)
+end
+
+function valueInUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
+    examples = _getExamplesFor_valueInUnitsOf_forSimpleQuantityAsTargetUnit()
+    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
+end
+
+function _getExamplesFor_valueInUnitsOf_forSimpleQuantityAsTargetUnit()
+    # format: SimpleQuantityArray, SimpleQuantity, SimpleQuantityArray expressed in units of SimpleQuantity
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, [1]  ),
+        ( [7] * ucat.meter, 8.9 * (ucat.milli*ucat.meter), [7000] ),
+        ( [2] * (ucat.milli * ucat.second)^2, pi * ucat.second^2, [2e-6]  ),
+        ( [5; 5] * Alicorn.unitlessUnit, -9 * Alicorn.unitlessUnit, [5; 5] )
+    ]
+end
+
+function valueInUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
+    examples = _getExamplesFor_valueInUnitsOf_forSimpleQuantityArrayAsTargetUnit()
+    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
+end
+
+function _getExamplesFor_valueInUnitsOf_forSimpleQuantityArrayAsTargetUnit()
+    # format: SimpleQuantityArray1, SimpleQuantityArray2, SimpleQuantityArray1 expressed in units of SimpleQuantityArray2
+    examples = [
+        ( [1] * Alicorn.unitlessUnit, [3] * Alicorn.unitlessUnit, [1] ),
+        ( [7] * ucat.meter, [8.9] * (ucat.milli*ucat.meter), [7000]  ),
+        ( [2] * (ucat.milli * ucat.second)^2, [pi] * ucat.second^2, [2e-6]  ),
+        ( [5; 5] * Alicorn.unitlessUnit, [-9] * Alicorn.unitlessUnit, [5; 5] )
+    ]
+end
+
 function inBasicSIUnits_implemented()
     examples = _getExamplesFor_inBasicSIUnits()
     return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
@@ -444,31 +518,6 @@ function test_valueOfDimensionless_ErrorsIfNotUnitless()
     sqArray = [2, 3] * Alicorn.meter
     expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
     @test_throws expectedError valueOfDimensionless(sqArray)
-end
-
-
-function valueInUnitsOf_implemented()
-    examples = _getExamplesFor_valueInUnitsOf()
-    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
-end
-
-function _getExamplesFor_valueInUnitsOf()
-    electronvoltInBasicSI = ucat.electronvolt.prefactor
-
-    # format: SimpleQuantityArray, Unit, SimpleQuantityArray expressed in units of Unit
-    examples = [
-        ( ones(2,2) * Alicorn.unitlessUnit, Alicorn.unitlessUnit, ones(2,2) ),
-        ( [7; 3] * ucat.meter, ucat.milli*ucat.meter, [7000; 3000] ),
-        ( [2] * (ucat.milli * ucat.second)^2, ucat.second^2, [2e-6] ),
-        ( [5 2] * Alicorn.unitlessUnit, Alicorn.unitlessUnit, [5 2] )
-    ]
-end
-
-function test_valueInUnitsOf_ErrorsForMismatchedUnits()
-    sqArray = [7, 2] * Alicorn.meter
-    mismatchedUnit = Alicorn.second
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
-    @test_throws expectedError valueInUnitsOf(sqArray, mismatchedUnit)
 end
 
 function SimpleQuantityArray_AbstractUnit_multiplication()

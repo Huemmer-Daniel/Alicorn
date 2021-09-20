@@ -37,17 +37,14 @@ function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitE
 end
 
 """
-    inUnitsOf(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    inUnitsOf(quantity::AbstractQuantity, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
 
-Express `simpleQuantity1` in units of `simpleQuantity2`.
+Express `quantity` as an object of type `SimpleQuantity` in terms of the unit of `simpleQuantity`.
 
 # Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `simpleQuantity1` and `simpleQuantity2` do not agree
+- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `simpleQuantity` do not agree
 """
-function inUnitsOf(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    unit = simpleQuantity2.unit
-    return inUnitsOf(simpleQuantity1, unit)
-end
+inUnitsOf(quantity::AbstractQuantity, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}) = inUnitsOf(quantity, simpleQuantity.unit)
 
 """
     inUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit)::SimpleQuantityArray
@@ -79,6 +76,62 @@ function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
     return resultingQuantityArray
 end
 
+"""
+    inUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
+
+Express `quantityArray` as an object of type `SimpleQuantityArray` in terms of the unit of `simpleQuantity`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `simpleQuantity` do not agree
+"""
+inUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}) = inUnitsOf(quantityArray, simpleQuantity.unit)
+
+
+## valueInUnitsOf
+export valueInUnitsOf
+"""
+    valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit)
+
+Returns the numerical value of `quantity` expressed in units of `unit`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `unit` do not agree
+"""
+function valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit) end
+
+valueInUnitsOf(simpleQuantity::SimpleQuantity, unit::AbstractUnit) = inUnitsOf(simpleQuantity, unit).value
+
+"""
+    valueInUnitsOf(quantity::AbstractQuantity, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
+
+Returns the numerical value of `quantity` expressed in units of `simpleQuantity`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `simpleQuantity` do not agree
+"""
+valueInUnitsOf(quantity::AbstractQuantity, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}) = inUnitsOf(quantity, simpleQuantity.unit).value
+
+"""
+    valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit)
+
+Returns the numerical value of `qArray` expressed in units of `unit`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `unit` do not agree
+"""
+function valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit) end
+
+valueInUnitsOf(sqArray::SimpleQuantityArray, unit::AbstractUnit) = inUnitsOf(sqArray, unit).value
+
+"""
+    valueInUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
+
+Returns the numerical value of `quantityArray` expressed in units of `simpleQuantity`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantityArray` and `simpleQuantity` do not agree
+"""
+valueInUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}) = inUnitsOf(quantityArray, simpleQuantity.unit).value
 
 ## inBasicSIUnits
 export inBasicSIUnits
@@ -171,28 +224,64 @@ end
 valueOfDimensionless(array::Array{<:Number}) = array
 
 
-## valueInUnitsOf
-export valueInUnitsOf
-"""
-    valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit)
-
-Returns the numerical value of `quantity` expressed in units of `unit`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `unit` do not agree
-"""
-function valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit) end
-
-valueInUnitsOf(simpleQuantity::SimpleQuantity, unit::AbstractUnit) = inUnitsOf(simpleQuantity, unit).value
+## Quantity-Unit arithmetics
 
 """
-    valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
+    Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
 
-Returns the numerical value of `qArray` expressed in units of `unit`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `unit` do not agree
+Modify the unit of `quantity` by multiplying it with `unit`.
 """
-function valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit) end
+function Base.:*(quantity::AbstractQuantity, unit::AbstractUnit) end
+function Base.:*(unit::AbstractUnit, quantity::AbstractQuantity) end
 
-valueInUnitsOf(sqArray::SimpleQuantityArray, unit::AbstractUnit) = inUnitsOf(sqArray, unit).value
+"""
+    Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
+
+Modify the unit of `qArray` by multiplying it with `unit`.
+"""
+function Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit) end
+function Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray) end
+
+function Base.:*(simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}, abstractUnit::AbstractUnit)
+    value = simpleQuantity.value
+    productUnit = simpleQuantity.unit * abstractUnit
+    return value * productUnit
+end
+
+function Base.:*(abstractUnit::AbstractUnit, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
+    value = simpleQuantity.value
+    productUnit = abstractUnit * simpleQuantity.unit
+    return value * productUnit
+end
+
+"""
+    Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
+    Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)
+
+Modify the unit of `quantity` by dividing it by `unit`, or vice versa.
+"""
+function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit) end
+function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity) end
+
+"""
+    Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit)
+    Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray)
+
+Modify the unit of `qArray` by dividing it by `unit`, or vice versa.
+"""
+function Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit) end
+function Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray) end
+
+function Base.:/(simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}, abstractUnit::AbstractUnit)
+    value = simpleQuantity.value
+    unitQuotient = simpleQuantity.unit / abstractUnit
+    return value * unitQuotient
+end
+
+function Base.:/(abstractUnit::AbstractUnit, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
+    value = inv(simpleQuantity.value)
+    unitQuotient = abstractUnit / simpleQuantity.unit
+    return value * unitQuotient
+end

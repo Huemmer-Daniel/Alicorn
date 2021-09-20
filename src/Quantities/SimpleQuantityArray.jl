@@ -118,58 +118,6 @@ function Base.setindex!(sqArray::SimpleQuantityArray, subarray::Union{AbstractAr
 end
 
 ## ## Methods implementing the interface of AbstractQuantityArray
-## 1. Unit conversion
-
-"""
-    inUnitsOf(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
-
-Express `sqArray` in units of `simpleQuantity`.
-"""
-function inUnitsOf(sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
-    targetUnit = simpleQuantity.unit
-    return inUnitsOf(sqArray, targetUnit)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(sqArray::SimpleQuantityArray, abstractUnit::AbstractUnit)
-    value = sqArray.value
-    unit = sqArray.unit
-
-    unitProduct = unit * abstractUnit
-
-    return SimpleQuantityArray(value, unitProduct)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(abstractUnit::AbstractUnit, sqArray::SimpleQuantityArray)
-    value = sqArray.value
-    unit = sqArray.unit
-
-    unitProduct = abstractUnit * unit
-
-    return SimpleQuantityArray(value, unitProduct)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(sqArray::SimpleQuantityArray, abstractUnit::AbstractUnit)
-    value = sqArray.value
-    unit = sqArray.unit
-
-    unitQuotient = unit / abstractUnit
-
-    return SimpleQuantityArray(value, unitQuotient)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(abstractUnit::AbstractUnit, sqArray::SimpleQuantityArray)
-    value = sqArray.value
-    unit = sqArray.unit
-
-    unitQuotient = abstractUnit / unit
-
-    return SimpleQuantityArray(inv(value), unitQuotient)
-end
-
 
 ## 2. Arithmetic unary and binary operators
 

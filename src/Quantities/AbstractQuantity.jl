@@ -12,40 +12,6 @@ abstract type AbstractQuantity{T} end
 # the following functions need to be extended for concrete implementations of
 # AbstractQuantity
 
-## 1. Unit conversion
-
-"""
-    Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
-    Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
-
-Modify the unit of `quantity` by multiplying it with `unit`.
-"""
-function Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
-    subtype = typeof(quantity)
-    error("missing specialization of Base.:*(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
-end
-
-function Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
-    subtype = typeof(quantity)
-    error("missing specialization of Base.:*(::AbstractUnit, ::AbstractQuantity) for subtype $subtype")
-end
-
-"""
-    Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
-    Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)
-
-Modify the unit of `quantity` by dividing it by `unit`, or vice versa.
-"""
-function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
-    subtype = typeof(quantity)
-    error("missing specialization of Base.:/(::AbstractQuantity, ::AbstractUnit) for subtype $subtype")
-end
-
-function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)
-    subtype = typeof(quantity)
-    error("missing specialization of Base.:/(::AbstractUnit, ::AbstractQuantity) for subtype $subtype")
-end
-
 ## 2. Arithmetic unary and binary operators
 
 """

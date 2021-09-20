@@ -125,48 +125,6 @@ end
 
 ## ## Methods implementing the interface of AbstractQuantity
 
-## 1. Unit conversion
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)
-    value = simpleQuantity.value
-    unit = simpleQuantity.unit
-
-    unitProduct = unit * abstractUnit
-
-    return SimpleQuantity(value, unitProduct)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:*(abstractUnit::AbstractUnit, simpleQuantity::SimpleQuantity)
-    value = simpleQuantity.value
-    unit = simpleQuantity.unit
-
-    unitProduct = abstractUnit * unit
-
-    return SimpleQuantity(value, unitProduct)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(simpleQuantity::SimpleQuantity, abstractUnit::AbstractUnit)
-    value = simpleQuantity.value
-    unit = simpleQuantity.unit
-
-    unitQuotient = unit / abstractUnit
-
-    return SimpleQuantity(value, unitQuotient)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.:/(abstractUnit::AbstractUnit, simpleQuantity::SimpleQuantity)
-    value = simpleQuantity.value
-    unit = simpleQuantity.unit
-
-    unitQuotient = abstractUnit / unit
-
-    return SimpleQuantity(1/value, unitQuotient)
-end
-
 ## 2. Arithmetic unary and binary operators
 
 """
