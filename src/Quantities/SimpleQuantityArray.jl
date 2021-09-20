@@ -6,7 +6,7 @@ A physical quantity consisting of a number array and a physical unit.
 
 TODO
 """
-mutable struct SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
+mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
     unit::Unit
 

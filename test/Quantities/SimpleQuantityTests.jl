@@ -25,12 +25,9 @@ function run()
         # 1. Unit conversion
         @test inUnitsOf_implemented()
         test_inUnitsOf_ErrorsForMismatchedUnits()
-        @test inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
-        @test inUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
         @test valueInUnitsOf_implemented()
         test_valueInUnitsOf_ErrorsForMismatchedUnits()
         @test valueInUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
-        @test ValueInUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
         @test inBasicSIUnits_implemented()
         @test valueOfDimensionless_implemented()
         test_valueOfDimensionless_ErrorsIfNotUnitless()
@@ -255,42 +252,6 @@ function test_inUnitsOf_ErrorsForMismatchedUnits()
     @test_throws expectedError inUnitsOf(simpleQuantity, mismatchedUnit)
 end
 
-function inUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
-    examples = _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
-    return TestingTools.testDyadicFunction(inUnitsOf, examples)
-end
-
-function _getExamplesFor_inUnitsOf_forSimpleQuantityAsTargetUnit()
-    electronvoltInBasicSI = ucat.electronvolt.prefactor
-
-    # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
-        ( 7 * ucat.meter, 8.9 * (ucat.milli*ucat.meter), 7000 * (ucat.milli*ucat.meter) ),
-        ( 2 * (ucat.milli * ucat.second)^2, pi * ucat.second^2, 2e-6 * ucat.second^2 ),
-        ( 1 * ucat.joule, -8.0 * ucat.electronvolt, (1/electronvoltInBasicSI) * ucat.electronvolt ),
-        ( 5 * Alicorn.unitlessUnit, -9 * Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit)
-    ]
-end
-
-function inUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
-    examples = _getExamplesFor_inUnitsOf_forSimpleQuantityArrayAsTargetUnit()
-    return TestingTools.testDyadicFunction(inUnitsOf, examples)
-end
-
-function _getExamplesFor_inUnitsOf_forSimpleQuantityArrayAsTargetUnit()
-    electronvoltInBasicSI = ucat.electronvolt.prefactor
-
-    # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, [3] * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
-        ( 7 * ucat.meter, [8.9] * (ucat.milli*ucat.meter), 7000 * (ucat.milli*ucat.meter) ),
-        ( 2 * (ucat.milli * ucat.second)^2, [pi] * ucat.second^2, 2e-6 * ucat.second^2 ),
-        ( 1 * ucat.joule, [-8.0] * ucat.electronvolt, (1/electronvoltInBasicSI) * ucat.electronvolt ),
-        ( 5 * Alicorn.unitlessUnit, [-9] * Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit)
-    ]
-end
-
 function inBasicSIUnits_implemented()
     examples = _getExamplesFor_inBasicSIUnits()
     return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
@@ -358,25 +319,10 @@ end
 function _getExamplesFor_valueInUnitsOf_forSimpleQuantityAsTargetUnit()
     # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
     examples = [
-        ( 1 * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, 1  ),
-        ( 7 * ucat.meter, 8.9 * (ucat.milli*ucat.meter), 7000  ),
-        ( 2 * (ucat.milli * ucat.second)^2, pi * ucat.second^2, 2e-6  ),
-        ( 5 * Alicorn.unitlessUnit, -9 * Alicorn.unitlessUnit, 5 )
-    ]
-end
-
-function ValueInUnitsOf_implemented_forSimpleQuantityArrayAsTargetUnit()
-    examples = _getExamplesFor_valueInUnitsOf_forSimpleQuantityArrayAsTargetUnit()
-    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
-end
-
-function _getExamplesFor_valueInUnitsOf_forSimpleQuantityArrayAsTargetUnit()
-    # format: SimpleQuantity, SimpleQuantityArray, SimpleQuantity expressed in units of SimpleQuantityArray
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, [3] * Alicorn.unitlessUnit, 1  ),
-        ( 7 * ucat.meter, [8.9] * (ucat.milli*ucat.meter), 7000  ),
-        ( 2 * (ucat.milli * ucat.second)^2, [pi] * ucat.second^2, 2e-6  ),
-        ( 5 * Alicorn.unitlessUnit, [-9] * Alicorn.unitlessUnit, 5 )
+        ( 1 * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, 1/3  ),
+        ( 7 * ucat.meter, 2 * (ucat.milli*ucat.meter), 3500  ),
+        ( 2 * (ucat.milli * ucat.second)^2, 2 * ucat.second^2, 1e-6  ),
+        ( 6 * Alicorn.unitlessUnit, -3 * Alicorn.unitlessUnit, -2 )
     ]
 end
 

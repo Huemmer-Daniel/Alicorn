@@ -11,8 +11,6 @@ function run()
         # initialization
         @test canInstanciateQuantityWithRealValue()
         @test canInstanciateQuantityWithComplexValue()
-        @test canInstanciateQuantityWithRealValuedArray()
-        @test canInstanciateQuantityWithComplexValuedArray()
 
         @test fieldsCorrectlyInitialized()
 
@@ -43,20 +41,6 @@ end
 
 function canInstanciateQuantityWithComplexValue()
     value = TestingTools.generateRandomComplex()
-    dimension = TestingTools.generateRandomDimension()
-    internalUnits = TestingTools.generateRandomInternalUnits()
-    return _testInstanciation(value, dimension, internalUnits)
-end
-
-function canInstanciateQuantityWithRealValuedArray()
-    value = TestingTools.generateRandomReal(dim=(2,3))
-    dimension = TestingTools.generateRandomDimension()
-    internalUnits = TestingTools.generateRandomInternalUnits()
-    return _testInstanciation(value, dimension, internalUnits)
-end
-
-function canInstanciateQuantityWithComplexValuedArray()
-    value = TestingTools.generateRandomComplex(dim=(2,3))
     dimension = TestingTools.generateRandomDimension()
     internalUnits = TestingTools.generateRandomInternalUnits()
     return _testInstanciation(value, dimension, internalUnits)

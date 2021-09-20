@@ -4,7 +4,7 @@ export Quantity
 
 A physical quantity consisting of... TODO
 """
-mutable struct Quantity{T} <: AbstractQuantity{T}
+mutable struct Quantity{T<:Number} <: AbstractQuantity{T}
     value::T
     dimension::Dimension
     internalUnits::InternalUnits
@@ -15,8 +15,7 @@ end
 function Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
     dimension = dimensionOf(simpleQuantity)
     internalUnit = _internalUnitForDimension(dimension, internalUnits)
-    unitlessQuantity = inBasicSIUnits(simpleQuantity / internalUnit)
-    internalValue = valueOfDimensionless(unitlessQuantity)
+    internalValue = valueInUnitsOf(simpleQuantity, internalUnit)
     return Quantity(internalValue, dimension, internalUnits)
 end
 
@@ -45,7 +44,6 @@ function Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
     simpleQuantity = 1 * abstractUnit
     return Quantity(simpleQuantity, internalUnits)
 end
-
 
 ## Methods implementing the interface of AbstractQuantity
 

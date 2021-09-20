@@ -58,7 +58,7 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
    2.23606797749979 nm^5e-1
    ```
 """
-mutable struct SimpleQuantity{T} <: AbstractQuantity{T}
+mutable struct SimpleQuantity{T<:Number} <: AbstractQuantity{T}
     value::T
     unit::Unit
 
@@ -211,25 +211,7 @@ true
 """
 function Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
-    return ( simpleQuantity1.value == simpleQuantity2.value )
-end
-
-function _ensureComparedWithSameUnit(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    try
-        simpleQuantity2 = inUnitsOf(simpleQuantity2, simpleQuantity1)
-    catch exception
-        _handleExceptionIn_ensureComparedWithSameUnit(exception)
-    end
-    return simpleQuantity2
-end
-
-function _handleExceptionIn_ensureComparedWithSameUnit(exception)
-    if isa(exception, Exceptions.DimensionMismatchError)
-        newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
-        throw(newException)
-    else
-        rethrow()
-    end
+    return simpleQuantity1.value == simpleQuantity2.value
 end
 
 """
@@ -247,6 +229,24 @@ before the comparison. Note that the conversion often leads to rounding errors.
 function Base.isless(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
     simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
     return isless( simpleQuantity1.value, simpleQuantity2.value )
+end
+
+function _ensureComparedWithSameUnit(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    try
+        simpleQuantity2 = inUnitsOf(simpleQuantity2, simpleQuantity1.unit)
+    catch exception
+        _handleExceptionIn_ensureComparedWithSameUnit(exception)
+    end
+    return simpleQuantity2
+end
+
+function _handleExceptionIn_ensureComparedWithSameUnit(exception)
+    if isa(exception, Exceptions.DimensionMismatchError)
+        newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+        throw(newException)
+    else
+        rethrow()
+    end
 end
 
 # method documented as part of the AbstractQuantity interface
