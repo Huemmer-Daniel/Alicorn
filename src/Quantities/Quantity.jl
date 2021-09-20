@@ -2,7 +2,28 @@ export Quantity
 @doc raw"""
     Quantity{T} <: AbstractQuantity{T}
 
-A physical quantity consisting of... TODO
+A physical quantity consisting of a scalar value, a physical dimension, and a
+set of seven `SimpleQuantity` objects representing the units with respect to
+which the seven basic dimensions of the SI system are measured.
+
+`Quantity` is a parametric type, where `T` is the type of the
+quantity's value. The type `T` needs to be a subtype of `Number`.
+
+# Fields
+- `value::T`: value of the quantity
+- `dimension::Dimension`: physical dimension of the quantity
+- `internalUnits::InternalUnits`: set of units with respect to which the seven
+basic dimensions of the SI system are measured.
+
+# Constructors
+```
+Quantity(value::T, dimension::Dimension, internalUnits::InternalUnits) where T <: Number
+Quantity(value::T, dimension::Dimension) where T <: Number
+Quantity(value::T, internalUnits::InternalUnits) where T <: Number
+Quantity(value::T) where T <: Number
+Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
+Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
+```
 """
 mutable struct Quantity{T<:Number} <: AbstractQuantity{T}
     value::T

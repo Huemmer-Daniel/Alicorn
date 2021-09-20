@@ -256,7 +256,4 @@ function dimensionOf(abstractQuantity::AbstractQuantity)
 end
 
 # documented together with dimensionOf(abstractQuantity::AbstractQuantity)
-function dimensionOf(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    return dimensionOf(unit)
-end
+dimensionOf(simpleQuantity::SimpleQuantity) = dimensionOf(simpleQuantity.unit)

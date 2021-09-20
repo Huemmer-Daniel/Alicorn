@@ -29,58 +29,12 @@ struct InternalUnits
 end
 
 function _verifyArguments(internalUnits::Tuple)
-    _assertQuantitiesAreReals(internalUnits)
-    _assertQuantitiesAreFinite(internalUnits)
-    _assertQuantitiesAreNonzero(internalUnits)
-    _assertQuantitiesHaveCorrectDimension(internalUnits)
-end
-
-function _assertQuantitiesAreReals(internalUnits::Tuple)
-    for quantity in internalUnits
-        _assertQuantityIsReal(quantity)
-    end
-end
-
-function _assertQuantityIsReal(quantity::SimpleQuantity)
-    value = quantity.value
-    if !isa(value, Real)
-        error = Core.DomainError("the values of internal units need to be real numbers")
-        throw(error)
-    end
-end
-
-function _assertQuantitiesAreFinite(internalUnits::Tuple)
-    for quantity in internalUnits
-        _assertQuantityIsFinite(quantity)
-    end
-end
-
-function _assertQuantityIsFinite(quantity::SimpleQuantity)
-    value = quantity.value
-    if !isfinite(value)
-        error = Core.DomainError("the values of internal units need to be finite")
-        throw(error)
-    end
-end
-
-function _assertQuantitiesAreNonzero(internalUnits::Tuple)
-    for quantity in internalUnits
-        _assertQuantityIsNonzero(quantity)
-    end
-end
-
-function _assertQuantityIsNonzero(quantity::SimpleQuantity)
-    value = quantity.value
-    if value == 0
-        error = Core.DomainError("the values of internal units need to be nonzero")
-        throw(error)
-    end
-end
-
-function _assertQuantitiesHaveCorrectDimension(internalUnits::Tuple)
     correctDimensions = _getCorrectDimensions()
     for (internalUnit, correctDimension) in zip(internalUnits, correctDimensions)
-        _assertQuantityHasCorrectDimension(internalUnit, correctDimension)
+        _assertIsReal(internalUnit)
+        _assertIsFinite(internalUnit)
+        _assertIsNonzero(internalUnit)
+        _assertHasCorrectDimension(internalUnit, correctDimension)
     end
 end
 
@@ -97,9 +51,30 @@ function _getCorrectDimensions()
     return correctDimensions
 end
 
-function _assertQuantityHasCorrectDimension(quantity::SimpleQuantity, correctDimension::Dimension)
-    actualDimension = dimensionOf(quantity)
-    if actualDimension != correctDimension
+function _assertIsReal(internalUnit::SimpleQuantity)
+    value = internalUnit.value
+    if !isa(value, Real)
+        error = Core.DomainError("the values of internal units need to be real numbers")
+        throw(error)
+    end
+end
+
+function _assertIsFinite(internalUnit::SimpleQuantity)
+    if !isfinite(internalUnit.value)
+        error = Core.DomainError("the values of internal units need to be finite")
+        throw(error)
+    end
+end
+
+function _assertIsNonzero(internalUnit::SimpleQuantity)
+    if internalUnit.value == 0
+        error = Core.DomainError("the values of internal units need to be nonzero")
+        throw(error)
+    end
+end
+
+function _assertHasCorrectDimension(internalUnit::SimpleQuantity, correctDimension::Dimension)
+    if dimensionOf(internalUnit) != correctDimension
         error = Exceptions.DimensionMismatchError("the specified internal unit has the wrong physical dimension")
         throw(error)
     end

@@ -45,10 +45,10 @@ export SimpleQuantity
 export SimpleQuantityArray
 export SimpleQuantityVector
 export SimpleQuantityMatrix
-export valueOfDimensionless
 export inUnitsOf
-export inBasicSIUnits
 export valueInUnitsOf
+export inBasicSIUnits
+export valueOfDimensionless
 
 export Dimension
 export dimensionOf
@@ -56,6 +56,9 @@ export dimensionOf
 export InternalUnits
 
 export Quantity
+export QuantityArray
+export QuantityVector
+export QuantityMatrix
 
 export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
 

@@ -11,7 +11,7 @@ quantity's value. The type `T` needs to be a subtype of `Number`.
 - `value::T`: value of the quantity
 - `unit::Unit`: unit of the quantity
 
-# Constructor
+# Constructors
 ```
 SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
 SimpleQuantity(value::T) where T <: Number
