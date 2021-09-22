@@ -11,10 +11,7 @@ function run()
         # initialization
         @test canInstanciateQuantityWithRealValue()
         @test canInstanciateQuantityWithComplexValue()
-
-        @test fieldsCorrectlyInitialized()
-
-        @test_skip canInstanciateQuantityFromSimpleQuantity()
+        @test canInstanciateQuantityFromSimpleQuantity()
         @test_skip canInstanciateQuantityFromAbstractUnit()
 
         # arithmetics
@@ -29,13 +26,12 @@ function canInstanciateQuantityWithRealValue()
     return _testInstanciation(value, dimension, internalUnits)
 end
 
-function _testInstanciation(value, dimension, internalUnits)
-    pass = false
-    try
-        Quantity(value, dimension, internalUnits)
-        pass = true
-    catch
-    end
+function _testInstanciation(value::Number, dimension::Dimension, internalUnits::InternalUnits)
+    pass = true
+    quantity = Quantity(value, dimension, internalUnits)
+    pass &= quantity.value == value
+    pass &= quantity.dimension == dimension
+    pass &= quantity.internalUnits == internalUnits
     return pass
 end
 
@@ -46,24 +42,11 @@ function canInstanciateQuantityWithComplexValue()
     return _testInstanciation(value, dimension, internalUnits)
 end
 
-function fieldsCorrectlyInitialized()
-    (randomQuantity, randomQuantityFields) = TestingTools.generateRandomQuantityWithFields()
-    return _verifyHasCorrectFields(randomQuantity, randomQuantityFields)
-end
-
-function _verifyHasCorrectFields(quantity::Quantity, randomFields::Dict{String,Any})
-    correctValue = (quantity.value == randomFields["value"])
-    correctDimension = (quantity.dimension == randomFields["dimension"])
-    correctInternalUnits = (quantity.internalUnits == randomFields["internalUnits"])
-    correct = correctValue && correctDimension && correctInternalUnits
-    return correct
-end
-
 function canInstanciateQuantityFromSimpleQuantity()
-    simpleQuantity = 7 * Alicorn.meter
-    intU = InternalUnits(length = 2 * Alicorn.meter )
+    simpleQuantity = 7 * ucat.meter
+    intU = InternalUnits(length = 2 * ucat.meter )
     returnedQuantity = Quantity(simpleQuantity, intU)
-    correctQuantity = Quantity(3.5, Dimension(L=2), intU)
+    correctQuantity = Quantity(3.5, Dimension(L=1), intU)
     correct = (returnedQuantity == correctQuantity)
     return correct
 end
@@ -103,19 +86,19 @@ function _getExamplesFor_equality()
     internalUnits1 = TestingTools.generateRandomInternalUnits()
     internalUnits2 = TestingTools.generateRandomInternalUnits()
 
-    randomQuantity1 = Quantity(value, dimension, internalUnits1)
-    randomQuantity1Copy = deepcopy(randomQuantity1)
+    q1 = Quantity(value, dimension, internalUnits1)
+    q1Copy = deepcopy(q1)
 
-    randomQuantity2 = Quantity(value, 2*dimension, internalUnits1)
-    randomQuantity3 = Quantity(2*value, dimension, internalUnits1)
-    randomQuantity4 = Quantity(value, dimension, internalUnits2)
+    q2 = Quantity(value, 2*dimension, internalUnits1)
+    q3 = Quantity(2*value, dimension, internalUnits1)
+    q4 = Quantity(value, dimension, internalUnits2)
 
     # format: quantity1, quantity2, correct result for quantity1 == quantity2
     examples = [
-        ( randomQuantity1, randomQuantity1Copy, true ),
-        # ( randomQuantity1, randomQuantity2, false ),
-        # ( randomQuantity1, randomQuantity3, false ),
-        # ( randomQuantity1, randomQuantity4, false )
+        ( q1, q1Copy, true ),
+        ( q1, q2, false ),
+        ( q1, q3, false ),
+        ( q1, q4, false )
     ]
     return examples
 end

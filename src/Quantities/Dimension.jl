@@ -235,7 +235,7 @@ function dimensionOf(baseUnit::BaseUnit)
 end
 
 @doc raw"""
-    dimensionOf(abstractQuantity::AbstractQuantity)
+    dimensionOf(quantity::AbstractQuantity)
 
 Returns the dimension of a physical quantity of type [`AbstractQuantity`](@ref).
 
@@ -250,10 +250,21 @@ julia> dimensionOf(oneHenry)
 Dimension M^1 L^2 T^-2 I^-2 θ^0 N^0 J^0
 ```
 """
-function dimensionOf(abstractQuantity::AbstractQuantity)
-    simpleQuantity = inBasicSIUnits(abstractQuantity)
-    return dimensionOf(simpleQuantity)
-end
+function dimensionOf(abstractQuantity::AbstractQuantity) end
 
-# documented together with dimensionOf(abstractQuantity::AbstractQuantity)
 dimensionOf(simpleQuantity::SimpleQuantity) = dimensionOf(simpleQuantity.unit)
+
+dimensionOf(quantity::Quantity) = quantity.dimension
+
+@doc raw"""
+    dimensionOf(quantityArray::AbstractQuantityArray)
+
+Returns the dimension of a physical quantity of type [`AbstractQuantityArray`](@ref),
+analogous to [`dimensionOf(::AbstractQuantity)`](@ref)
+```
+"""
+function dimensionOf(quantityArray::AbstractQuantityArray) end
+
+dimensionOf(sqArray::SimpleQuantityArray) = dimensionOf(sqArray.unit)
+
+dimensionOf(qArray::QuantityArray) = qArray.dimension

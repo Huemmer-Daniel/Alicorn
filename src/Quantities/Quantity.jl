@@ -18,9 +18,6 @@ basic dimensions of the SI system are measured.
 # Constructors
 ```
 Quantity(value::T, dimension::Dimension, internalUnits::InternalUnits) where T <: Number
-Quantity(value::T, dimension::Dimension) where T <: Number
-Quantity(value::T, internalUnits::InternalUnits) where T <: Number
-Quantity(value::T) where T <: Number
 Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
 Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
 ```
@@ -40,6 +37,7 @@ function Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
     return Quantity(internalValue, dimension, internalUnits)
 end
 
+# TODO: turn into exported function in InternalUnits
 function _internalUnitForDimension(dimension, internalUnits)
     Mexp = dimension.massExponent
     Lexp = dimension.lengthExponent
@@ -75,9 +73,6 @@ Compare two `Quantity` objects.
 
 The two quantities are equal if their values, their dimensions, and their internal units are equal.
 Note that the units are not converted during the comparison.
-
-# Examples
-TODO
 """
 function Base.:(==)(quantity1::Quantity, quantity2::Quantity)
     valuesEqual = ( quantity1.value == quantity2.value )

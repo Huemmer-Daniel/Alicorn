@@ -257,10 +257,10 @@ Returns `true` if `qArray1` and `qArray2` are of equal value.
 
 The behavior of the comparison depends on the concrete subtype of `AbstractQuantityArray`.
 """
-function Base.:(==)(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
-    subtype = typeof(qArray1)
-    error("missing specialization of Base.:==(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype $subtype")
-end
+# function Base.:(==)(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray)
+#     subtype = typeof(qArray1)
+#     error("missing specialization of Base.:==(::AbstractQuantityArray, ::AbstractQuantityArray) for subtype $subtype")
+# end
 
 """
     Base.isapprox(qArray1::AbstractQuantityArray, qArray2::AbstractQuantityArray; rtol::Real = sqrt(eps()) )
