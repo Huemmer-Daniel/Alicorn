@@ -1,7 +1,8 @@
 module Quantities
 
-using ..Units
 using ..Exceptions
+using ..Units
+using ..Dimensions
 
 include("AbstractQuantity.jl")
 include("AbstractQuantityArray.jl")
@@ -9,7 +10,6 @@ include("AbstractQuantityArray.jl")
 include("SimpleQuantity.jl")
 include("SimpleQuantityArray.jl")
 
-include("Dimension.jl")
 include("InternalUnits.jl")
 include("Quantity.jl")
 include("QuantityArray.jl")
@@ -20,8 +20,8 @@ VectorQuantity{T} = Union{Vector{T}, AbstractQuantityArray{T, 1}} where T<:Numbe
 MatrixQuantity{T} = Union{Matrix{T}, AbstractQuantityArray{T, 2}} where T<:Number
 ArrayQuantity{T} = Union{Array{T}, AbstractQuantityArray{T}} where T<:Number
 
-include("unitConversion.jl")
-include("arithmetics.jl")
+include("quantity_dimensions.jl")
+include("quantity_unitConversion.jl")
+include("quantity_arithmetics.jl")
 
-
-end
+end # module

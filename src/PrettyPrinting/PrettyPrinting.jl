@@ -2,6 +2,7 @@ module PrettyPrinting
 
 using ..Utils
 using ..Units
+using ..Dimensions
 using ..Quantities
 
 function _addStringWithWhitespace(string, addString)

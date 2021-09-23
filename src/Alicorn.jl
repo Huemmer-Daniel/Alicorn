@@ -34,6 +34,11 @@ export add!
 
 export inv
 
+include("Dimensions/Dimensions.jl")
+using .Dimensions
+
+export Dimension
+
 include("Quantities/Quantities.jl")
 using .Quantities
 
@@ -50,7 +55,6 @@ export valueInUnitsOf
 export inBasicSIUnits
 export valueOfDimensionless
 
-export Dimension
 export dimensionOf
 
 export InternalUnits

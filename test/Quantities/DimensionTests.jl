@@ -18,7 +18,10 @@ function run()
         @test addition_implemented()
 
         @test dimensionOf_implementedForUnits()
-        @test dimensionOf_implementedForQuantities()
+        @test dimensionOf_implementedForSimpleQuantity()
+        @test_skip dimensionOf_implementedForQuantityArray()
+        @test_skip dimensionOf_implementedForQuantity()
+        @test_skip dimensionOf_implementedForQuantityArray()
     end
 end
 
@@ -199,8 +202,8 @@ function _getExamplesFor_dimensionOf_forUnits()
     return examples
 end
 
-function dimensionOf_implementedForQuantities()
-    examples = _getExamplesFor_dimensionOf_forQuantities()
+function dimensionOf_implementedForSimpleQuantity()
+    examples = _getExamplesFor_dimensionOf_forSimpleQuantity()
     return TestingTools.testMonadicFunction(dimensionOf, examples)
 end
 
@@ -213,7 +216,7 @@ function Alicorn.Quantities.inBasicSIUnits(mockQuantity::MockQuantityForDimensio
     return 1 * mockUnit
 end
 
-function _getExamplesFor_dimensionOf_forQuantities()
+function _getExamplesFor_dimensionOf_forSimpleQuantity()
     ucat = UnitCatalogue()
 
     # format: object of type AbstractQuantity, corresponding Dimension

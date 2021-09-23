@@ -12,7 +12,7 @@ function run()
         @test canInstanciateQuantityWithRealValue()
         @test canInstanciateQuantityWithComplexValue()
         @test canInstanciateQuantityFromSimpleQuantity()
-        @test_skip canInstanciateQuantityFromAbstractUnit()
+        @test canInstanciateQuantityFromAbstractUnit()
 
         # arithmetics
         @test equality_implemented()
