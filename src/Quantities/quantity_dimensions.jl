@@ -1,5 +1,3 @@
-
-export dimensionOf
 @doc raw"""
     dimensionOf(abstractUnit::AbstractUnit)
 
@@ -21,7 +19,6 @@ function dimensionOf(abstractUnit::AbstractUnit)
     return dimensionOf(unit)
 end
 
-# documented together with dimensionOf(abstractUnit::AbstractUnit)
 function dimensionOf(unit::Unit)
     unitFactors = unit.unitFactors
 
@@ -30,7 +27,6 @@ function dimensionOf(unit::Unit)
     return dimension
 end
 
-# documented together with dimensionOf(abstractUnit::AbstractUnit)
 function dimensionOf(unitFactor::UnitFactor)
     baseUnit = unitFactor.baseUnit
     exponent = unitFactor.exponent
@@ -40,7 +36,6 @@ function dimensionOf(unitFactor::UnitFactor)
     return dimension
 end
 
-# documented together with dimensionOf(abstractUnit::AbstractUnit)
 function dimensionOf(baseUnit::BaseUnit)
     baseUnitExps = baseUnit.exponents
 

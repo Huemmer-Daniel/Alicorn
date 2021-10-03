@@ -42,29 +42,13 @@ export Dimension
 include("Quantities/Quantities.jl")
 using .Quantities
 
-export AbstractQuantity
-export AbstractQuantityArray
-export AbstractQuantityVector
-export AbstractQuantityMatrix
-export SimpleQuantity
-export SimpleQuantityArray
-export SimpleQuantityVector
-export SimpleQuantityMatrix
-export inUnitsOf
-export valueInUnitsOf
-export inBasicSIUnits
-export valueOfDimensionless
-
-export dimensionOf
-
-export InternalUnits
-
-export Quantity
-export QuantityArray
-export QuantityVector
-export QuantityMatrix
-
+export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector, AbstractQuantityMatrix
 export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
+export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix
+export InternalUnits, internalUnitForDimension
+export Quantity, QuantityArray, QuantityVector, QuantityMatrix
+export dimensionOf
+export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless
 
 include("PrettyPrinting/PrettyPrinting.jl")
 

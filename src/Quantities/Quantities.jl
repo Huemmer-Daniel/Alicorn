@@ -6,22 +6,24 @@ using ..Dimensions
 
 include("AbstractQuantity.jl")
 include("AbstractQuantityArray.jl")
+export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector, AbstractQuantityMatrix
+export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
 
 include("SimpleQuantity.jl")
 include("SimpleQuantityArray.jl")
+export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix
 
 include("InternalUnits.jl")
+export InternalUnits, internalUnitForDimension
+
 include("Quantity.jl")
 include("QuantityArray.jl")
-
-export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
-ScalarQuantity{T} = Union{T, AbstractQuantity{T}} where T<:Number
-VectorQuantity{T} = Union{Vector{T}, AbstractQuantityArray{T, 1}} where T<:Number
-MatrixQuantity{T} = Union{Matrix{T}, AbstractQuantityArray{T, 2}} where T<:Number
-ArrayQuantity{T} = Union{Array{T}, AbstractQuantityArray{T}} where T<:Number
+export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 
 include("quantity_dimensions.jl")
+export dimensionOf
 include("quantity_unitConversion.jl")
+export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless
 include("quantity_arithmetics.jl")
 
 end # module

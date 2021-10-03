@@ -1,11 +1,10 @@
-export SimpleQuantity
 @doc raw"""
-    SimpleQuantity{T} <: AbstractQuantity{T}
+    SimpleQuantity{T<:Number} <: AbstractQuantity{T}
 
 A physical quantity consisting of a scalar value and a physical unit.
 
-`SimpleQuantity` is a parametric type, where `T` is the type of the
-quantity's value. The type `T` needs to be a subtype of `Number`.
+The value field of a `SimpleQuantity{T}` is of type `T`, which needs to be a
+subtype of `Number`.
 
 # Fields
 - `value::T`: value of the quantity
@@ -16,6 +15,7 @@ quantity's value. The type `T` needs to be a subtype of `Number`.
 SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
 SimpleQuantity(value::T) where T <: Number
 SimpleQuantity(abstractUnit::AbstractUnit)
+SimpleQuantity(simpleQuantity::SimpleQuantity)
 ```
 
 If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is used by default. If no value is passed to the constructor, the value is set to 1 by default.
@@ -41,21 +41,6 @@ If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is
 
    julia> quantity = 7nm
    7 nm
-   ```
-3. The value can be of any numerical type `T <: Number`. Any mathematical operation included in the
-   interface of [`AbstractQuantity`](@ref) is applied to the value field, and
-   the unit is modified accordingly.
-   ```jldoctest
-   julia> ucat = UnitCatalogue() ;
-
-   julia> nm = ucat.nano * ucat.meter
-   UnitFactor nm
-
-   julia> quantity = 5nm
-   5 nm
-
-   julia> sqrt(quantity)
-   2.23606797749979 nm^5e-1
    ```
 """
 mutable struct SimpleQuantity{T<:Number} <: AbstractQuantity{T}

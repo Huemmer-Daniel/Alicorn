@@ -1,13 +1,12 @@
-export Quantity
 @doc raw"""
-    Quantity{T} <: AbstractQuantity{T}
+    Quantity{T<:Number} <: AbstractQuantity{T}
 
-A physical quantity consisting of a scalar value, a physical dimension, and a
-set of seven `SimpleQuantity` objects representing the units with respect to
-which the seven basic dimensions of the SI system are measured.
+A physical quantity consisting of a number, a `Dimension` object representing
+the physical dimension, and an `InternalUnits` object representing the units
+with respect to which the seven basic dimensions of the SI system are measured.
 
-`Quantity` is a parametric type, where `T` is the type of the
-quantity's value. The type `T` needs to be a subtype of `Number`.
+The value field of a `Quantity{T}` is of type `T`, which needs to be a subtype
+of `Number`.
 
 # Fields
 - `value::T`: value of the quantity
@@ -19,7 +18,6 @@ basic dimensions of the SI system are measured.
 ```
 Quantity(value::T, dimension::Dimension, internalUnits::InternalUnits) where T <: Number
 Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
-Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
 ```
 """
 mutable struct Quantity{T<:Number} <: AbstractQuantity{T}
@@ -32,37 +30,16 @@ end
 
 function Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
     dimension = dimensionOf(simpleQuantity)
-    internalUnit = _internalUnitForDimension(dimension, internalUnits)
+    internalUnit = internalUnitForDimension(dimension, internalUnits)
     internalValue = valueInUnitsOf(simpleQuantity, internalUnit)
     return Quantity(internalValue, dimension, internalUnits)
-end
-
-# TODO: turn into exported function in InternalUnits
-function _internalUnitForDimension(dimension, internalUnits)
-    Mexp = dimension.massExponent
-    Lexp = dimension.lengthExponent
-    Texp = dimension.timeExponent
-    Iexp = dimension.currentExponent
-    Θexp = dimension.temperatureExponent
-    Nexp = dimension.amountExponent
-    Jexp = dimension.luminousIntensityExponent
-
-    Munit = internalUnits.mass
-    Lunit = internalUnits.length
-    Tunit = internalUnits.time
-    Iunit = internalUnits.current
-    θunit = internalUnits.temperature
-    Nunit = internalUnits.amount
-    Junit = internalUnits.luminousIntensity
-
-    internalUnit = Munit^Mexp * Lunit^Lexp * Tunit^Texp * Iunit^Iexp * θunit^Θexp * Nunit^Nexp * Junit^Jexp
-    return internalUnit
 end
 
 function Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
     simpleQuantity = 1 * abstractUnit
     return Quantity(simpleQuantity, internalUnits)
 end
+
 
 ## Methods implementing the interface of AbstractQuantity
 

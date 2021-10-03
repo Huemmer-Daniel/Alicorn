@@ -1,10 +1,9 @@
-export QuantityArray
 @doc raw"""
-    QuantityArray{T,N} <: AbstractQuantity{T,N}
+    QuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
 
-A physical quantity consisting of an array, a `Dimension` representing the
-physical dimension, and an `InternalUnits` object representing the units with
-respect to which the seven basic dimensions of the SI system are measured.
+A physical quantity consisting of an array, a `Dimension` object representing
+the physical dimension, and an `InternalUnits` object representing the units
+with respect to which the seven basic dimensions of the SI system are measured.
 
 The value field of a `QuantityArray{T,N}` is of type `Array{T,N}`. `T` needs to
 be a subtype of `Number`.
@@ -17,26 +16,30 @@ basic dimensions of the SI system are measured.
 
 # Constructors
 ```
-QuantityArray(value::Array{T,N}, dimension::Dimension, internalUnits::InternalUnits)
+QuantityArray(value::AbstractArray{T,N}, dimension::Dimension, internalUnits::InternalUnits)
 QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnits)
 """
 mutable struct QuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
     dimension::Dimension
     internalUnits::InternalUnits
+
+    function QuantityArray(value::AbstractArray{T,N}, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number, N}
+        value = Array(value)
+        qArray = new{T,N}(value, dimension, internalUnits)
+        return qArray
+    end
 end
 
-export QuantityVector
 QuantityVector{T} = QuantityArray{T,1}
 
-export QuantityMatrix
 QuantityMatrix{T} = QuantityArray{T,2}
 
 ## External constructors
 
 function QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnits)
     dimension = dimensionOf(sqArray)
-    internalUnit = _internalUnitForDimension(dimension, internalUnits)
+    internalUnit = internalUnitForDimension(dimension, internalUnits)
     internalValue = valueInUnitsOf(sqArray, internalUnit)
     return QuantityArray(internalValue, dimension, internalUnits)
 end

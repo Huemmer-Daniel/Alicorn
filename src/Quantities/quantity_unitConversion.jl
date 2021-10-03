@@ -1,5 +1,4 @@
 ## inUnitsOf
-export inUnitsOf
 """
     inUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit)::SimpleQuantity
 
@@ -68,7 +67,6 @@ end
 
 
 ## valueInUnitsOf
-export valueInUnitsOf
 """
     valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit)
 
@@ -118,7 +116,6 @@ The result is equivalent to `valueOfDimensionless(quantityArray / simpleQuantity
 valueInUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::SimpleQuantity) = valueOfDimensionless(quantityArray / simpleQuantity)
 
 ## inBasicSIUnits
-export inBasicSIUnits
 """
     inBasicSIUnits(quantity::AbstractQuantity)::SimpleQuantity
 
@@ -157,7 +154,6 @@ end
 
 
 ## valueOfDimensionless
-export valueOfDimensionless
 """
     valueOfDimensionless(quantity::AbstractQuantity)
 

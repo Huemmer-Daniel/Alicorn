@@ -3,7 +3,6 @@ module PrettyPrintingTests
 using Alicorn
 using Test
 using ..TestingTools
-using ..UnitsTests
 
 function run()
     @testset "PrettyPrinting" begin
@@ -16,7 +15,7 @@ function run()
         @test unitPrettyPrinting()
 
         @test simpleQuantityPrettyPrinting()
-        @test_skip simpleQuantityArrayPrettyPrinting()
+        @test simpleQuantityArrayPrettyPrinting()
         @test dimensionPrettyPrinting()
         @test InternalUnits_PrettyPrinting()
     end
@@ -223,13 +222,21 @@ function _getSimpleQuantityArrayExamples()
     ucat = UnitCatalogue()
     unit = (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2)
 
-    array1 = [1 2; 3.4 5]
+    array1 = [1, 2]
+    array2 = [1.0 2]
+    array3 = [1 2; 3.4 5]
+    array4 = zeros(1,2,2)
 
     examples = [
-        # integer
-        ( SimpleQuantityArray( array1, unit ),
-        """2×2 Alicorn.Quantities.SimpleQuantityArray{Float64, 2} of unit kg^3.1 TH^-2:\n 1.0  2.0\n 3.4  5.0""")
-    ]
+        ( array1 * unit,
+        """2-element Alicorn.Quantities.SimpleQuantityVector{Int64} of unit kg^3.1 TH^-2:\n 1\n 2"""),
+        ( array2 * unit,
+        """1×2 Alicorn.Quantities.SimpleQuantityMatrix{Float64} of unit kg^3.1 TH^-2:\n 1.0  2.0"""),
+        ( array3 * unit,
+        """2×2 Alicorn.Quantities.SimpleQuantityMatrix{Float64} of unit kg^3.1 TH^-2:\n 1.0  2.0\n 3.4  5.0"""),
+        ( array4 * unit,
+        """1×2×2 Alicorn.Quantities.SimpleQuantityArray{Float64, 3} of unit kg^3.1 TH^-2:\n[:, :, 1] =\n 0.0  0.0\n\n[:, :, 2] =\n 0.0  0.0""")
+        ]
 end
 
 ## Dimension

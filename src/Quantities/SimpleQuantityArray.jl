@@ -1,10 +1,21 @@
-export SimpleQuantityArray
 @doc raw"""
-    SimpleQuantityArray{T,N} <: AbstractQuantityArray{T,N}
+    SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
 
 A physical quantity consisting of a number array and a physical unit.
 
-TODO
+The value field of a `SimpleQuantityArray{T,N}` is of type `Array{T,N}`. `T`
+needs to be a subtype of `Number`.
+
+# Fields
+- `value::Array{T,N}`: value of the quantity
+- `unit::Unit`: unit of the quantity
+
+# Constructors
+```
+SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+SimpleQuantityArray(value::AbstractArray{T,N}) where {T<:Number, N}
+SimpleQuantityArray(simpleQuantity::SimpleQuantity)
+SimpleQuantityArray(sqArray::SimpleQuantityArray)
 """
 mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
@@ -18,10 +29,8 @@ mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     end
 end
 
-export SimpleQuantityVector
 SimpleQuantityVector{T} = SimpleQuantityArray{T,1}
 
-export SimpleQuantityMatrix
 SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
 
 ## ## External constructors
@@ -53,7 +62,7 @@ Combine the array `value` and `abstractUnit` to form a physical quantity of type
 julia> ucat = UnitCatalogue() ;
 
 julia> [3.5, 4.6] * ucat.tesla
-2-element SimpleQuantityArray{Float64, 1} of unit T:
+2-element SimpleQuantityVector{Float64} of unit T:
  3.5
  4.6
 ```
@@ -72,7 +81,7 @@ Combine the array `value` and `abstractUnit` to form a physical quantity of type
 julia> ucat = UnitCatalogue() ;
 
 julia> [3.5, 4.6] / ucat.second
-2-element SimpleQuantityArray{Float64, 1} of unit s^-1:
+2-element SimpleQuantityVector{Float64} of unit s^-1:
  3.5
  4.6
 ```
@@ -116,6 +125,8 @@ function Base.setindex!(sqArray::SimpleQuantityArray, subarray::Union{AbstractAr
     end
     return sqArray
 end
+
+# TODO below
 
 ## ## Methods implementing the interface of AbstractQuantityArray
 
