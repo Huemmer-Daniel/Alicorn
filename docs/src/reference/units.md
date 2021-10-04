@@ -119,6 +119,7 @@ Base.:*(::UnitPrefix, ::AbstractUnit)
 Base.inv(::AbstractUnit)
 Base.:^(::AbstractUnit, ::Real)
 Base.:sqrt(::AbstractUnit)
+Base.:cbrt(::AbstractUnit)
 convertToBasicSI(::AbstractUnit)
 Alicorn.convertToBasicSIAsExponents(::AbstractUnit)
 ```
@@ -148,6 +149,7 @@ Base.:*(::UnitPrefix, ::BaseUnit)
 Base.inv(::BaseUnit)
 Base.:^(::BaseUnit, ::Real)
 Base.sqrt(::BaseUnit)
+Base.cbrt(::BaseUnit)
 ```
 
 #### Constants of type BaseUnit
@@ -184,6 +186,7 @@ Base.:*(::UnitPrefix, ::UnitFactor)
 Base.inv(::UnitFactor)
 Base.:^(::UnitFactor, ::Real)
 Base.sqrt(::UnitFactor)
+Base.cbrt(::UnitFactor)
 ```
 
 #### Constants of type UnitFactor
@@ -208,6 +211,7 @@ Base.:*(::UnitPrefix, ::Unit)
 Base.inv(::Unit)
 Base.:^(unit::Unit, exponent::Real)
 Base.sqrt(::Unit)
+Base.cbrt(::Unit)
 ```
 
 #### Constants of type Unit

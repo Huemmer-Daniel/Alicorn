@@ -16,55 +16,75 @@ Unless stated otherwise, all types, functions, and constants defined in the subm
 Pages = ["quantities.md"]
 ```
 
-## Abstract Supertypes
+#### Quantities
 
 ```@docs
 AbstractQuantity
+SimpleQuantity
+Quantity
 ```
 
-#### Interface of AbstractQuantity
+```@docs
+Base.:*(::Number, ::AbstractUnit)
+Base.:/(::Number, ::AbstractUnit)
+```
 
-The following functions are considered part of the interface of `AbstractQuantity` and need to be extended for all concrete subtypes of `AbstractQuantity`:
+## Unit conversion
 
 ```@docs
-Base.:(==)(::AbstractQuantity, ::AbstractQuantity)
 inUnitsOf(::AbstractQuantity, ::AbstractUnit)
 inBasicSIUnits(::AbstractQuantity)
-Base.:*(::AbstractQuantity, ::Any)
-Base.:*(::AbstractQuantity, ::AbstractUnit)
-Base.:/(::AbstractQuantity, ::Any)
-Base.:/(::AbstractQuantity, ::AbstractUnit)
-Base.:+(::AbstractQuantity, ::AbstractQuantity)
-Base.:-(::AbstractQuantity, ::AbstractQuantity)
-Base.:*(::AbstractQuantity, ::AbstractQuantity)
-Base.:/(::AbstractQuantity, ::AbstractQuantity)
-Base.inv(::AbstractQuantity)
-Base.:^(::AbstractQuantity, ::Real)
-Base.sqrt(::AbstractQuantity)
-Base.transpose(::AbstractQuantity)
-Base.length(::AbstractQuantity)
-Base.size(::AbstractQuantity)
-Base.getindex(::AbstractQuantity, key...)
-Base.setindex!(::AbstractQuantity{A}, ::AbstractQuantity, key...) where A <: AbstractArray
+valueInUnitsOf(::AbstractQuantity, ::AbstractUnit)
+valueInUnitsOf(::AbstractQuantity, ::SimpleQuantity)
+valueOfDimensionless(::AbstractQuantity)
 ```
 
-## SimpleQuantity
+```@docs
+Base.:*(::AbstractQuantity, ::AbstractUnit)
+Base.:/(::AbstractQuantity, ::AbstractUnit)
+```
 
 ```@docs
-SimpleQuantity
 valueOfDimensionless(::SimpleQuantity)
 Base.:(==)(::SimpleQuantity, ::SimpleQuantity)
-Base.:*(::Any, ::AbstractUnit)
-Base.:/(::Any, ::AbstractUnit)
+Base.:(==)(::Quantity, ::Quantity)
+Base.:+(::SimpleQuantity, ::SimpleQuantity)
+Base.:-(::SimpleQuantity, ::SimpleQuantity)
+Base.isless(::SimpleQuantity, ::SimpleQuantity)
+Base.isapprox(::SimpleQuantity, ::SimpleQuantity)
+Base.zero(::Type, ::AbstractUnit)
 ```
-## Dimension
+
+#### Quantity Arrays
 
 ```@docs
-Dimension
-Base.:*(::Number, ::Dimension)
-Base.:+(::Dimension, ::Dimension)
-dimensionOf(::AbstractUnit)
-dimensionOf(::AbstractQuantity)
+AbstractQuantityArray
+SimpleQuantityArray
+QuantityArray
+```
+
+```@docs
+Base.:*(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}
+Base.:/(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}
+```
+
+## Unit conversion
+```@docs
+inUnitsOf(::AbstractQuantityArray, ::AbstractUnit)
+inBasicSIUnits(::AbstractQuantityArray)
+valueInUnitsOf(::AbstractQuantityArray, ::AbstractUnit)
+valueInUnitsOf(::AbstractQuantityArray, ::SimpleQuantity)
+valueOfDimensionless(::AbstractQuantityArray)
+Base.:*(::AbstractQuantityArray, ::AbstractUnit)
+Base.:/(::AbstractQuantityArray, ::AbstractUnit)
+```
+
+```@docs
+Base.:(==)(::SimpleQuantityArray, ::SimpleQuantityArray)
+Base.:(==)(::QuantityArray, ::QuantityArray)
+Base.isapprox(::SimpleQuantityArray, ::SimpleQuantityArray)
+Base.:+(::SimpleQuantityArray, ::SimpleQuantityArray)
+Base.:-(::SimpleQuantityArray, ::SimpleQuantityArray)
 ```
 
 ## InternalUnits
@@ -72,13 +92,7 @@ dimensionOf(::AbstractQuantity)
 ```@docs
 InternalUnits
 Base.:(==)(::InternalUnits, ::InternalUnits)
-```
-
-## Quantity
-
-```@docs
-Quantity
-Base.:(==)(::Quantity, ::Quantity)
+internalUnitForDimension(::Dimension, ::InternalUnits)
 ```
 
 ```@meta

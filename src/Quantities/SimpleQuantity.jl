@@ -440,3 +440,8 @@ function Base.getindex(simpleQuantity::SimpleQuantity, index...)
     value = getindex(simpleQuantity.value, index...)
     return SimpleQuantity(value, unit)
 end
+
+# TODO below
+
+Base.copy(simpleQuantity::SimpleQuantity) = SimpleQuantity(copy(simpleQuantity.value), simpleQuantity.unit)
+Base.deepcopy(simpleQuantity::SimpleQuantity) = SimpleQuantity(deepcopy(simpleQuantity.value), simpleQuantity.unit)

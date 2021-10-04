@@ -316,6 +316,11 @@ Base.circshift(sqArray::SimpleQuantityArray, shifts::Real) = circshift(sqArray.v
 Base.circshift(sqArray::SimpleQuantityArray, shifts::Base.DimsInteger) = circshift(sqArray.value, shifts) * sqArray.unit
 Base.circshift(sqArray::SimpleQuantityArray, shifts) = circshift(sqArray.value, shifts) * sqArray.unit
 
+Base.deleteat!(sqArray::SimpleQuantityArray, inds) = deleteat!(sqArray.value, inds)
+
+Base.copy(sqArray::SimpleQuantityArray) = SimpleQuantityArray(copy(sqArray.value), sqArray.unit)
+Base.deepcopy(sqArray::SimpleQuantityArray) = SimpleQuantityArray(deepcopy(sqArray.value), sqArray.unit)
+
 ## ## Broadcasting
 
 # Broadcasting style
