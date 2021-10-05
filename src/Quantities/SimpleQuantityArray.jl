@@ -29,9 +29,24 @@ mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     end
 end
 
-SimpleQuantityVector{T} = SimpleQuantityArray{T,1}
+"""
+    SimpleQuantityVector{T}
 
-SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
+One-dimensional array-valued simple quantity with elements of type `T`.
+
+Alias for `SimpleQuantityArray{T,1}`.
+"""
+const SimpleQuantityVector{T} = SimpleQuantityArray{T,1}
+
+"""
+    SimpleQuantityMatrix{T}
+
+Two-dimensional array-valued simple quantity with elements of type `T`.
+
+Alias for `SimpleQuantityArray{T,2}`.
+"""
+const SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
+
 
 ## ## External constructors
 
@@ -401,6 +416,8 @@ end
 inferTargetUnit(::typeof(real), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
 inferTargetUnit(::typeof(imag), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
+
+inferTargetUnit(::typeof(isless), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple{<:AbstractUnit, <:Any}) = unitlessUnit
 
 # broadcastable operations on SimpleQuantityArrays that require eager evaluation
 

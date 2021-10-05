@@ -31,9 +31,23 @@ mutable struct QuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     end
 end
 
-QuantityVector{T} = QuantityArray{T,1}
+"""
+    QuantityVector{T}
 
-QuantityMatrix{T} = QuantityArray{T,2}
+One-dimensional array-valued quantity with elements of type `T`.
+
+Alias for `QuantityArray{T,1}`.
+"""
+const QuantityVector{T} = QuantityArray{T,1}
+
+"""
+    QuantityMatrix{T}
+
+Two-dimensional array-valued quantity with elements of type `T`.
+
+Alias for `QuantityArray{T,2}`.
+"""
+const QuantityMatrix{T} = QuantityArray{T,2}
 
 ## External constructors
 

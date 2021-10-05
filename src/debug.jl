@@ -1,5 +1,7 @@
 using Alicorn
+ucat = UnitCatalogue()
 
-ucat = UnitCatalogue() ;
-a = [3.5, 4.6] * ucat.tesla ;
-copy(a)
+A = [1, 2] * ucat.meter
+b = 1.5 * ucat.meter
+
+A .< b

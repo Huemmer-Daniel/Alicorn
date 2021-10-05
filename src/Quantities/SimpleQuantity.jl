@@ -3,9 +3,6 @@
 
 A physical quantity consisting of a scalar value and a physical unit.
 
-The value field of a `SimpleQuantity{T}` is of type `T`, which needs to be a
-subtype of `Number`.
-
 # Fields
 - `value::T`: value of the quantity
 - `unit::Unit`: unit of the quantity
@@ -55,6 +52,18 @@ mutable struct SimpleQuantity{T<:Number} <: AbstractQuantity{T}
 end
 
 ## ## External constructors
+
+# TODO: missing documentation
+function SimpleQuantity{T}(value, abstractUnit::AbstractUnit) where T
+    value = convert(T, value)
+    return SimpleQuantity(value, abstractUnit)
+end
+
+# TODO: missing documentation
+function SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where T
+    value = convert(T, simpleQuantity.value)
+    return SimpleQuantity(value, simpleQuantity.unit)
+end
 
 function SimpleQuantity(value::T) where T <: Number
     unit = unitlessUnit
@@ -445,3 +454,5 @@ end
 
 Base.copy(simpleQuantity::SimpleQuantity) = SimpleQuantity(copy(simpleQuantity.value), simpleQuantity.unit)
 Base.deepcopy(simpleQuantity::SimpleQuantity) = SimpleQuantity(deepcopy(simpleQuantity.value), simpleQuantity.unit)
+
+Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where T<:SimpleQuantity = simpleQuantity isa T ? simpleQuantity : T(simpleQuantity)
