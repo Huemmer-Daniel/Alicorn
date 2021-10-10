@@ -35,11 +35,12 @@ function Quantity(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
     return Quantity(internalValue, dimension, internalUnits)
 end
 
+Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(value*unit, internalUnits)
+
 function Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
     simpleQuantity = 1 * abstractUnit
     return Quantity(simpleQuantity, internalUnits)
 end
-
 
 ## Methods implementing the interface of AbstractQuantity
 

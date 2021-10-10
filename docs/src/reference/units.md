@@ -18,7 +18,7 @@ Pages = ["units.md"]
 
 ## Overview
 
-#### How Units are represented
+#### How units are represented
 
 To understand how Alicorn handles physical units, let us consider the unit
 ```math
@@ -47,7 +47,7 @@ joule. A [`BaseUnit`](@ref) is characterized through a prefactor and the
 corresponding powers of the basic units, represented as a
 [`BaseUnitExponents`](@ref) object.
 
-#### Type Graph for Representations of Units
+#### Types representing units
 
 There are three types that represent valid physical units: [`BaseUnit`](@ref),
 [`UnitFactor`](@ref), and [`Unit`](@ref), in order of increasing complexity.
@@ -69,7 +69,7 @@ AbstractUnitElement
 The types [`UnitPrefix`](@ref) and [`BaseUnit`](@ref) making up a
 [`UnitFactor`](@ref) are collected in the type union [`UnitFactorElement`](@ref).
 
-#### How Units can be constructed
+#### How units can be constructed
 
 Definitions of [`UnitPrefix`](@ref) and [`BaseUnit`](@ref) objects are collected
 in a [`UnitCatalogue`](@ref). Alicorn provides a default catalogue constructed

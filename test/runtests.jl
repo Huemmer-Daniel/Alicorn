@@ -6,8 +6,8 @@ include("TestingTools/TestingTools.jl")
 # include("Units/UnitsTests.jl")
 # UnitsTests.run()
 
-include("Quantities/QuantitiesTests.jl")
-QuantitiesTests.run()
+# include("Quantities/QuantitiesTests.jl")
+# QuantitiesTests.run()
 
-# include("PrettyPrinting/PrettyPrintingTests.jl")
-# PrettyPrintingTests.run()
+include("PrettyPrinting/PrettyPrintingTests.jl")
+PrettyPrintingTests.run()

@@ -1,14 +1,14 @@
 function Base.show(io::IO, dimension::Dimension)
-    output = _generateLongPrettyPrintingOutput(dimension)
+    output = generatePrettyPrintingOutput(dimension)
     print(io, output)
 end
 
-function _generateLongPrettyPrintingOutput(dimension::Dimension)
-    prettyString = _generateLongStringRepresentation(dimension)
+function generatePrettyPrintingOutput(dimension::Dimension)
+    prettyString = generateLongStringRepresentation(dimension)
     return "Dimension " * prettyString
 end
 
-function _generateLongStringRepresentation(dimension::Dimension)
+function generateLongStringRepresentation(dimension::Dimension)
     exponents = _getExponentsAsArray(dimension)
     prettyString = ""
     for exp in exponents
@@ -37,4 +37,25 @@ function _addLongPrettyFactor_Dimension(prettyString::String, exp::Tuple)
     addString = "$symbol^$expString"
 
     return _addStringWithWhitespace( prettyString, addString )
+end
+
+function generateShortStringRepresentation(dimension::Dimension)
+    exponents = _getExponentsAsArray(dimension)
+    prettyString = ""
+    for exp in exponents
+        prettyString = _addShortPrettyFactor_Dimension(prettyString, exp)
+    end
+    return prettyString
+end
+
+function _addShortPrettyFactor_Dimension(prettyString::String, exp::Tuple)
+    (symbol, exponent) = exp
+
+    if exponent == 0
+        return prettyString
+    else
+        expString = prettyPrintScientificNumber(exponent, sigdigits=2)
+        addString = "$symbol^$expString"
+        return _addStringWithWhitespace( prettyString, addString )
+    end
 end

@@ -58,6 +58,7 @@ function QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnit
     return QuantityArray(internalValue, dimension, internalUnits)
 end
 
+QuantityArray(value::AbstractArray{T,N}, unit::AbstractUnit, internalUnits::InternalUnits) where {T<:Number, N} = QuantityArray(value*unit, internalUnits)
 
 ## Arithemtics
 
@@ -76,3 +77,9 @@ function Base.:(==)(qArray1::QuantityArray, qArray2::QuantityArray)
     isEqual = valuesEqual && dimensionsEqual && internalUnitsEqual
     return isEqual
 end
+
+## ## Methods implementing the interface of AbstractArray
+
+Base.size(qArray::QuantityArray) = size(qArray.value)
+
+Base.IndexStyle(::Type{<:QuantityArray}) = IndexLinear()

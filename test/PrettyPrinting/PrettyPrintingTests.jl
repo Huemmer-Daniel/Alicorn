@@ -16,9 +16,36 @@ function run()
 
         @test simpleQuantityPrettyPrinting()
         @test simpleQuantityArrayPrettyPrinting()
-        @test dimensionPrettyPrinting()
+        @test DimensionPrettyPrinting()
         @test InternalUnits_PrettyPrinting()
+        @test QuantityPrettyPrinting()
+        @test QuantityArrayPrettyPrinting()
     end
+end
+
+function _checkPrettyPrintingExamplesImplemented(examples::Array{Tuple{Real,String}}, significantDigits::Int64)
+    correct = true
+    for (number, correctPrettyStr) in examples
+        returnedPrettyString = Alicorn.PrettyPrinting.prettyPrintScientificNumber(number, sigdigits=significantDigits)
+        correct &= returnedPrettyString==correctPrettyStr
+    end
+    return correct
+end
+
+function _verifyPrettyPrintingImplemented(examples)
+    correct = true
+    for (object, correctPrettyStr) in examples
+        generatedPrettyStr = _getShowString(object)
+        correct &= ( generatedPrettyStr == correctPrettyStr )
+    end
+    return correct
+end
+
+function _getShowString(object)
+    io = IOBuffer()
+    show(io, "text/plain", object)
+    generatedString = String(take!(io))
+    return generatedString
 end
 
 ## Numbers
@@ -50,15 +77,6 @@ function _getPrettyPrintingExamples()
     return (examples, significantDigits)
 end
 
-function _checkPrettyPrintingExamplesImplemented(examples::Array{Tuple{Real,String}}, significantDigits::Int64)
-    correct = true
-    for (number, correctPrettyStr) in examples
-        returnedPrettyString = Alicorn.PrettyPrinting.prettyPrintScientificNumber(number, sigdigits=significantDigits)
-        correct &= returnedPrettyString==correctPrettyStr
-    end
-    return correct
-end
-
 ## UnitPrefix
 
 function unitPrefixPrettyPrinting()
@@ -80,22 +98,6 @@ function _getUnitPrefixExamples()
         examples = append!( examples, [ (prefix, prettyStr) ] )
     end
     return examples
-end
-
-function _verifyPrettyPrintingImplemented(examples)
-    correct = true
-    for (object, correctPrettyStr) in examples
-        generatedPrettyStr = _getShowString(object)
-        correct &= ( generatedPrettyStr == correctPrettyStr )
-    end
-    return correct
-end
-
-function _getShowString(object)
-    io = IOBuffer()
-    show(io, "text/plain", object)
-    generatedString = String(take!(io))
-    return generatedString
 end
 
 ## BaseUnitExponents
@@ -241,7 +243,7 @@ end
 
 ## Dimension
 
-function dimensionPrettyPrinting()
+function DimensionPrettyPrinting()
     examples = _getDimensionExamples()
     return _verifyPrettyPrintingImplemented(examples)
 end
@@ -274,5 +276,61 @@ function _getInternalUnitsExamples()
      "InternalUnits\n mass unit:               1 g\n length unit:             2 m\n time unit:               3 s\n current unit:            4 A\n temperature unit:        5 K\n amount unit:             6 mol\n luminous intensity unit: 7 cd" )
     ]
 end
+
+## Quantity
+
+function QuantityPrettyPrinting()
+    examples = _getQuantityExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getQuantityExamples()
+    ucat = UnitCatalogue()
+    intu = InternalUnits()
+    unit = (ucat.kilo * ucat.gram) * (ucat.tera * ucat.henry)
+
+    int = 712
+    float = 4.345193
+    complex = 1 + 3im
+
+    examples = [
+        # integer
+        ( Quantity( int, unit, intu ), """Alicorn.Quantities.Quantity{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 7.12e14""" ),
+        # float
+        ( Quantity( float, unit, intu ), "Alicorn.Quantities.Quantity{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 4.345193e12" ),
+        # # complex
+        ( Quantity( complex, unit, intu ), "Alicorn.Quantities.Quantity{ComplexF64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12 + 3.0e12im" )
+    ]
+end
+
+## QuantityArray
+
+function QuantityArrayPrettyPrinting()
+    examples = _getQuantityArrayExamples()
+    return _verifyPrettyPrintingImplemented(examples)
+end
+
+function _getQuantityArrayExamples()
+    ucat = UnitCatalogue()
+    intu = InternalUnits()
+    unit = (ucat.kilo * ucat.gram) * (ucat.tera * ucat.henry)
+
+    array1 = [1, 2]
+    array2 = [1.0 2]
+    array3 = [1 2; 3.4 5]
+    array4 = zeros(1,2,2)
+
+    examples = [
+        ( QuantityArray( array1, unit, intu),
+        """2-element Alicorn.Quantities.QuantityVector{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12\n 2.0e12"""),
+        ( QuantityArray( array2, unit, intu),
+        """1×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12"""),
+        ( QuantityArray( array3, unit, intu),
+        """2×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12\n 3.4e12  5.0e12"""),
+        ( QuantityArray( array4, unit, intu),
+        """1×2×2 Alicorn.Quantities.QuantityArray{Float64, 3} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n[:, :, 1] =\n 0.0  0.0\n\n[:, :, 2] =\n 0.0  0.0""")
+        ]
+end
+
 
 end # module

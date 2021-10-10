@@ -25,7 +25,7 @@ tensor-valued) quantities. The abstract superype for all scalar quantities is
 quantities is [`AbstractQuantityArray`](@ref). `AbstractQuantityArray` is a
 subtype of `Base.AbstractQuantity` and implements its interface.
 
-#### Types representing Quantities
+#### Types representing quantities
 
 There are two concrete implementations of each supertype:
 - [`SimpleQuantity`](@ref) and [`Quantity`](@ref) for scalar quantities, and
@@ -54,12 +54,12 @@ unit conversions during calculations. Moreover, it facilitates the use of a
 global set of internal units adapted to the magnitudes of the quantities
 appearing in a given calculation.
 
-#### Type Aliases
+#### Type aliases
 
 Alicorn defines aliases for one- and two-dimensional arrays, and type unions
 representing both dimensional and dimensionless values.
 
-| Type name | Value dimension | Role  | Alias for | Carries physical dimension |
+| Type name | Mathematical dimension | Role  | Alias for | Carries physical dimension |
 | :---      | :---:           | :---: | :---:        | :---:        |
 | [`AbstractQuantity{T}`](@ref) | N=0 | abstract supertype | - | yes |
 | [`AbstractQuantityVector{T}`](@ref) | N=1 | abstract supertype | `AbstractQuantityArray{T,1}` | yes |
@@ -79,7 +79,7 @@ representing both dimensional and dimensionless values.
 | [`ArrayQuantity{T,N}`](@ref) | N | type union | `Union{Array{T,N}, AbstractQuantityArray{T,N}} where {T<:Number, N}` | either yes or no |
 
 
-## Scalar Quantities
+## Scalar quantities
 
 ### Types
 
@@ -141,11 +141,11 @@ Base.:(==)(::Quantity, ::Quantity)
 
 
 
-## Array Quantities
+## Array quantities
 
 ### Types
 
-#### Array-valued Abstract Supertypes
+#### Array-valued abstract supertypes
 
 ```@docs
 AbstractQuantityArray
@@ -153,7 +153,7 @@ AbstractQuantityVector
 AbstractQuantityMatrix
 ```
 
-#### Array-valued Simple Quantities
+#### Array-valued simple quantities
 
 ```@docs
 SimpleQuantityArray
@@ -161,7 +161,7 @@ SimpleQuantityVector
 SimpleQuantityMatrix
 ```
 
-#### Array-valued Quantities
+#### Array-valued quantities
 
 ```@docs
 QuantityArray
@@ -169,7 +169,7 @@ QuantityVector
 QuantityMatrix
 ```
 
-#### Aliases for Arrays with or without Units
+#### Aliases for arrays with or without units
 
 ```@docs
 VectorQuantity
