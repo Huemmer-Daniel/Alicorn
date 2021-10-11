@@ -291,11 +291,11 @@ function _getQuantityExamples()
 
     int = 712
     float = 4.345193
-    complex = 1 + 3im
+    complex = 1 + 3.0im
 
     examples = [
         # integer
-        ( Quantity( int, unit, intu ), """Alicorn.Quantities.Quantity{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 7.12e14""" ),
+        ( Quantity( int, unit, intu ), """Alicorn.Quantities.Quantity{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 712000000000000""" ),
         # float
         ( Quantity( float, unit, intu ), "Alicorn.Quantities.Quantity{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 4.345193e12" ),
         # # complex
@@ -318,17 +318,17 @@ function _getQuantityArrayExamples()
     array1 = [1, 2]
     array2 = [1.0 2]
     array3 = [1 2; 3.4 5]
-    array4 = zeros(1,2,2)
+    array4 = zeros(Int32, 1,2,2)
 
     examples = [
         ( QuantityArray( array1, unit, intu),
-        """2-element Alicorn.Quantities.QuantityVector{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12\n 2.0e12"""),
+        """2-element Alicorn.Quantities.QuantityVector{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1000000000000\n 2000000000000"""),
         ( QuantityArray( array2, unit, intu),
         """1×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12"""),
         ( QuantityArray( array3, unit, intu),
         """2×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12\n 3.4e12  5.0e12"""),
         ( QuantityArray( array4, unit, intu),
-        """1×2×2 Alicorn.Quantities.QuantityArray{Float64, 3} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n[:, :, 1] =\n 0.0  0.0\n\n[:, :, 2] =\n 0.0  0.0""")
+        """1×2×2 Alicorn.Quantities.QuantityArray{Int32, 3} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n[:, :, 1] =\n 0  0\n\n[:, :, 2] =\n 0  0""")
         ]
 end
 

@@ -5,18 +5,22 @@ using Test
 using ..TestingTools
 
 const ucat = UnitCatalogue()
+const intu = InternalUnits()
 
 function run()
     @testset "QuantityArray" begin
-        # initialization
+        # Instanciation
         @test canInstanciateQuantityArrayWithRealValues()
         @test canInstanciateQuantityWithComplexValues()
         @test canInstanciateQuantityArrayFromSimpleQuantityArray()
+        @test InstanciationTriesToPreservesValueType()
 
-        # arithmetics
+        # Arithmetics
         @test equality_implemented()
     end
 end
+
+# Instanciation
 
 function canInstanciateQuantityArrayWithRealValues()
     value = TestingTools.generateRandomReal(dim=(2,3))
@@ -49,6 +53,32 @@ function canInstanciateQuantityArrayFromSimpleQuantityArray()
     correct = (returnedQArray == correctQArray)
     return correct
 end
+
+function InstanciationTriesToPreservesValueType()
+    examples = _getExamplesFor_InstanciationTriesToPreservesValueType()
+
+    correct = true
+    for (value, unit, intu, correctType) in examples
+        returnedType = typeof( QuantityArray(value, unit, intu).value )
+        correct &= returnedType==correctType
+    end
+    return correct
+end
+
+function _getExamplesFor_InstanciationTriesToPreservesValueType()
+    intu2 = InternalUnits(length = 2 * ucat.meter )
+    intu3 = InternalUnits(length = 0.5 * ucat.meter )
+
+    # format: n::Array, u::AbstractUnit, intu::InternalUnits, typeof(QuantityArray(n, u, intu).value)
+    examples = [
+        ( Array{Int32}([7, 14]), ucat.meter, intu, Array{Int32, 1} ),
+        ( Array{Int32}([7, 14]), ucat.meter, intu2, Array{Float64, 1} ),
+        ( Array{Float32}([3.5]), ucat.meter, intu3, Array{Float32, 1} )
+    ]
+    return examples
+end
+
+## Arithmetics
 
 function equality_implemented()
     examples = _getExamplesFor_equality()

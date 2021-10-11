@@ -16,19 +16,45 @@ basic dimensions of the SI system are measured.
 
 # Constructors
 ```
-QuantityArray(value::AbstractArray{T,N}, dimension::Dimension, internalUnits::InternalUnits)
-QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnits)
+QuantityArray(value::Array{T,N}, dimension::Dimension, internalUnits::InternalUnits)
+QuantityArray(sqArray::SimpleQuantityArray{T}, internalUnits::InternalUnits)
+QuantityArray(value::AbstractArray{T,N}, unit::AbstractUnit, internalUnits::InternalUnits) where {T<:Number, N}
+```
+
+The constructors preserve the type of the value upon conversion to the
+internal units whenever possible.
+
+# Examples
+1. The vector-valued quantity ``[7, 14]\,\mathrm{nm}`` can for instance be
+   constructed as follows:
+   ```jldoctest
+   julia> ucat = UnitCatalogue() ;
+          nm = ucat.nano*ucat.meter;
+          intu = InternalUnits(length=1nm) ;
+
+   julia> QuantityArray([7, 14]nm, intu)
+   2-element QuantityVector{Int64} of dimension L^1 in units of (1 nm):
+     7
+    14
+   ```
+   Note that the original type `Int64` of the value is preserved.
+2. If we use ``2\,\mathrm{nm}`` as internal unit for length, the vector can no
+   longer be represented as type `Vector{Int64}` internally:
+   ```jldoctest
+   julia> ucat = UnitCatalogue() ;
+          nm = ucat.nano*ucat.meter;
+          intu = InternalUnits(length=2nm) ;
+
+   julia> QuantityArray([7, 14]nm, intu)
+   2-element QuantityVector{Float64} of dimension L^1 in units of (2 nm):
+    3.5
+    7.0
+   ```
 """
 mutable struct QuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
     dimension::Dimension
     internalUnits::InternalUnits
-
-    function QuantityArray(value::AbstractArray{T,N}, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number, N}
-        value = Array(value)
-        qArray = new{T,N}(value, dimension, internalUnits)
-        return qArray
-    end
 end
 
 """
@@ -55,7 +81,16 @@ function QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnit
     dimension = dimensionOf(sqArray)
     internalUnit = internalUnitForDimension(dimension, internalUnits)
     internalValue = valueInUnitsOf(sqArray, internalUnit)
+    internalValue = _attemptConversionToOriginalType(internalValue, typeof(sqArray.value))
     return QuantityArray(internalValue, dimension, internalUnits)
+end
+
+function _attemptConversionToOriginalType(value::AbstractArray{S,N}, T::Type) where {S<:Number, N}
+    try
+        value = convert(T, value)
+    catch
+    end
+    return value
 end
 
 QuantityArray(value::AbstractArray{T,N}, unit::AbstractUnit, internalUnits::InternalUnits) where {T<:Number, N} = QuantityArray(value*unit, internalUnits)

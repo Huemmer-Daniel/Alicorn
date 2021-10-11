@@ -16,6 +16,7 @@ SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where
 SimpleQuantityArray(value::AbstractArray{T,N}) where {T<:Number, N}
 SimpleQuantityArray(simpleQuantity::SimpleQuantity)
 SimpleQuantityArray(sqArray::SimpleQuantityArray)
+```
 """
 mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}

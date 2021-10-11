@@ -1,4 +1,4 @@
-module DimensionTests
+module DimensionsTests
 
 using Alicorn
 using Test
@@ -208,7 +208,8 @@ function dimensionOf_implementedForSimpleQuantity()
 end
 
 struct MockQuantityForDimension{T} <: AbstractQuantity{T}
-    unit::T
+    value::T
+    unit::Unit
 end
 
 function Alicorn.Quantities.inBasicSIUnits(mockQuantity::MockQuantityForDimension)
@@ -225,7 +226,7 @@ function _getExamplesFor_dimensionOf_forSimpleQuantity()
         ( 1 * Alicorn.unitlessUnit, Dimension() ),
         ( 1 * ucat.henry, Dimension(M=1, L=2, T=-2, I=-2) ),
         # AbstractQuantity
-        ( MockQuantityForDimension( Unit(ucat.henry) ), Dimension(M=1, L=2, T=-2, I=-2)  )
+        ( MockQuantityForDimension( 1, Unit(ucat.henry) ), Dimension(M=1, L=2, T=-2, I=-2)  )
     ]
     return examples
 end

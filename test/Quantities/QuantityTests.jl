@@ -5,19 +5,23 @@ using Test
 using ..TestingTools
 
 const ucat = UnitCatalogue()
+const intu = InternalUnits()
 
 function run()
     @testset "Quantity" begin
-        # initialization
+        # instanciation
         @test canInstanciateQuantityWithRealValue()
         @test canInstanciateQuantityWithComplexValue()
         @test canInstanciateQuantityFromSimpleQuantity()
         @test canInstanciateQuantityFromAbstractUnit()
+        @test InstanciationTriesToPreservesValueType()
 
         # arithmetics
         @test equality_implemented()
     end
 end
+
+## Instanciation
 
 function canInstanciateQuantityWithRealValue()
     value = TestingTools.generateRandomReal()
@@ -74,6 +78,32 @@ function Alicorn.Units.convertToUnit(mockAbstractUnit::MockAbstractUnit)
     unit = Unit(unitFactor)
     return unit
 end
+
+function InstanciationTriesToPreservesValueType()
+    examples = _getExamplesFor_InstanciationTriesToPreservesValueType()
+
+    correct = true
+    for (value, unit, intu, correctType) in examples
+        returnedType = typeof( Quantity(value, unit, intu).value )
+        correct &= returnedType==correctType
+    end
+    return correct
+end
+
+function _getExamplesFor_InstanciationTriesToPreservesValueType()
+    intu2 = InternalUnits(length = 2 * ucat.meter )
+    intu3 = InternalUnits(length = 0.5 * ucat.meter )
+
+    # format: n::Number, u::AbstractUnit, intu::InternalUnits, typeof(Quantity(n, u, intu).value)
+    examples = [
+        ( Int32(7), ucat.meter, intu, Int32 ),
+        ( Int32(7), ucat.meter, intu2, Float64 ),
+        ( Float32(3.5), ucat.meter, intu3, Float32 )
+    ]
+    return examples
+end
+
+## Arithmetics
 
 function equality_implemented()
     examples = _getExamplesFor_equality()
