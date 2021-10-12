@@ -9,12 +9,17 @@ const ucat = UnitCatalogue()
 function run()
     @testset "SimpleQuantityArray" begin
 
-        #- Constructors
-        @test canInstanciateSQArrayWithRealArray()
-        @test canInstanciateSQArrayWithComplexArray()
-        @test canInstanciateSQArraWithBaseUnit()
-        @test canInstanciateSQArraWithUnitFactor()
-        @test canInstanciateSQArraWithoutUnit()
+        # Constructors
+        @test canConstructFromArrayAndUnit()
+        @test canConstructFromArrayAndAbstractUnit()
+        @test canConstructFromArray()
+        @test canConstructFromSimpleQuantityArray()
+        @test canConstructFromSimpleQuantityArray_TypeSpecified()
+        @test canConstructFromArrayAndAbstractUnit_TypeSpecified()
+        @test canConstructFromArray_TypeSpecified()
+
+        # Type conversion
+        @test canConvertTypeParameter()
 
         #- Methods for constructing a SimpleQuantityArray
         @test AbstractArray_AbstractUnit_multiplication()
@@ -107,17 +112,43 @@ function run()
     end
 end
 
-## #- Constructors
+## ## Constructors
 
-function canInstanciateSQArrayWithRealArray()
-    value = TestingTools.generateRandomReal(dim = (2,2))
-    unit = TestingTools.generateRandomUnit()
-    sqArray = SimpleQuantityArray(value, unit)
-    correctFields = Dict([
-        ("value", value),
-        ("unit", unit)
+function canConstructFromArrayAndUnit()
+    examples = _getExamplesFor_canConstructFromArrayAndUnit()
+    return _checkConstructorExamples(examples)
+end
+
+function _getExamplesFor_canConstructFromArrayAndUnit()
+    realValue = TestingTools.generateRandomReal(dim=2)
+    unit1 = TestingTools.generateRandomUnit()
+    sqArray1 = SimpleQuantityArray(realValue, unit1)
+    correctFields1 = Dict([
+        ("value", realValue),
+        ("unit", unit1)
     ])
-    return _verifyHasCorrectFields(sqArray, correctFields)
+
+    complexValue = TestingTools.generateRandomComplex(dim=2)
+    unit2 = TestingTools.generateRandomUnit()
+    sqArray2 = SimpleQuantityArray(complexValue, unit2)
+    correctFields2 = Dict([
+        ("value", complexValue),
+        ("unit", unit2)
+    ])
+
+    examples = [
+        (sqArray1, correctFields1),
+        (sqArray2, correctFields2)
+    ]
+    return examples
+end
+
+function _checkConstructorExamples(examples::Array)
+    correct = true
+    for (sqArray, correctFields) in examples
+        correct &= _verifyHasCorrectFields(sqArray, correctFields)
+    end
+    return correct
 end
 
 function _verifyHasCorrectFields(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
@@ -127,51 +158,197 @@ function _verifyHasCorrectFields(sqArray::SimpleQuantityArray, correctFields::Di
     return correct
 end
 
-function canInstanciateSQArrayWithComplexArray()
-    value = TestingTools.generateRandomComplex(dim = (2,2))
-    unit = TestingTools.generateRandomUnit()
-    sqArray = SimpleQuantityArray(value, unit)
-    correctFields = Dict([
-        ("value", value),
-        ("unit", unit)
-    ])
-    return _verifyHasCorrectFields(sqArray, correctFields)
+function canConstructFromArrayAndAbstractUnit()
+    examples = _getExamplesFor_canConstructFromArrayAndAbstractUnit()
+    return _checkConstructorExamples(examples)
 end
 
-function canInstanciateSQArraWithBaseUnit()
-    value = TestingTools.generateRandomReal(dim = (2,2))
-    baseUnit = TestingTools.generateRandomBaseUnit()
-    unit = convertToUnit(baseUnit)
-
-    sqArray = SimpleQuantityArray(value, baseUnit)
-    correctFields = Dict([
-        ("value", value),
-        ("unit", unit)
-    ])
-    return _verifyHasCorrectFields(sqArray, correctFields)
-end
-
-function canInstanciateSQArraWithUnitFactor()
-    value = TestingTools.generateRandomComplex(dim = (2,2))
+function _getExamplesFor_canConstructFromArrayAndAbstractUnit()
+    realValue = TestingTools.generateRandomReal(dim=2)
     unitFactor = TestingTools.generateRandomUnitFactor()
-    unit = convertToUnit(unitFactor)
+    sqArray1 = SimpleQuantityArray(realValue, unitFactor)
+    correctFields1 = Dict([
+        ("value", realValue),
+        ("unit", Unit(unitFactor))
+    ])
 
-    sqArray = SimpleQuantityArray(value, unitFactor)
-    correctFields = Dict([
-        ("value", value),
+    complexValue = TestingTools.generateRandomComplex(dim=2)
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    sqArray2 = SimpleQuantityArray(complexValue, baseUnit)
+    correctFields2 = Dict([
+        ("value", complexValue),
+        ("unit", Unit(baseUnit))
+    ])
+
+    unit = TestingTools.generateRandomUnit()
+    sqArray3 = SimpleQuantityArray(complexValue, unit)
+    correctFields3 = Dict([
+        ("value", complexValue),
         ("unit", unit)
     ])
-    return _verifyHasCorrectFields(sqArray, correctFields)
+
+    examples = [
+        (sqArray1, correctFields1),
+        (sqArray2, correctFields2),
+        (sqArray3, correctFields3)
+    ]
+    return examples
 end
 
-function canInstanciateSQArraWithoutUnit()
-    value = TestingTools.generateRandomComplex(dim = (2,2))
-    sqArray = SimpleQuantityArray(value)
-    correctFields = Dict([
-        ("value", value),
+function canConstructFromArray()
+    examples = _getExamplesFor_canConstructFromArray()
+    return _checkConstructorExamples(examples)
+end
+
+function _getExamplesFor_canConstructFromArray()
+    realValue = TestingTools.generateRandomReal(dim=2)
+    sqArray1 = SimpleQuantityArray(realValue)
+    correctFields1 = Dict([
+        ("value", realValue),
         ("unit", Alicorn.unitlessUnit)
     ])
-    return _verifyHasCorrectFields(sqArray, correctFields)
+
+    complexValue = TestingTools.generateRandomComplex(dim=2)
+    sqArray2 = SimpleQuantityArray(complexValue)
+    correctFields2 = Dict([
+        ("value", complexValue),
+        ("unit", Alicorn.unitlessUnit)
+    ])
+
+    examples = [
+        (sqArray1, correctFields1),
+        (sqArray2, correctFields2)
+    ]
+    return examples
+end
+
+function canConstructFromSimpleQuantityArray()
+    sqArray1 = TestingTools.generateRandomSimpleQuantityArray()
+    sqArray2 = SimpleQuantityArray(sqArray1)
+    return sqArray1==sqArray2
+end
+
+function canConstructFromSimpleQuantityArray_TypeSpecified()
+    value = [6.7, 5.4]
+    unit = TestingTools.generateRandomUnit()
+    sqArray_64 = SimpleQuantityArray(Array{Float32}(value), unit)
+    sqArray_32 = SimpleQuantityArray{Float32}( sqArray_64 )
+
+    correctFields = Dict([
+        ("value", Array{Float32}(value)),
+        ("unit", unit),
+        ("value type", Array{Float32})
+    ])
+    return _verifyHasCorrectFieldsAndType(sqArray_32, correctFields)
+end
+
+function _verifyHasCorrectFieldsAndType(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
+    correctValue = (sqArray.value == correctFields["value"])
+    correctUnit = (sqArray.unit == correctFields["unit"])
+    correctType = isa(sqArray.value, correctFields["value type"])
+    return correctValue && correctUnit && correctType
+end
+
+function canConstructFromArrayAndAbstractUnit_TypeSpecified()
+    examples = _getExamplesFor_canConstructFromArrayAndAbstractUnit_TypeSpecified()
+    return _checkConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructFromArrayAndAbstractUnit_TypeSpecified()
+    realValue = TestingTools.generateRandomReal(dim=(2,3))
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    sqArray1 = SimpleQuantityArray{Float32}(realValue, unitFactor)
+    correctFields1 = Dict([
+        ("value", Array{Float32}(realValue)),
+        ("unit", Unit(unitFactor)),
+        ("value type", Array{Float32})
+    ])
+
+    value2 = [1.0, 2.0]
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    sqArray2 = SimpleQuantityArray{Complex{Int32}}(value2, baseUnit)
+    correctFields2 = Dict([
+        ("value", Array{Complex{Int32}}(value2)),
+        ("unit", Unit(baseUnit)),
+        ("value type", Array{Complex{Int32}})
+    ])
+
+    value3 = [2, 3]
+    unit = TestingTools.generateRandomUnit()
+    sqArray3 = SimpleQuantityArray{Float16}(value3, unit)
+    correctFields3 = Dict([
+        ("value", Array{Float16}(value3)),
+        ("unit", unit),
+        ("value type", Array{Float16})
+    ])
+
+    examples = [
+        (sqArray1, correctFields1),
+        (sqArray2, correctFields2),
+        (sqArray3, correctFields3)
+    ]
+    return examples
+end
+
+function _checkConstructorExamplesIncludingType(examples::Array)
+    correct = true
+    for (sqArray, correctFields) in examples
+        correct &= _verifyHasCorrectFieldsAndType(sqArray, correctFields)
+    end
+    return correct
+end
+
+function canConstructFromArray_TypeSpecified()
+    examples = _getExamplesFor_canConstructFromArray_TypeSpecified()
+    return _checkConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructFromArray_TypeSpecified()
+    realValue = TestingTools.generateRandomReal(dim=(2,3))
+    sqArray1 = SimpleQuantityArray{Float32}(realValue)
+    correctFields1 = Dict([
+        ("value", Array{Float32}(realValue)),
+        ("unit", Alicorn.unitlessUnit),
+        ("value type", Array{Float32})
+    ])
+
+    value2 = [1.0, 2.0]
+    sqArray2 = SimpleQuantityArray{Complex{Int32}}(value2)
+    correctFields2 = Dict([
+        ("value", Array{Complex{Int32}}(value2)),
+        ("unit", Alicorn.unitlessUnit),
+        ("value type", Array{Complex{Int32}})
+    ])
+
+    value3 = [2, 3]
+    sqArray3 = SimpleQuantityArray{Float16}(value3)
+    correctFields3 = Dict([
+        ("value", Array{Float16}(value3)),
+        ("unit", Alicorn.unitlessUnit),
+        ("value type", Array{Float16})
+    ])
+
+    examples = [
+        (sqArray1, correctFields1),
+        (sqArray2, correctFields2),
+        (sqArray3, correctFields3)
+    ]
+    return examples
+end
+
+## ## Type conversion
+
+function canConvertTypeParameter()
+    examples = _getExamplesFor_canConvertTypeParameter()
+    return TestingTools.testDyadicFunction(Base.convert, examples)
+end
+
+function _getExamplesFor_canConvertTypeParameter()
+    examples = [
+        ( SimpleQuantityArray{Float32}, SimpleQuantityArray{Float64}([7.1], ucat.meter), SimpleQuantityArray{Float32}([7.1], ucat.meter) ),
+        ( SimpleQuantityArray{UInt16}, SimpleQuantityArray{Float64}([16], ucat.meter), SimpleQuantityArray{UInt16}([16], ucat.meter) ),
+        ( SimpleQuantityArray{Float16}, SimpleQuantityArray{Int64}([16], ucat.meter), SimpleQuantityArray{Float16}([16], ucat.meter) )
+    ]
 end
 
 ## #- Methods for constructing a SimpleQuantityArray
@@ -1051,8 +1228,8 @@ end
 
 function _test_isapprox_examples(examples::Array)
     pass = true
-    for (sq1, sq2, rtol, correctResult) in examples
-        pass &= ( isapprox(sq1, sq2, rtol=rtol) == correctResult )
+    for (sqArray1, sqArray2, rtol, correctResult) in examples
+        pass &= ( isapprox(sqArray1, sqArray2, rtol=rtol) == correctResult )
     end
     return pass
 end

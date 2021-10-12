@@ -12,11 +12,18 @@ needs to be a subtype of `Number`.
 
 # Constructors
 ```
-SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
-SimpleQuantityArray(value::AbstractArray{T,N}) where {T<:Number, N}
-SimpleQuantityArray(simpleQuantity::SimpleQuantity)
-SimpleQuantityArray(sqArray::SimpleQuantityArray)
+SimpleQuantityArray(value::AbstractArray{T}, unit::AbstractUnit) where {T<:Number}
+SimpleQuantityArray(value::AbstractArray{T}) where {T<:Number}
 ```
+If no unit is passed to the constructor, `unitlessUnit` is used by default.
+
+```
+SimpleQuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number}
+SimpleQuantityArray{T}(value::AbstractArray, unit::AbstractUnit) where {T<:Number}
+SimpleQuantityArray{T}(value::AbstractArray) where {T<:Number}
+```
+If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
+accordingly.
 """
 mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
@@ -48,27 +55,26 @@ const SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
 
 ## ## External constructors
 
-function SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
-    value = Array(value)
-    unit = convertToUnit(abstractUnit)
-    sqArray = SimpleQuantityArray(value, unit)
-    return sqArray
-end
-
-function SimpleQuantityArray(value::Array{T,N}) where {T<:Number, N}
-    unit = unitlessUnit
-    sqArray = SimpleQuantityArray(value, unit)
-    return sqArray
-end
-
-function SimpleQuantityArray(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = [simpleQuantity.value]
-    sqArray = SimpleQuantityArray(value, unit)
-    return sqArray
-end
-
+SimpleQuantityArray(value::AbstractArray{T}, abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantityArray( Array(value), convertToUnit(abstractUnit) )
+SimpleQuantityArray(value::AbstractArray{T}) where {T<:Number} = SimpleQuantityArray(value, unitlessUnit)
 SimpleQuantityArray(sqArray::SimpleQuantityArray) = sqArray
+
+SimpleQuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, sqArray.value), sqArray.unit)
+SimpleQuantityArray{T}(value::AbstractArray, abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, value), abstractUnit)
+SimpleQuantityArray{T}(value::AbstractArray) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, value) )
+
+
+## ## Type conversion
+
+"""
+    Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray}
+
+Convert `sqArray` to another `SimpleQuantityArray` type `T`.
+
+Allows to convert, for instance, from `SimpleQuantityArray{Float64}` to `SimpleQuantityArray{UInt8}`.
+"""
+Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray} = sqArray isa T ? sqArray : T(sqArray)
+
 
 ## ## Methods for creating a SimpleQuantityArray
 

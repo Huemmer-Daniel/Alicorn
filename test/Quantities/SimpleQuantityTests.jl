@@ -10,16 +10,15 @@ function run()
     @testset "SimpleQuantity" begin
 
         # Constructors
-        @test canConstructSimpleQuantity_FromNumberAndQuantity()
-        @test canConstructSimpleQuantity_FromNumberAndAbstractQuantity()
-        @test canConstructSimpleQuantity_FromNumber()
-        @test canConstructSimpleQuantity_FromAbstractQuantity()
+        @test canConstructFromNumberAndUnit()
+        @test canConstructFromNumberAndAbstractUnit()
+        @test canConstructFromNumber()
+        @test canConstructFromAbstractUnit()
         @test canConstructFromSimpleQuantity()
         @test canConstructFromSimpleQuantity_TypeSpecified()
-        @test canConstructFromSimpleQuantity_TypeSpecified()
-        @test canConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
-        @test canConstructSimpleQuantity_FromNumber_TypeSpecified()
-        @test canConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
+        @test canConstructFromNumberAndAbstractUnit_TypeSpecified()
+        @test canConstructFromNumber_TypeSpecified()
+        @test canConstructFromAbstractUnit_TypeSpecified()
 
         # Type conversion
         @test canConvertTypeParameter()
@@ -115,12 +114,12 @@ end
 
 ## ## Constructors
 
-function canConstructSimpleQuantity_FromNumberAndQuantity()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndQuantity()
+function canConstructFromNumberAndUnit()
+    examples = _getExamplesFor_canConstructFromNumberAndUnit()
     return _checkConstructorExamples(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndQuantity()
+function _getExamplesFor_canConstructFromNumberAndUnit()
     realValue = TestingTools.generateRandomReal()
     unit1 = TestingTools.generateRandomUnit()
     sq1 = SimpleQuantity(realValue, unit1)
@@ -159,12 +158,12 @@ function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, correctFields::
     return correct
 end
 
-function canConstructSimpleQuantity_FromNumberAndAbstractQuantity()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity()
+function canConstructFromNumberAndAbstractUnit()
+    examples = _getExamplesFor_canConstructFromNumberAndAbstractUnit()
     return _checkConstructorExamples(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity()
+function _getExamplesFor_canConstructFromNumberAndAbstractUnit()
     realValue = TestingTools.generateRandomReal()
     unitFactor = TestingTools.generateRandomUnitFactor()
     sq1 = SimpleQuantity(realValue, unitFactor)
@@ -196,12 +195,12 @@ function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity()
     return examples
 end
 
-function canConstructSimpleQuantity_FromNumber()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumber()
+function canConstructFromNumber()
+    examples = _getExamplesFor_canConstructFromNumber()
     return _checkConstructorExamples(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromNumber()
+function _getExamplesFor_canConstructFromNumber()
     realValue = TestingTools.generateRandomReal()
     sq1 = SimpleQuantity(realValue)
     correctFields1 = Dict([
@@ -223,12 +222,12 @@ function _getExamplesFor_ConstructSimpleQuantity_FromNumber()
     return examples
 end
 
-function canConstructSimpleQuantity_FromAbstractQuantity()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity()
+function canConstructFromAbstractUnit()
+    examples = _getExamplesFor_canConstructFromAbstractUnit()
     return _checkConstructorExamples(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity()
+function _getExamplesFor_canConstructFromAbstractUnit()
     unitFactor = TestingTools.generateRandomUnitFactor()
     sq1 = SimpleQuantity(unitFactor)
     correctFields1 = Dict([
@@ -285,12 +284,12 @@ function _verifyHasCorrectFieldsAndType(simpleQuantity::SimpleQuantity, correctF
     return correctValue && correctUnit && correctType
 end
 
-function canConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
+function canConstructFromNumberAndAbstractUnit_TypeSpecified()
+    examples = _getExamplesFor_canConstructFromNumberAndAbstractUnit_TypeSpecified()
     return _checkConstructorExamplesIncludingType(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
+function _getExamplesFor_canConstructFromNumberAndAbstractUnit_TypeSpecified()
     realValue = TestingTools.generateRandomReal()
     unitFactor = TestingTools.generateRandomUnitFactor()
     sq1 = SimpleQuantity{Float32}(realValue, unitFactor)
@@ -334,12 +333,12 @@ function _checkConstructorExamplesIncludingType(examples::Array)
     return correct
 end
 
-function canConstructSimpleQuantity_FromNumber_TypeSpecified()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumber_TypeSpecified()
+function canConstructFromNumber_TypeSpecified()
+    examples = _getExamplesFor_canConstructFromNumber_TypeSpecified()
     return _checkConstructorExamplesIncludingType(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromNumber_TypeSpecified()
+function _getExamplesFor_canConstructFromNumber_TypeSpecified()
     realValue = TestingTools.generateRandomReal()
     sq1 = SimpleQuantity{Float32}(realValue)
     correctFields1 = Dict([
@@ -372,12 +371,12 @@ function _getExamplesFor_ConstructSimpleQuantity_FromNumber_TypeSpecified()
     return examples
 end
 
-function canConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
-    examples = _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
+function canConstructFromAbstractUnit_TypeSpecified()
+    examples = _getExamplesFor_canConstructFromAbstractUnit_TypeSpecified()
     return _checkConstructorExamplesIncludingType(examples)
 end
 
-function _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
+function _getExamplesFor_canConstructFromAbstractUnit_TypeSpecified()
     unitFactor = TestingTools.generateRandomUnitFactor()
     sq1 = SimpleQuantity{Float32}(unitFactor)
     correctFields1 = Dict([

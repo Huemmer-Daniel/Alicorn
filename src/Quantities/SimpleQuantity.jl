@@ -23,7 +23,7 @@ SimpleQuantity{T}(value::Number) where {T<:Number}
 SimpleQuantity{T}(unit::AbstractUnit) where {T<:Number}
 ```
 If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
-argument accordingly.
+accordingly.
 
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
@@ -74,7 +74,7 @@ SimpleQuantity{T}(abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity
 """
     Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity}
 
-Convert `simpleQuantity` to another SimpleQuantity type `T`.
+Convert `simpleQuantity` to another `SimpleQuantity` type `T`.
 
 Allows to convert, for instance, from `SimpleQuantity{Float64}` to `SimpleQuantity{UInt8}`.
 """

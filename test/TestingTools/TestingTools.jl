@@ -319,7 +319,7 @@ function generateRandomSimpleQuantityArrayWithFields()
     randomFields["unit"] = randomUnit
 
     randomSimpleQuantityArray = SimpleQuantityArray(randomValue, randomUnit)
-
+    return (randomSimpleQuantityArray, randomFields)
 end
 
 function generateRandomInternalUnits()

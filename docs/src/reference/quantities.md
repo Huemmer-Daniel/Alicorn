@@ -183,6 +183,7 @@ ArrayQuantity
 ```@docs
 Base.:*(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}
 Base.:/(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}
+Base.convert(::Type{T}, ::SimpleQuantityArray) where {T<:SimpleQuantityArray}
 ```
 
 
