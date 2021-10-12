@@ -90,12 +90,13 @@ Quantity
 ScalarQuantity
 ```
 
-### Construction
+### Construction and type conversion
 
 ```@docs
 Base.:*(::Number, ::AbstractUnit)
 Base.:/(::Number, ::AbstractUnit)
 Base.zero(::Type, ::AbstractUnit)
+Base.convert(::Type{SimpleQuantity}, ::SimpleQuantity)
 ```
 
 ### Dimension
@@ -177,7 +178,7 @@ MatrixQuantity
 ArrayQuantity
 ```
 
-### Construction
+### Construction and type conversion
 
 ```@docs
 Base.:*(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}

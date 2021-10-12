@@ -69,6 +69,17 @@ SimpleQuantity{T}(value::Number, abstractUnit::AbstractUnit) where {T<:Number} =
 SimpleQuantity{T}(value::Number) where {T<:Number} = SimpleQuantity(convert(T, value))
 SimpleQuantity{T}(abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity(T(1), abstractUnit)
 
+## ## Type conversion
+
+"""
+    Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity}
+
+Convert `simpleQuantity` to another SimpleQuantity type `T`.
+
+Allows to convert, for instance, from `SimpleQuantity{Float64}` to `SimpleQuantity{UInt8}`.
+"""
+Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity} = simpleQuantity isa T ? simpleQuantity : T(simpleQuantity)
+
 ## ## Methods for creating a SimpleQuantity
 
 """
@@ -443,5 +454,3 @@ end
 
 Base.copy(simpleQuantity::SimpleQuantity) = SimpleQuantity(copy(simpleQuantity.value), simpleQuantity.unit)
 Base.deepcopy(simpleQuantity::SimpleQuantity) = SimpleQuantity(deepcopy(simpleQuantity.value), simpleQuantity.unit)
-
-Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where T<:SimpleQuantity = simpleQuantity isa T ? simpleQuantity : T(simpleQuantity)

@@ -21,6 +21,9 @@ function run()
         @test canConstructSimpleQuantity_FromNumber_TypeSpecified()
         @test canConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
 
+        # Type conversion
+        @test canConvertTypeParameter()
+
         #- Methods for constructing a SimpleQuantity
         @test Number_AbstractUnit_multiplication()
         @test Number_AbstractUnit_division()
@@ -110,7 +113,7 @@ function run()
     end
 end
 
-## #- Constructors
+## ## Constructors
 
 function canConstructSimpleQuantity_FromNumberAndQuantity()
     examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndQuantity()
@@ -405,6 +408,21 @@ function _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity_TypeSpecif
         (sq3, correctFields3)
     ]
     return examples
+end
+
+## ## Type conversion
+
+function canConvertTypeParameter()
+    examples = _getExamplesFor_canConvertTypeParameter()
+    return TestingTools.testDyadicFunction(Base.convert, examples)
+end
+
+function _getExamplesFor_canConvertTypeParameter()
+    examples = [
+        ( SimpleQuantity{Float32}, SimpleQuantity{Float64}(7.1, ucat.meter), SimpleQuantity{Float32}(7.1, ucat.meter) ),
+        ( SimpleQuantity{UInt16}, SimpleQuantity{Float64}(16, ucat.meter), SimpleQuantity{UInt16}(16, ucat.meter) ),
+        ( SimpleQuantity{Float16}, SimpleQuantity{Int64}(16, ucat.meter), SimpleQuantity{Float16}(16, ucat.meter) )
+    ]
 end
 
 ## #- Methods for constructing a SimpleQuantity
