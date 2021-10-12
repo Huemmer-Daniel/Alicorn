@@ -9,13 +9,21 @@ A physical quantity consisting of a scalar value and a physical unit.
 
 # Constructors
 ```
-SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
-SimpleQuantity(value::T) where T <: Number
+SimpleQuantity(value::Number, unit::AbstractUnit)
+SimpleQuantity(value::Number)
 SimpleQuantity(abstractUnit::AbstractUnit)
-SimpleQuantity(simpleQuantity::SimpleQuantity)
 ```
+If no unit is passed to the constructor, `unitlessUnit` is used by default. If
+no value is passed to the constructor, the value is set to 1 by default.
 
-If no `AbstractUnit` is passed to the constructor, the `Alicorn.unitlessUnit` is used by default. If no value is passed to the constructor, the value is set to 1 by default.
+```
+SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number}
+SimpleQuantity{T}(value::Number, unit::AbstractUnit) where {T<:Number}
+SimpleQuantity{T}(value::Number) where {T<:Number}
+SimpleQuantity{T}(unit::AbstractUnit) where {T<:Number}
+```
+If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
+argument accordingly.
 
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
@@ -44,41 +52,22 @@ mutable struct SimpleQuantity{T<:Number} <: AbstractQuantity{T}
     value::T
     unit::Unit
 
-    function SimpleQuantity(value::T, abstractUnit::AbstractUnit) where T <: Number
-        unit = convertToUnit(abstractUnit)
-        simpleQuantity = new{T}(value, unit)
-        return simpleQuantity
+    function SimpleQuantity(value::T, unit::Unit) where {T<:Number}
+        return new{T}(value, unit)
     end
 end
 
 ## ## External constructors
 
-# TODO: missing documentation
-function SimpleQuantity{T}(value, abstractUnit::AbstractUnit) where T
-    value = convert(T, value)
-    return SimpleQuantity(value, abstractUnit)
-end
-
-# TODO: missing documentation
-function SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where T
-    value = convert(T, simpleQuantity.value)
-    return SimpleQuantity(value, simpleQuantity.unit)
-end
-
-function SimpleQuantity(value::T) where T <: Number
-    unit = unitlessUnit
-    simpleQuantity = SimpleQuantity(value, unit)
-    return simpleQuantity
-end
-
-function SimpleQuantity(abstractUnit::AbstractUnit)
-    value = 1
-    unit = convertToUnit(abstractUnit)
-    simpleQuantity = SimpleQuantity(value, unit)
-    return simpleQuantity
-end
-
+SimpleQuantity(value::Number, abstractUnit::AbstractUnit) = SimpleQuantity(value, convertToUnit(abstractUnit))
+SimpleQuantity(value::Number) = SimpleQuantity(value, unitlessUnit)
+SimpleQuantity(abstractUnit::AbstractUnit) = SimpleQuantity(1, abstractUnit)
 SimpleQuantity(simpleQuantity::SimpleQuantity) = simpleQuantity
+
+SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantity(convert(T, simpleQuantity.value), simpleQuantity.unit)
+SimpleQuantity{T}(value::Number, abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity(convert(T, value), abstractUnit)
+SimpleQuantity{T}(value::Number) where {T<:Number} = SimpleQuantity(convert(T, value))
+SimpleQuantity{T}(abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity(T(1), abstractUnit)
 
 ## ## Methods for creating a SimpleQuantity
 

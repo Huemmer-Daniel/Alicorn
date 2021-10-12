@@ -9,13 +9,17 @@ const ucat = UnitCatalogue()
 function run()
     @testset "SimpleQuantity" begin
 
-        #- Constructors
-        @test canInstanciateSimpleQuantityWithRealValue()
-        @test canInstanciateSimpleQuantityWithComplexValue()
-        @test canInstanciateSimpleQuantityWithBaseUnit()
-        @test canInstanciateSimpleQuantityWithUnitFactor()
-        @test canInstanciateSimpleQuantityWithoutUnit()
-        @test canInstanciateSimpleQuantityWithoutValue()
+        # Constructors
+        @test canConstructSimpleQuantity_FromNumberAndQuantity()
+        @test canConstructSimpleQuantity_FromNumberAndAbstractQuantity()
+        @test canConstructSimpleQuantity_FromNumber()
+        @test canConstructSimpleQuantity_FromAbstractQuantity()
+        @test canConstructFromSimpleQuantity()
+        @test canConstructFromSimpleQuantity_TypeSpecified()
+        @test canConstructFromSimpleQuantity_TypeSpecified()
+        @test canConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
+        @test canConstructSimpleQuantity_FromNumber_TypeSpecified()
+        @test canConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
 
         #- Methods for constructing a SimpleQuantity
         @test Number_AbstractUnit_multiplication()
@@ -108,15 +112,41 @@ end
 
 ## #- Constructors
 
-function canInstanciateSimpleQuantityWithRealValue()
-    value = TestingTools.generateRandomReal()
-    unit = TestingTools.generateRandomUnit()
-    simpleQuantity = SimpleQuantity(value, unit)
-    correctFields = Dict([
-        ("value", value),
-        ("unit", unit)
+function canConstructSimpleQuantity_FromNumberAndQuantity()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndQuantity()
+    return _checkConstructorExamples(examples)
+end
+
+function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndQuantity()
+    realValue = TestingTools.generateRandomReal()
+    unit1 = TestingTools.generateRandomUnit()
+    sq1 = SimpleQuantity(realValue, unit1)
+    correctFields1 = Dict([
+        ("value", realValue),
+        ("unit", unit1)
     ])
-    return _verifyHasCorrectFields(simpleQuantity, correctFields)
+
+    complexValue = TestingTools.generateRandomComplex()
+    unit2 = TestingTools.generateRandomUnit()
+    sq2 = SimpleQuantity(complexValue, unit2)
+    correctFields2 = Dict([
+        ("value", complexValue),
+        ("unit", unit2)
+    ])
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2)
+    ]
+    return examples
+end
+
+function _checkConstructorExamples(examples::Array)
+    correct = true
+    for (simpleQuantity, correctFields) in examples
+        correct &= _verifyHasCorrectFields(simpleQuantity, correctFields)
+    end
+    return correct
 end
 
 function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
@@ -126,57 +156,255 @@ function _verifyHasCorrectFields(simpleQuantity::SimpleQuantity, correctFields::
     return correct
 end
 
-function canInstanciateSimpleQuantityWithComplexValue()
-    value = TestingTools.generateRandomComplex()
-    unit = TestingTools.generateRandomUnit()
-    simpleQuantity = SimpleQuantity(value, unit)
-    correctFields = Dict([
-        ("value", value),
-        ("unit", unit)
-    ])
-    return _verifyHasCorrectFields(simpleQuantity, correctFields)
+function canConstructSimpleQuantity_FromNumberAndAbstractQuantity()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity()
+    return _checkConstructorExamples(examples)
 end
 
-function canInstanciateSimpleQuantityWithBaseUnit()
-    value = TestingTools.generateRandomReal()
-    baseUnit = TestingTools.generateRandomBaseUnit()
-    simpleQuantity = SimpleQuantity(value, baseUnit)
-    correctFields = Dict([
-        ("value", value),
-        ("unit", Unit(baseUnit))
-    ])
-    return _verifyHasCorrectFields(simpleQuantity, correctFields)
-end
-
-function canInstanciateSimpleQuantityWithUnitFactor()
-    value = TestingTools.generateRandomReal()
+function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity()
+    realValue = TestingTools.generateRandomReal()
     unitFactor = TestingTools.generateRandomUnitFactor()
-    simpleQuantity = SimpleQuantity(value, unitFactor)
-    correctFields = Dict([
-        ("value", value),
+    sq1 = SimpleQuantity(realValue, unitFactor)
+    correctFields1 = Dict([
+        ("value", realValue),
         ("unit", Unit(unitFactor))
     ])
-    return _verifyHasCorrectFields(simpleQuantity, correctFields)
+
+    complexValue = TestingTools.generateRandomComplex()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    sq2 = SimpleQuantity(complexValue, baseUnit)
+    correctFields2 = Dict([
+        ("value", complexValue),
+        ("unit", Unit(baseUnit))
+    ])
+
+    unit = TestingTools.generateRandomUnit()
+    sq3 = SimpleQuantity(complexValue, unit)
+    correctFields3 = Dict([
+        ("value", complexValue),
+        ("unit", unit)
+    ])
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2),
+        (sq3, correctFields3)
+    ]
+    return examples
 end
 
-function canInstanciateSimpleQuantityWithoutUnit()
-    value = TestingTools.generateRandomReal()
-    simpleQuantity = SimpleQuantity(value)
-    correctFields = Dict([
-        ("value", value),
+function canConstructSimpleQuantity_FromNumber()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumber()
+    return _checkConstructorExamples(examples)
+end
+
+function _getExamplesFor_ConstructSimpleQuantity_FromNumber()
+    realValue = TestingTools.generateRandomReal()
+    sq1 = SimpleQuantity(realValue)
+    correctFields1 = Dict([
+        ("value", realValue),
         ("unit", Alicorn.unitlessUnit)
     ])
-    return _verifyHasCorrectFields(simpleQuantity, correctFields)
+
+    complexValue = TestingTools.generateRandomComplex()
+    sq2 = SimpleQuantity(complexValue)
+    correctFields2 = Dict([
+        ("value", complexValue),
+        ("unit", Alicorn.unitlessUnit)
+    ])
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2)
+    ]
+    return examples
 end
 
-function canInstanciateSimpleQuantityWithoutValue()
+function canConstructSimpleQuantity_FromAbstractQuantity()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity()
+    return _checkConstructorExamples(examples)
+end
+
+function _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    sq1 = SimpleQuantity(unitFactor)
+    correctFields1 = Dict([
+        ("value", 1),
+        ("unit", Unit(unitFactor))
+    ])
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    sq2 = SimpleQuantity(baseUnit)
+    correctFields2 = Dict([
+        ("value", 1),
+        ("unit", Unit(baseUnit))
+    ])
+
     unit = TestingTools.generateRandomUnit()
-    simpleQuantity = SimpleQuantity(unit)
-    correctFields = Dict([
+    sq3 = SimpleQuantity(unit)
+    correctFields3 = Dict([
         ("value", 1),
         ("unit", unit)
     ])
-    return _verifyHasCorrectFields(simpleQuantity, correctFields)
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2),
+        (sq3, correctFields3)
+    ]
+    return examples
+end
+
+function canConstructFromSimpleQuantity()
+    sq1 = TestingTools.generateRandomSimpleQuantity()
+    sq2 = SimpleQuantity(sq1)
+    return sq1==sq2
+end
+
+function canConstructFromSimpleQuantity_TypeSpecified()
+    value = 6.7
+    unit = TestingTools.generateRandomUnit()
+    sq_64 = SimpleQuantity(Float64(value), unit)
+    sq_32 = SimpleQuantity{Float32}( sq_64 )
+
+    correctFields = Dict([
+        ("value", Float32(value)),
+        ("unit", unit),
+        ("value type", Float32)
+    ])
+    return _verifyHasCorrectFieldsAndType(sq_32, correctFields)
+end
+
+function _verifyHasCorrectFieldsAndType(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
+    correctValue = (simpleQuantity.value == correctFields["value"])
+    correctUnit = (simpleQuantity.unit == correctFields["unit"])
+    correctType = isa(simpleQuantity.value, correctFields["value type"])
+    return correctValue && correctUnit && correctType
+end
+
+function canConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
+    return _checkConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_ConstructSimpleQuantity_FromNumberAndAbstractQuantity_TypeSpecified()
+    realValue = TestingTools.generateRandomReal()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    sq1 = SimpleQuantity{Float32}(realValue, unitFactor)
+    correctFields1 = Dict([
+        ("value", Float32(realValue)),
+        ("unit", Unit(unitFactor)),
+        ("value type", Float32)
+    ])
+
+    value2 = 1.0
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    sq2 = SimpleQuantity{Complex{Int32}}(value2, baseUnit)
+    correctFields2 = Dict([
+        ("value", Complex{Int32}(value2)),
+        ("unit", Unit(baseUnit)),
+        ("value type", Complex{Int32})
+    ])
+
+    value3 = 2
+    unit = TestingTools.generateRandomUnit()
+    sq3 = SimpleQuantity{Float16}(value3, unit)
+    correctFields3 = Dict([
+        ("value", Float16(value3)),
+        ("unit", unit),
+        ("value type", Float16)
+    ])
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2),
+        (sq3, correctFields3)
+    ]
+    return examples
+end
+
+function _checkConstructorExamplesIncludingType(examples::Array)
+    correct = true
+    for (simpleQuantity, correctFields) in examples
+        correct &= _verifyHasCorrectFieldsAndType(simpleQuantity, correctFields)
+    end
+    return correct
+end
+
+function canConstructSimpleQuantity_FromNumber_TypeSpecified()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromNumber_TypeSpecified()
+    return _checkConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_ConstructSimpleQuantity_FromNumber_TypeSpecified()
+    realValue = TestingTools.generateRandomReal()
+    sq1 = SimpleQuantity{Float32}(realValue)
+    correctFields1 = Dict([
+        ("value", Float32(realValue)),
+        ("unit", Alicorn.unitlessUnit),
+        ("value type", Float32)
+    ])
+
+    value2 = 1.0
+    sq2 = SimpleQuantity{Complex{Int32}}(value2)
+    correctFields2 = Dict([
+        ("value", Complex{Int32}(value2)),
+        ("unit", Alicorn.unitlessUnit),
+        ("value type", Complex{Int32})
+    ])
+
+    value3 = 2
+    sq3 = SimpleQuantity{Float16}(value3)
+    correctFields3 = Dict([
+        ("value", Float16(2)),
+        ("unit", Alicorn.unitlessUnit),
+        ("value type", Float16)
+    ])
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2),
+        (sq3, correctFields3)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
+    examples = _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
+    return _checkConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_ConstructSimpleQuantity_FromAbstractQuantity_TypeSpecified()
+    unitFactor = TestingTools.generateRandomUnitFactor()
+    sq1 = SimpleQuantity{Float32}(unitFactor)
+    correctFields1 = Dict([
+        ("value", Float32(1)),
+        ("unit", Unit(unitFactor)),
+        ("value type", Float32)
+    ])
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    sq2 = SimpleQuantity{Complex{Int32}}(baseUnit)
+    correctFields2 = Dict([
+        ("value", Complex{Int32}(1)),
+        ("unit", Unit(baseUnit)),
+        ("value type", Complex{Int32})
+    ])
+
+    unit = TestingTools.generateRandomUnit()
+    sq3 = SimpleQuantity{Float16}(unit)
+    correctFields3 = Dict([
+        ("value", Float16(1)),
+        ("unit", unit),
+        ("value type", Float16)
+    ])
+
+    examples = [
+        (sq1, correctFields1),
+        (sq2, correctFields2),
+        (sq3, correctFields3)
+    ]
+    return examples
 end
 
 ## #- Methods for constructing a SimpleQuantity

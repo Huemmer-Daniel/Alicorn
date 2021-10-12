@@ -22,11 +22,8 @@ mutable struct SimpleQuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
     unit::Unit
 
-    function SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
-        value = Array(value)
-        unit = convertToUnit(abstractUnit)
-        sqArray = new{T,N}(value, unit)
-        return sqArray
+    function SimpleQuantityArray(value::Array{T,N}, unit::Unit) where {T<:Number, N}
+        return new{T,N}(value, unit)
     end
 end
 
@@ -50,6 +47,13 @@ const SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
 
 
 ## ## External constructors
+
+function SimpleQuantityArray(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    value = Array(value)
+    unit = convertToUnit(abstractUnit)
+    sqArray = SimpleQuantityArray(value, unit)
+    return sqArray
+end
 
 function SimpleQuantityArray(value::Array{T,N}) where {T<:Number, N}
     unit = unitlessUnit
