@@ -47,12 +47,12 @@ Quantities describing an energy are of dimension
 The corresponding `Dimension` object is:
 ```jldoctest
 julia> Dimension(M=1, L=2, T=-2)
-Dimension M^1 L^2 T^-2 I^0 θ^0 N^0 J^0
+Dimension M^1 L^2 T^-2
 ```
 Calling the constructor without any keyword arguments returns exponents that correspond to a dimensionless quantity:
 ```jldoctest
 julia> Dimension()
-Dimension M^0 L^0 T^0 I^0 θ^0 N^0 J^0
+Dimension 1
 ```
 """
 struct Dimension

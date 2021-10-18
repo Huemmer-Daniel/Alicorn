@@ -250,14 +250,14 @@ end
 
 function _getDimensionExamples()
     examples = [
-    ( Dimension(), "Dimension M^0 L^0 T^0 I^0 θ^0 N^0 J^0"),
-    ( Dimension(M=1), "Dimension M^1 L^0 T^0 I^0 θ^0 N^0 J^0"),
-    ( Dimension(L=2), "Dimension M^0 L^2 T^0 I^0 θ^0 N^0 J^0"),
-    ( Dimension(L=2, T=1.554), "Dimension M^0 L^2 T^1.6 I^0 θ^0 N^0 J^0"),
-    ( Dimension(T=1.554, I=pi), "Dimension M^0 L^0 T^1.6 I^3.1 θ^0 N^0 J^0"),
-    ( Dimension(T=1.554, I=pi, θ=-1), "Dimension M^0 L^0 T^1.6 I^3.1 θ^-1 N^0 J^0"),
-    ( Dimension(T=1.554, N=pi, θ=-1), "Dimension M^0 L^0 T^1.6 I^0 θ^-1 N^3.1 J^0"),
-    ( Dimension(J=-70), "Dimension M^0 L^0 T^0 I^0 θ^0 N^0 J^-7e+1")
+    ( Dimension(), "Dimension 1"),
+    ( Dimension(M=1), "Dimension M^1"),
+    ( Dimension(L=2), "Dimension L^2"),
+    ( Dimension(L=2, T=1.554), "Dimension L^2 T^1.6"),
+    ( Dimension(T=1.554, I=pi), "Dimension T^1.6 I^3.1"),
+    ( Dimension(T=1.554, I=pi, θ=-1), "Dimension T^1.6 I^3.1 θ^-1"),
+    ( Dimension(T=1.554, N=pi, θ=-1), "Dimension T^1.6 θ^-1 N^3.1"),
+    ( Dimension(J=-70), "Dimension J^-7e+1")
     ]
     return examples
 end
@@ -294,6 +294,8 @@ function _getQuantityExamples()
     complex = 1 + 3.0im
 
     examples = [
+        # dimensionless
+        ( Quantity( int, Alicorn.unitlessUnit, intu ), """Alicorn.Quantities.Quantity{Int64} of dimension 1 in units of (1):\n 712""" ),
         # integer
         ( Quantity( int, unit, intu ), """Alicorn.Quantities.Quantity{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 712000000000000""" ),
         # float

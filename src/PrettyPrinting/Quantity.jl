@@ -5,7 +5,7 @@ end
 
 function generatePrettyPrintingOutput(quantity::Quantity)
     valueStr = string(quantity.value)
-    dimStr = generateShortStringRepresentation(quantity.dimension)
+    dimStr = generateStringRepresentation(quantity.dimension)
     intuStr = generateShortStringRepresentation(quantity.internalUnits, quantity.dimension)
 
     return "$(typeof(quantity)) of dimension " * dimStr * " in units of (" * intuStr * "):\n $valueStr"

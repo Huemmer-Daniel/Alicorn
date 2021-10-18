@@ -96,7 +96,8 @@ ScalarQuantity
 Base.:*(::Number, ::AbstractUnit)
 Base.:/(::Number, ::AbstractUnit)
 Base.zero(::Type, ::AbstractUnit)
-Base.convert(::Type{SimpleQuantity}, ::SimpleQuantity)
+Base.convert(::Type{T}, ::SimpleQuantity) where {T<:SimpleQuantity}
+Base.convert(::Type{T}, ::Quantity) where {T<:Quantity}
 ```
 
 ### Dimension

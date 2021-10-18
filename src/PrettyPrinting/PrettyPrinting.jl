@@ -6,8 +6,8 @@ using ..Dimensions
 using ..Quantities
 
 function _addStringWithWhitespace(string, addString)
-    if string != "" && string[end] != " " && addString != ""
-        addString  = " " * addString
+    if !isempty(string) && string[end] != " " && !isempty(addString)
+        addString = " " * addString
     end
     return string * addString
 end

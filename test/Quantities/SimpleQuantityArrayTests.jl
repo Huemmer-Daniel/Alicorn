@@ -17,6 +17,8 @@ function run()
         @test canConstructFromSimpleQuantityArray_TypeSpecified()
         @test canConstructFromArrayAndAbstractUnit_TypeSpecified()
         @test canConstructFromArray_TypeSpecified()
+        @test canConstructFromSimpleQuantity()
+        @test canConstructFromSimpleQuantity_TypeSpecified()
 
         # Type conversion
         @test canConvertTypeParameter()
@@ -335,6 +337,48 @@ function _getExamplesFor_canConstructFromArray_TypeSpecified()
     ]
     return examples
 end
+
+function canConstructFromSimpleQuantity()
+    examples = _getExamplesFor_canConstructFromSimpleQuantity()
+    return _checkConstructorExamples(examples)
+end
+
+function _getExamplesFor_canConstructFromSimpleQuantity()
+    sQuantity = TestingTools.generateRandomSimpleQuantity()
+    sqArray = SimpleQuantityArray(sQuantity)
+    correctFields1 = Dict([
+        ("value", [sQuantity.value]),
+        ("unit", sQuantity.unit)
+    ])
+
+    examples = [
+        (sqArray, correctFields1)
+    ]
+    return examples
+end
+
+function canConstructFromSimpleQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructFromSimpleQuantity_TypeSpecified()
+    return _checkConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructFromSimpleQuantity_TypeSpecified()
+    realValue = TestingTools.generateRandomReal()
+    unit = TestingTools.generateRandomUnit()
+    sQuantity = SimpleQuantity{Float64}(realValue, unit)
+    sqArray = SimpleQuantityArray{Float32}(sQuantity)
+    correctFields1 = Dict([
+        ("value", Array{Float32}([realValue])),
+        ("unit", unit),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (sqArray, correctFields1)
+    ]
+    return examples
+end
+
 
 ## ## Type conversion
 

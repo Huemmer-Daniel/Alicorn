@@ -1,5 +1,5 @@
 function Base.showarg(io::IO, qArray::QuantityArray, toplevel)
-    dimStr = generateShortStringRepresentation(qArray.dimension)
+    dimStr = generateStringRepresentation(qArray.dimension)
     intuStr = generateShortStringRepresentation(qArray.internalUnits, qArray.dimension)
     descriptor = " of dimension $dimStr in units of ($intuStr)"
     return print(io, typeof(qArray), descriptor)

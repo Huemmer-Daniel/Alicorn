@@ -16,14 +16,14 @@ SimpleQuantity(abstractUnit::AbstractUnit)
 If no unit is passed to the constructor, `unitlessUnit` is used by default. If
 no value is passed to the constructor, the value is set to 1 by default.
 
+If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
+accordingly:
 ```
 SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number}
 SimpleQuantity{T}(value::Number, unit::AbstractUnit) where {T<:Number}
 SimpleQuantity{T}(value::Number) where {T<:Number}
 SimpleQuantity{T}(unit::AbstractUnit) where {T<:Number}
 ```
-If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
-accordingly.
 
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can be constructed using
@@ -57,6 +57,7 @@ mutable struct SimpleQuantity{T<:Number} <: AbstractQuantity{T}
     end
 end
 
+
 ## ## External constructors
 
 SimpleQuantity(value::Number, abstractUnit::AbstractUnit) = SimpleQuantity(value, convertToUnit(abstractUnit))
@@ -69,16 +70,18 @@ SimpleQuantity{T}(value::Number, abstractUnit::AbstractUnit) where {T<:Number} =
 SimpleQuantity{T}(value::Number) where {T<:Number} = SimpleQuantity(convert(T, value))
 SimpleQuantity{T}(abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity(T(1), abstractUnit)
 
+
 ## ## Type conversion
 
 """
     Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity}
 
-Convert `simpleQuantity` to another `SimpleQuantity` type `T`.
+Convert `simpleQuantity` from type `SimpleQuantity{S} where S` to type `SimpleQuantity{T}`.
 
 Allows to convert, for instance, from `SimpleQuantity{Float64}` to `SimpleQuantity{UInt8}`.
 """
 Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity} = simpleQuantity isa T ? simpleQuantity : T(simpleQuantity)
+
 
 ## ## Methods for creating a SimpleQuantity
 

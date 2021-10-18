@@ -15,12 +15,12 @@ julia> Q = 2 * ucat.meter
 2 m
 
 julia> D = dimensionOf(Q)
-Dimension M^0 L^1 T^0 I^0 θ^0 N^0 J^0
+Dimension L^1
 ```
 If we raise `Q` to the power of 3, it has dimension ``L^3`` which can be represented by `3 * D`:
 ```jldoctest; setup = :( ucat = UnitCatalogue(); Q = 2 * ucat.meter; D = dimensionOf(Q) )
 julia> D2 = dimensionOf(Q^3)
-Dimension M^0 L^3 T^0 I^0 θ^0 N^0 J^0
+Dimension L^3
 
 julia> D2 == 3 * D
 true
@@ -56,16 +56,16 @@ julia> Q1 = 2 * ucat.meter
 2 m
 
 julia> D1 = dimensionOf(Q1)
-Dimension M^0 L^1 T^0 I^0 θ^0 N^0 J^0
+Dimension L^1
 
 julia> Q2 = 3 / ucat.second
 3 s^-1
 
 julia> D2 = dimensionOf(Q2)
-Dimension M^0 L^0 T^-1 I^0 θ^0 N^0 J^0
+Dimension T^-1
 
 julia> D = dimensionOf( Q1 * Q2 )
-Dimension M^0 L^1 T^-1 I^0 θ^0 N^0 J^0
+Dimension L^1 T^-1
 
 julia> D == D1 + D2
 true

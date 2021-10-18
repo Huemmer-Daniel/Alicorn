@@ -381,6 +381,10 @@ function _getCoreDimensions()
     return ["mass", "length", "time", "current", "temperature", "amount", "luminousIntensity"]
 end
 
+function generateRandomQuantity()
+     return generateRandomQuantityWithFields()[1]
+end
+
 function generateRandomQuantityWithFields()
     randomFields = generateRandomQuantityFields()
     randomQuantity = Quantity(

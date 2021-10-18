@@ -28,7 +28,13 @@ function generateShortStringRepresentation(internalUnits::InternalUnits, dimensi
     (isFirstElement, amountString) = _generateShortString(internalUnits.amount, dimension.amountExponent, isFirstElement)
     (isFirstElement, luminousIntensityString) = _generateShortString(internalUnits.luminousIntensity, dimension.luminousIntensityExponent, isFirstElement)
 
-    return massString * lengthString * timeString * currentString * temperatureString * amountString * luminousIntensityString
+    prettyString = massString * lengthString * timeString * currentString * temperatureString * amountString * luminousIntensityString
+
+    if isempty(prettyString)
+        prettyString = "1"
+    end
+
+    return prettyString
 end
 
 function _generateShortString(internalUnit::SimpleQuantity, dimensionExponent::Real, isFirstElement::Bool)

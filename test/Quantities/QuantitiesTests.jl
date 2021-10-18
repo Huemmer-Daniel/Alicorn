@@ -19,10 +19,10 @@ function run()
         # AbstractQuantityArrayTests.run()
 
         # SimpleQuantityTests.run()
-        SimpleQuantityArrayTests.run()
-        #
+        # SimpleQuantityArrayTests.run()
+
         # InternalUnitsTests.run()
-        # QuantityTests.run()
+        QuantityTests.run()
         # QuantityArrayTests.run()
     end
 end

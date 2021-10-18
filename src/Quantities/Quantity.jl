@@ -15,13 +15,42 @@ of `Number`.
 basic dimensions of the SI system are measured.
 
 # Constructors
+The constructors preserve the type `T` of the value upon conversion to the
+internal units whenever possible. If no `InternalUnits` are passed to the
+constructor, the basic SI units are used by default.
+
+Construction from value and dimension; if no dimension is passed to the
+constructor, a dimensionless quantity is constructed by default.
 ```
 Quantity(value::Number, dimension::Dimension, internalUnits::InternalUnits)
-Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnits) where T <: Number
-Quantity(value::T, unit::AbstractUnit, internalUnits::InternalUnits)
+Quantity(value::Number, dimension::Dimension)
+Quantity(value::Number, internalUnits::InternalUnits)
+Quantity(value::Number)
 ```
-The constructors preserve the type `T` of the value upon conversion to the
-internal units whenever possible.
+If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
+accordingly:
+```
+Quantity{T}(quantity::Quantity) where {T<:Number}
+Quantity{T}(value::Number, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number}
+Quantity{T}(value::Number, dimension::Dimension) where {T<:Number}
+Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number}
+Quantity{T}(value::Number) where {T<:Number}
+```
+
+Construction from a `SimpleQuantity`:
+```
+Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnits) where {T<:Number}
+Quantity(simpleQuantity::SimpleQuantity{T}) where {T<:Number}
+```
+
+Construction from value and unit; if no unit is passed to the constructor, a
+dimensionless quantity is constructed by default.
+```
+Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits)
+Quantity(value::Number, unit::AbstractUnit)
+Quantity(unit::AbstractUnit, internalUnits::InternalUnits)
+Quantity(unit::AbstractUnit)
+```
 
 # Examples
 1. The quantity ``7\,\mathrm{nm}`` (seven nanometers) can for instance be
@@ -52,10 +81,27 @@ mutable struct Quantity{T<:Number} <: AbstractQuantity{T}
     value::T
     dimension::Dimension
     internalUnits::InternalUnits
+
+    function Quantity(value::T, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number}
+        return new{T}(value, dimension, internalUnits)
+    end
 end
+
 
 ## External constructors
 
+Quantity(value::Number, dimension::Dimension) = Quantity(value, dimension, InternalUnits())
+Quantity(value::Number, internalUnits::InternalUnits) = Quantity(value, Dimension(), internalUnits)
+Quantity(value::Number) = Quantity(value, Dimension(), InternalUnits())
+Quantity(quantity::Quantity) = quantity
+
+Quantity{T}(quantity::Quantity) where {T<:Number} = Quantity(convert(T, quantity.value), quantity.dimension, quantity.internalUnits)
+Quantity{T}(value::Number, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = Quantity(convert(T, value), dimension, internalUnits)
+Quantity{T}(value::Number, dimension::Dimension) where {T<:Number} = Quantity{T}(value, dimension, InternalUnits())
+Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number} = Quantity{T}(value, Dimension(), internalUnits)
+Quantity{T}(value::Number) where {T<:Number} = Quantity{T}(value, Dimension(), InternalUnits())
+
+# from simple quantity
 function Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnits) where T
     dimension = dimensionOf(simpleQuantity)
     internalUnit = internalUnitForDimension(dimension, internalUnits)
@@ -72,12 +118,26 @@ function _attemptConversionToOriginalType(value::Number, T::Type)
     return value
 end
 
-Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(value*unit, internalUnits)
+Quantity(simpleQuantity::SimpleQuantity) = Quantity(simpleQuantity, InternalUnits())
 
-function Quantity(abstractUnit::AbstractUnit, internalUnits::InternalUnits)
-    simpleQuantity = 1 * abstractUnit
-    return Quantity(simpleQuantity, internalUnits)
-end
+# from value and unit
+Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(value*unit, internalUnits)
+Quantity(value::Number, unit::AbstractUnit) = Quantity(value, unit, InternalUnits())
+Quantity(unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(1, unit, internalUnits)
+Quantity(unit::AbstractUnit) = Quantity(1, unit, InternalUnits())
+
+
+## ## Type conversion
+
+"""
+    Base.convert(::Type{T}, quantity::Quantity) where {T<:Quantity}
+
+Convert `quantity` from type `Quantity{S} where S` to type `Quantity{T}`.
+
+Allows to convert, for instance, from `Quantity{Float64}` to `Quantity{UInt8}`.
+"""
+Base.convert(::Type{T}, quantity::Quantity) where {T<:Quantity} = quantity isa T ? quantity : T(quantity)
+
 
 ## Methods implementing the interface of AbstractQuantity
 

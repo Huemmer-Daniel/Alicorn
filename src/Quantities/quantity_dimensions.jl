@@ -11,7 +11,7 @@ julia> ucat = UnitCatalogue() ;
 julia> siemens = ucat.siemens
 BaseUnit siemens (1 S = 1 kg^-1 m^-2 s^3 A^2)
 julia> dimensionOf(siemens)
-Dimension M^-1 L^-2 T^3 I^2 θ^0 N^0 J^0
+Dimension M^-1 L^-2 T^3 I^2
 ```
 """
 function dimensionOf(abstractUnit::AbstractUnit)
@@ -64,7 +64,7 @@ julia> ucat = UnitCatalogue() ;
 julia> oneHenry = 1 * ucat.henry
 1 H
 julia> dimensionOf(oneHenry)
-Dimension M^1 L^2 T^-2 I^-2 θ^0 N^0 J^0
+Dimension M^1 L^2 T^-2 I^-2
 ```
 """
 function dimensionOf(abstractQuantity::AbstractQuantity)
