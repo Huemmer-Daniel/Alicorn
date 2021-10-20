@@ -8,7 +8,6 @@ const ucat = UnitCatalogue()
 
 function run()
     @testset "SimpleQuantity" begin
-
         # Constructors
         @test canConstructFromNumberAndUnit()
         @test canConstructFromNumberAndAbstractUnit()

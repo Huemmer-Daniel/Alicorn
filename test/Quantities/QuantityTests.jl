@@ -9,19 +9,18 @@ const intu = InternalUnits()
 
 function run()
     @testset "Quantity" begin
-
         # Constructors
         @test canConstructFromNumberAndDimensionAndIntU()
         @test canConstructFromNumberAndDimension()
         @test canConstructFromNumberAndIntU()
         @test canConstructFromNumber()
+        @test canConstructFromQuantity()
         @test canConstructFromSimpleQuantityAndIntU()
         @test canConstructFromSimpleQuantity()
         @test canConstructFromNumberAndAbstractUnitAndIntU()
         @test canConstructFromNumberAndAbstractUnit()
         @test canConstructFromAbstractUnitAndIntU()
         @test canConstructFromAbstractUnit()
-        @test canConstructFromQuantity()
         @test canConstructFromQuantity_TypeSpecified()
         @test canConstructFromNumberAndDimensionAndIntU_TypeSpecified()
         @test canConstructFromNumberAndDimension_TypeSpecified()
@@ -603,7 +602,6 @@ function _getExamplesFor_InstanciationTriesToPreservesValueType()
 end
 
 
-
 ## ## Type conversion
 
 function canConvertTypeParameter()
@@ -619,6 +617,7 @@ function _getExamplesFor_canConvertTypeParameter()
         ( Quantity{Float16}, Quantity{Int64}(16, dim, intu), Quantity(Float16(16), dim, intu) )
     ]
 end
+
 
 ## Arithmetics
 

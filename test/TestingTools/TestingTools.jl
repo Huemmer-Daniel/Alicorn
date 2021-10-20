@@ -408,4 +408,31 @@ function generateRandomQuantityFields()
     return randomFields
 end
 
+function generateRandomQuantityArray()
+     return generateRandomQuantityArrayWithFields()[1]
+end
+
+function generateRandomQuantityArrayWithFields()
+    randomFields = generateRandomQuantityArrayFields()
+    randomQuantityArray = QuantityArray(
+        randomFields["value"],
+        randomFields["dimension"],
+        randomFields["internalUnits"]
+    )
+    return (randomQuantityArray, randomFields)
+end
+
+function generateRandomQuantityArrayFields()
+    randomValue = generateRandomReal(dim=(2,3))
+    randomDimension = generateRandomDimension()
+    randomInternalUnits = generateRandomInternalUnits()
+
+    randomFields = Dict([
+        ("value", randomValue),
+        ("dimension", randomDimension),
+        ("internalUnits", randomInternalUnits)
+    ])
+    return randomFields
+end
+
 end # module

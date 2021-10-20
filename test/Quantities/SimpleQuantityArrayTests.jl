@@ -8,16 +8,15 @@ const ucat = UnitCatalogue()
 
 function run()
     @testset "SimpleQuantityArray" begin
-
         # Constructors
         @test canConstructFromArrayAndUnit()
         @test canConstructFromArrayAndAbstractUnit()
         @test canConstructFromArray()
         @test canConstructFromSimpleQuantityArray()
-        @test canConstructFromSimpleQuantityArray_TypeSpecified()
+        @test canConstructFromSimpleQuantity()
         @test canConstructFromArrayAndAbstractUnit_TypeSpecified()
         @test canConstructFromArray_TypeSpecified()
-        @test canConstructFromSimpleQuantity()
+        @test canConstructFromSimpleQuantityArray_TypeSpecified()
         @test canConstructFromSimpleQuantity_TypeSpecified()
 
         # Type conversion

@@ -22,8 +22,8 @@ function run()
         # SimpleQuantityArrayTests.run()
 
         # InternalUnitsTests.run()
-        QuantityTests.run()
-        # QuantityArrayTests.run()
+        # QuantityTests.run()
+        QuantityArrayTests.run()
     end
 end
 

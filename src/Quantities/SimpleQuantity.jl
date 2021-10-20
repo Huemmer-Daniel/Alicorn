@@ -9,9 +9,9 @@ A physical quantity consisting of a scalar value and a physical unit.
 
 # Constructors
 ```
-SimpleQuantity(value::Number, unit::AbstractUnit)
-SimpleQuantity(value::Number)
-SimpleQuantity(abstractUnit::AbstractUnit)
+SimpleQuantity(::Number, ::AbstractUnit)
+SimpleQuantity(::Number)
+SimpleQuantity(::AbstractUnit)
 ```
 If no unit is passed to the constructor, `unitlessUnit` is used by default. If
 no value is passed to the constructor, the value is set to 1 by default.
@@ -19,10 +19,10 @@ no value is passed to the constructor, the value is set to 1 by default.
 If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
 accordingly:
 ```
-SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number}
-SimpleQuantity{T}(value::Number, unit::AbstractUnit) where {T<:Number}
-SimpleQuantity{T}(value::Number) where {T<:Number}
-SimpleQuantity{T}(unit::AbstractUnit) where {T<:Number}
+SimpleQuantity{T}(::SimpleQuantity) where {T<:Number}
+SimpleQuantity{T}(::Number, ::AbstractUnit) where {T<:Number}
+SimpleQuantity{T}(::Number) where {T<:Number}
+SimpleQuantity{T}(::AbstractUnit) where {T<:Number}
 ```
 
 # Examples

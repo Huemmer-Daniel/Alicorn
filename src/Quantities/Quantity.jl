@@ -22,34 +22,34 @@ constructor, the basic SI units are used by default.
 Construction from value and dimension; if no dimension is passed to the
 constructor, a dimensionless quantity is constructed by default.
 ```
-Quantity(value::Number, dimension::Dimension, internalUnits::InternalUnits)
-Quantity(value::Number, dimension::Dimension)
-Quantity(value::Number, internalUnits::InternalUnits)
-Quantity(value::Number)
+Quantity(::Number, ::Dimension, ::InternalUnits)
+Quantity(::Number, ::Dimension)
+Quantity(::Number, ::InternalUnits)
+Quantity(::Number)
 ```
 If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
 accordingly:
 ```
-Quantity{T}(quantity::Quantity) where {T<:Number}
-Quantity{T}(value::Number, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number}
-Quantity{T}(value::Number, dimension::Dimension) where {T<:Number}
-Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number}
-Quantity{T}(value::Number) where {T<:Number}
+Quantity{T}(::Quantity) where {T<:Number}
+Quantity{T}(::Number, ::Dimension, ::InternalUnits) where {T<:Number}
+Quantity{T}(::Number, ::Dimension) where {T<:Number}
+Quantity{T}(::Number, ::InternalUnits) where {T<:Number}
+Quantity{T}(::Number) where {T<:Number}
 ```
 
 Construction from a `SimpleQuantity`:
 ```
-Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnits) where {T<:Number}
-Quantity(simpleQuantity::SimpleQuantity{T}) where {T<:Number}
+Quantity(::SimpleQuantity{T}, ::InternalUnits) where {T<:Number}
+Quantity(::SimpleQuantity{T}) where {T<:Number}
 ```
 
 Construction from value and unit; if no unit is passed to the constructor, a
 dimensionless quantity is constructed by default.
 ```
-Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits)
-Quantity(value::Number, unit::AbstractUnit)
-Quantity(unit::AbstractUnit, internalUnits::InternalUnits)
-Quantity(unit::AbstractUnit)
+Quantity(::Number, ::AbstractUnit, ::InternalUnits)
+Quantity(::Number, ::AbstractUnit)
+Quantity(::AbstractUnit, ::InternalUnits)
+Quantity(::AbstractUnit)
 ```
 
 # Examples
@@ -101,7 +101,7 @@ Quantity{T}(value::Number, dimension::Dimension) where {T<:Number} = Quantity{T}
 Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number} = Quantity{T}(value, Dimension(), internalUnits)
 Quantity{T}(value::Number) where {T<:Number} = Quantity{T}(value, Dimension(), InternalUnits())
 
-# from simple quantity
+# from SimpleQuantity
 function Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnits) where T
     dimension = dimensionOf(simpleQuantity)
     internalUnit = internalUnitForDimension(dimension, internalUnits)

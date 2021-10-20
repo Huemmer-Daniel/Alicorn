@@ -15,14 +15,43 @@ be a subtype of `Number`.
 basic dimensions of the SI system are measured.
 
 # Constructors
+The constructors preserve the type `T` of the value upon conversion to the
+internal units whenever possible. If no `InternalUnits` are passed to the
+constructor, the basic SI units are used by default.
+
+Construction from value and dimension; if no dimension is passed to the
+constructor, a dimensionless quantity is constructed by default.
 ```
-QuantityArray(value::Array{T,N}, dimension::Dimension, internalUnits::InternalUnits)
-QuantityArray(sqArray::SimpleQuantityArray{T}, internalUnits::InternalUnits)
-QuantityArray(value::AbstractArray{T,N}, unit::AbstractUnit, internalUnits::InternalUnits) where {T<:Number, N}
+        @test canConstructFromQuantity_TypeSpecified()
+QuantityArray(::AbstractArray, ::Dimension, ::InternalUnits)
+QuantityArray(::AbstractArray, ::Dimension)
+QuantityArray(::AbstractArray, ::InternalUnits)
+QuantityArray(::AbstractArray)
+QuantityArray(::Quantity)
+```
+If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
+accordingly:
+```
+QuantityArray{T}(::AbstractArray, ::Dimension, ::InternalUnits) where {T<:Number}
+QuantityArray{T}(::AbstractArray, ::Dimension) where {T<:Number}
+QuantityArray{T}(::AbstractArray, ::InternalUnits) where {T<:Number}
+QuantityArray{T}(::AbstractArray) where {T<:Number}
+QuantityArray{T}(::QuantityArray) where {T<:Number}
+QuantityArray{T}(::Quantity) where {T<:Number}
 ```
 
-The constructors preserve the type of the value upon conversion to the
-internal units whenever possible.
+Construction from a `SimpleQuantityArray`:
+```
+QuantityArray(::SimpleQuantityArray, ::InternalUnits)
+QuantityArray(::SimpleQuantityArray)
+```
+
+Construction from value and unit; if no unit is passed to the constructor, a
+dimensionless quantity is constructed by default.
+```
+QuantityArray(::AbstractArray{T}, ::AbstractUnit, ::InternalUnits) where {T<:Number}
+QuantityArray(::AbstractArray{T}, ::AbstractUnit) where {T<:Number}
+```
 
 # Examples
 1. The vector-valued quantity ``[7, 14]\,\mathrm{nm}`` can for instance be
@@ -55,6 +84,10 @@ mutable struct QuantityArray{T<:Number,N} <: AbstractQuantityArray{T,N}
     value::Array{T,N}
     dimension::Dimension
     internalUnits::InternalUnits
+
+    function QuantityArray(value::Array{T,N}, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number,N}
+        return new{T,N}(value, dimension, internalUnits)
+    end
 end
 
 """
@@ -75,8 +108,24 @@ Alias for `QuantityArray{T,2}`.
 """
 const QuantityMatrix{T} = QuantityArray{T,2}
 
+
 ## External constructors
 
+QuantityArray(value::AbstractArray{T}, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = QuantityArray( Array(value), dimension, internalUnits)
+QuantityArray(value::AbstractArray{T}, dimension::Dimension) where {T<:Number} = QuantityArray( Array(value), dimension, InternalUnits())
+QuantityArray(value::AbstractArray{T}, internalUnits::InternalUnits) where {T<:Number} = QuantityArray( Array(value), Dimension(), internalUnits)
+QuantityArray(value::AbstractArray{T}) where {T<:Number} = QuantityArray( Array(value), Dimension(), InternalUnits())
+QuantityArray(qArray::QuantityArray) = qArray
+QuantityArray(quantity::Quantity) = QuantityArray([quantity.value], quantity.dimension, quantity.internalUnits)
+
+QuantityArray{T}(value::AbstractArray, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = QuantityArray(convert(Array{T}, value), dimension, internalUnits)
+QuantityArray{T}(value::AbstractArray, dimension::Dimension) where {T<:Number} = QuantityArray(convert(Array{T}, value), dimension, InternalUnits())
+QuantityArray{T}(value::AbstractArray, internalUnits::InternalUnits) where {T<:Number} = QuantityArray(convert(Array{T}, value), Dimension(), internalUnits)
+QuantityArray{T}(value::AbstractArray) where {T<:Number} = QuantityArray(convert(Array{T}, value), Dimension(), InternalUnits())
+QuantityArray{T}(qArray::QuantityArray) where {T<:Number} = QuantityArray(convert(Array{T}, qArray.value), qArray.dimension, qArray.internalUnits)
+QuantityArray{T}(quantity::Quantity) where {T<:Number} = QuantityArray{T}([quantity.value], quantity.dimension, quantity.internalUnits)
+
+# from SimpleQuantityArray
 function QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnits)
     dimension = dimensionOf(sqArray)
     internalUnit = internalUnitForDimension(dimension, internalUnits)
@@ -93,7 +142,24 @@ function _attemptConversionToOriginalType(value::AbstractArray{S,N}, T::Type) wh
     return value
 end
 
-QuantityArray(value::AbstractArray{T,N}, unit::AbstractUnit, internalUnits::InternalUnits) where {T<:Number, N} = QuantityArray(value*unit, internalUnits)
+QuantityArray(sqArray::SimpleQuantityArray) = QuantityArray(sqArray, InternalUnits())
+
+# from value and unit
+QuantityArray(value::AbstractArray{T}, unit::AbstractUnit, internalUnits::InternalUnits) where {T<:Number} = QuantityArray(value*unit, internalUnits)
+QuantityArray(value::AbstractArray{T}, unit::AbstractUnit) where {T<:Number} = QuantityArray(value, unit, InternalUnits())
+
+
+## ## Type conversion
+
+"""
+    Base.convert(::Type{T}, qArray::QuantityArray) where {T<:QuantityArray}
+
+Convert `qArray` from type `QuantityArray{S} where S` to type `QuantityArray{T}`.
+
+Allows to convert, for instance, from `QuantityArray{Float64}` to `QuantityArray{UInt8}`.
+"""
+Base.convert(::Type{T}, qArray::QuantityArray) where {T<:QuantityArray} = qArray isa T ? qArray : T(qArray)
+
 
 ## Arithemtics
 
@@ -118,3 +184,17 @@ end
 Base.size(qArray::QuantityArray) = size(qArray.value)
 
 Base.IndexStyle(::Type{<:QuantityArray}) = IndexLinear()
+
+function Base.getindex(qArray::QuantityArray, inds...)
+    dimension = qArray.dimension
+    internalUnits = qArray.internalUnits
+    array = qArray.value
+
+    subarray = getindex(array, inds...)
+
+    if length(subarray) == 1
+        return Quantity(subarray, dimension, internalUnits)
+    else
+        return QuantityArray(subarray, dimension, internalUnits)
+    end
+end
