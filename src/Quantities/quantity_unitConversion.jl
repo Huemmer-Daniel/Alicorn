@@ -14,9 +14,8 @@ function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
     originalUnit = simpleQuantity.unit
 
     if originalUnit == targetUnit
-        resultingQuantity = simpleQuantity
+        resultingSimpleQuantity = simpleQuantity
     else
-
         (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
         (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
 
@@ -24,9 +23,19 @@ function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
         conversionFactor = originalUnitPrefactor / targetUnitPrefactor
 
         resultingValue = originalValue * conversionFactor
-        resultingQuantity = SimpleQuantity( resultingValue, targetUnit )
+        try
+            resultingValue = convert(typeof(originalValue), resultingValue)
+        catch
+        end
+        resultingSimpleQuantity = SimpleQuantity( resultingValue, targetUnit )
     end
-    return resultingQuantity
+    return resultingSimpleQuantity
+end
+
+function inUnitsOf(quantity::Quantity, targetUnit::AbstractUnit)
+    internalUnit = internalUnitForDimension(quantity.dimension, quantity.internalUnits)
+    resultingSimpleQuantity = inUnitsOf(quantity.value * internalUnit, targetUnit)
+    return resultingSimpleQuantity
 end
 
 function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitExponents2::BaseUnitExponents)
@@ -50,7 +59,7 @@ function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
     originalUnit = sqArray.unit
 
     if originalUnit == targetUnit
-        resultingQuantityArray = sqArray
+        resultingSimpleQuantityArray = sqArray
     else
 
         (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
@@ -60,9 +69,19 @@ function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
         conversionFactor = originalUnitPrefactor / targetUnitPrefactor
 
         resultingvalue = originalvalue .* conversionFactor
-        resultingQuantityArray = SimpleQuantityArray( resultingvalue, targetUnit )
+        try
+            resultingValue = convert(typeof(originalValue), resultingValue)
+        catch
+        end
+        resultingSimpleQuantityArray = SimpleQuantityArray( resultingvalue, targetUnit )
     end
-    return resultingQuantityArray
+    return resultingSimpleQuantityArray
+end
+
+function inUnitsOf(qArray::QuantityArray, targetUnit::AbstractUnit)
+    internalUnit = internalUnitForDimension(qArray.dimension, qArray.internalUnits)
+    resultingSimpleQuantityArray = inUnitsOf(qArray.value * internalUnit, targetUnit)
+    return resultingSimpleQuantityArray
 end
 
 
@@ -75,9 +94,7 @@ Returns the numerical value of `quantity` expressed in units of `unit`.
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `unit` do not agree
 """
-function valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit) end
-
-valueInUnitsOf(simpleQuantity::SimpleQuantity, unit::AbstractUnit) = inUnitsOf(simpleQuantity, unit).value
+valueInUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit) = inUnitsOf(quantity, unit).value
 
 """
     valueInUnitsOf(quantity::AbstractQuantity, simpleQuantity::SimpleQuantity)
@@ -89,7 +106,7 @@ The result is equivalent to `valueOfDimensionless(quantity / simpleQuantity)`.
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `simpleQuantity` do not agree
 """
-valueInUnitsOf(quantity::AbstractQuantity, simpleQuantity::SimpleQuantity) = valueOfDimensionless(quantity / simpleQuantity)
+valueInUnitsOf(quantity::AbstractQuantity, simpleQuantity::SimpleQuantity) = valueInUnitsOf(quantity, simpleQuantity.unit) / simpleQuantity.value
 
 """
     valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit)
@@ -99,9 +116,7 @@ Returns the numerical value of `qArray` expressed in units of `unit`.
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `unit` do not agree
 """
-function valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit) end
-
-valueInUnitsOf(sqArray::SimpleQuantityArray, unit::AbstractUnit) = inUnitsOf(sqArray, unit).value
+valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit) = inUnitsOf(qArray, unit).value
 
 """
     valueInUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::SimpleQuantity)
@@ -113,7 +128,8 @@ The result is equivalent to `valueOfDimensionless(quantityArray / simpleQuantity
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantityArray` and `simpleQuantity` do not agree
 """
-valueInUnitsOf(quantityArray::AbstractQuantityArray, simpleQuantity::SimpleQuantity) = valueOfDimensionless(quantityArray / simpleQuantity)
+valueInUnitsOf(qArray::AbstractQuantityArray, simpleQuantity::SimpleQuantity) = valueInUnitsOf(qArray, simpleQuantity.unit) / simpleQuantity.value
+
 
 ## inBasicSIUnits
 """

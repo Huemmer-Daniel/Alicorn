@@ -95,7 +95,6 @@ ScalarQuantity
 ```@docs
 Base.:*(::Number, ::AbstractUnit)
 Base.:/(::Number, ::AbstractUnit)
-Base.zero(::Type, ::AbstractUnit)
 Base.convert(::Type{T}, ::SimpleQuantity) where {T<:SimpleQuantity}
 Base.convert(::Type{T}, ::Quantity) where {T<:Quantity}
 ```
@@ -182,8 +181,8 @@ ArrayQuantity
 ### Construction and type conversion
 
 ```@docs
-Base.:*(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}
-Base.:/(::AbstractArray{T,N}, ::AbstractUnit) where {T<:Number, N}
+Base.:*(::AbstractArray{T}, ::AbstractUnit) where {T<:Number}
+Base.:/(::AbstractArray{T}, ::AbstractUnit) where {T<:Number}
 Base.convert(::Type{T}, ::SimpleQuantityArray) where {T<:SimpleQuantityArray}
 Base.convert(::Type{T}, ::QuantityArray) where {T<:QuantityArray}
 ```

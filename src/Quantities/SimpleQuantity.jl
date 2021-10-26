@@ -369,36 +369,6 @@ function Base.cbrt(simpleQuantity::SimpleQuantity)
     return rootOfQuantity
 end
 
-## 7. Literal zero
-
-# method documented as part of the AbstractQuantity interface
-function Base.zero(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = zero(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
-
-"""
-    Base.zero(numberType::Type, unit::AbstractUnit)
-
-Return a `SimpleQuantity` with unit `unit` and value `zero(numberType)`.
-
-
-# Raises Exceptions
-- `Alicorn.DomainError`: if `numberType` is not a subtype of `Number`.
-"""
-function Base.zero(numberType::Type, unit::AbstractUnit)
-    _assertIsSubtypeOfNumber(numberType)
-    value = zero(numberType)
-    return SimpleQuantity(value, unit)
-end
-
-function _assertIsSubtypeOfNumber(type::Type)
-    if !(type<:Number)
-        error = Core.DomainError(type, "type $type is not a subtype of Number")
-        throw(error)
-    end
-end
 
 ## 8. Complex numbers
 

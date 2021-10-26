@@ -22,17 +22,12 @@ function run()
         # Type conversion
         @test canConvertTypeParameter()
 
-        #- Methods for constructing a SimpleQuantity
+        # Methods for constructing a SimpleQuantity
         @test Number_AbstractUnit_multiplication()
         @test Number_AbstractUnit_division()
 
         #- AbstractQuantity interface
         # 1. Unit conversion
-        @test inUnitsOf_implemented()
-        test_inUnitsOf_ErrorsForMismatchedUnits()
-        @test valueInUnitsOf_implemented()
-        test_valueInUnitsOf_ErrorsForMismatchedUnits()
-        @test valueInUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
         @test inBasicSIUnits_implemented()
         @test valueOfDimensionless_implemented()
         test_valueOfDimensionless_ErrorsIfNotUnitless()
@@ -90,11 +85,6 @@ function run()
         # 6. Roots
         @test sqrt_implemented()
         @test cbrt_implemented()
-
-        # 7. Literal zero
-        @test zero_implemented()
-        @test zero_dyadicImplemented()
-        test_zero_dyadic_errorsOnNonnumberType()
 
         # 8. Complex numbers
         @test real_implemented()
@@ -471,30 +461,6 @@ end
 ## #- AbstractQuantity interface
 ## 1. Unit conversion
 
-function inUnitsOf_implemented()
-    examples = _getExamplesFor_inUnitsOf()
-    return TestingTools.testDyadicFunction(inUnitsOf, examples)
-end
-
-function _getExamplesFor_inUnitsOf()
-    electronvoltInBasicSI = ucat.electronvolt.prefactor
-
-    # format: SimpleQuantity, Unit, SimpleQuantity expressed in units of Unit
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
-        ( 7 * ucat.meter, ucat.milli*ucat.meter, 7000 * (ucat.milli*ucat.meter) ),
-        ( 2 * (ucat.milli * ucat.second)^2, ucat.second^2, 2e-6 * ucat.second^2 ),
-        ( 1 * ucat.joule, ucat.electronvolt, (1/electronvoltInBasicSI) * ucat.electronvolt ),
-        ( 5 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit)
-    ]
-end
-
-function test_inUnitsOf_ErrorsForMismatchedUnits()
-    simpleQuantity = 7 * Alicorn.meter
-    mismatchedUnit = Alicorn.second
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
-    @test_throws expectedError inUnitsOf(simpleQuantity, mismatchedUnit)
-end
 
 function inBasicSIUnits_implemented()
     examples = _getExamplesFor_inBasicSIUnits()
@@ -533,42 +499,6 @@ function test_valueOfDimensionless_ErrorsIfNotUnitless()
     @test_throws expectedError valueOfDimensionless(simpleQuantity)
 end
 
-function valueInUnitsOf_implemented()
-    examples = _getExamplesFor_valueInUnitsOf()
-    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
-end
-
-function _getExamplesFor_valueInUnitsOf()
-    # format: SimpleQuantity, Unit, value of SimpleQuantity expressed in units of Unit
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 1),
-        ( 7 * ucat.meter, ucat.milli*ucat.meter, 7000 ),
-        ( 2 * (ucat.milli * ucat.second)^2, ucat.second^2, 2e-6 ),
-        ( 5 * Alicorn.unitlessUnit, Alicorn.unitlessUnit, 5 )
-    ]
-end
-
-function test_valueInUnitsOf_ErrorsForMismatchedUnits()
-    simpleQuantity = 7 * Alicorn.meter
-    mismatchedUnit = Alicorn.second
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
-    @test_throws expectedError valueInUnitsOf(simpleQuantity, mismatchedUnit)
-end
-
-function valueInUnitsOf_implemented_forSimpleQuantityAsTargetUnit()
-    examples = _getExamplesFor_valueInUnitsOf_forSimpleQuantityAsTargetUnit()
-    return TestingTools.testDyadicFunction(valueInUnitsOf, examples)
-end
-
-function _getExamplesFor_valueInUnitsOf_forSimpleQuantityAsTargetUnit()
-    # format: SimpleQuantity1, SimpleQuantity2, SimpleQuantity1 expressed in units of SimpleQuantity2
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, 3 * Alicorn.unitlessUnit, 1/3  ),
-        ( 7 * ucat.meter, 2 * (ucat.milli*ucat.meter), 3500  ),
-        ( 2 * (ucat.milli * ucat.second)^2, 2 * ucat.second^2, 1e-6  ),
-        ( 6 * Alicorn.unitlessUnit, -3 * Alicorn.unitlessUnit, -2 )
-    ]
-end
 
 function SimpleQuantity_AbstractUnit_multiplication()
     examples = _getExamplesFor_SimpleQuantity_AbstractUnit_multiplication()

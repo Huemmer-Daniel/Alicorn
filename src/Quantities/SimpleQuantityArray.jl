@@ -83,7 +83,7 @@ Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityAr
 ## ## Methods for creating a SimpleQuantityArray
 
 """
-    Base.:*(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    Base.:*(value::AbstractArray{T}, abstractUnit::AbstractUnit) where {T<:Number}
 
 Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
@@ -97,12 +97,12 @@ julia> [3.5, 4.6] * ucat.tesla
  4.6
 ```
 """
-function Base.:*(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+function Base.:*(value::AbstractArray{T}, abstractUnit::AbstractUnit) where {T<:Number}
     return SimpleQuantityArray(value, abstractUnit)
 end
 
 """
-    Base.:/(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+    Base.:/(value::AbstractArray{T}, abstractUnit::AbstractUnit) where {T<:Number}
 
 Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
@@ -116,7 +116,7 @@ julia> [3.5, 4.6] / ucat.second
  4.6
 ```
 """
-function Base.:/(value::AbstractArray{T,N}, abstractUnit::AbstractUnit) where {T<:Number, N}
+function Base.:/(value::AbstractArray{T}, abstractUnit::AbstractUnit) where {T<:Number}
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantityArray(value, inverseAbstractUnit)
 end
