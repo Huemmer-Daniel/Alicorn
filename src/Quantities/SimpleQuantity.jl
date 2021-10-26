@@ -90,12 +90,15 @@ Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity
 
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
+If `abstractUnit` is a product of a `UnitPrefix` and `BaseUnit`, they are first
+combined into a `SimpleQuantity`, which is then in turn combined with `value`.
+
 # Example
 ```jldoctest
 julia> ucat = UnitCatalogue() ;
 
-julia> 3.5 * ucat.tesla
-3.5 T
+julia> 3.5 * ucat.milli * ucat.tesla
+3.5 mT
 ```
 """
 function Base.:*(value::Number, abstractUnit::AbstractUnit)
@@ -107,18 +110,35 @@ end
 
 Combine `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantity`.
 
+If `abstractUnit` is a product of a `UnitPrefix` and `BaseUnit`, they are first
+combined into a `SimpleQuantity`, which is then in turn combined with `value`.
+
 # Example
 ```jldoctest
 julia> ucat = UnitCatalogue() ;
 
-julia> 3.5 / ucat.second
-3.5 s^-1
+julia> 3.5 / ucat.nano * ucat.second
+3.5 ns^-1
 ```
 """
 function Base.:/(value::Number, abstractUnit::AbstractUnit)
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantity(value, inverseAbstractUnit)
 end
+
+# the following definitions allow to create a simple quantity by directly
+# multiplying (dividing) n::Number, pre::UnitPrefix, and base::Union{BaseUnit, UnitFactor}) without
+# parentheses:
+#  n * pre * base
+#  n / pre * base
+# instead of
+#  n * (pre * base)
+#  n / (pre * base)
+Base.:*(value::Number, unitPrefix::UnitPrefix) = (value, unitPrefix, *)
+Base.:/(value::Number, unitPrefix::UnitPrefix) = (value, unitPrefix, /)
+Base.:*(valueWithUnitPrefix::Tuple{Number, UnitPrefix, typeof(*)}, baseUnit::Union{BaseUnit, UnitFactor}) = valueWithUnitPrefix[1] * ( valueWithUnitPrefix[2] * baseUnit )
+Base.:*(valueWithUnitPrefix::Tuple{Number, UnitPrefix, typeof(/)}, baseUnit::Union{BaseUnit, UnitFactor}) = valueWithUnitPrefix[1] / ( valueWithUnitPrefix[2] * baseUnit )
+
 
 ## ## Methods implementing the interface of AbstractQuantity
 

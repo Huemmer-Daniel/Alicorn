@@ -26,6 +26,11 @@ function run()
         @test Number_AbstractUnit_multiplication()
         @test Number_AbstractUnit_division()
 
+        @test Number_UnitPrefix_BaseUnit__multiplication_implemented()
+        @test Number_UnitPrefix_UnitFactor__multiplication_implemented()
+        @test Number_UnitPrefix_BaseUnit__division_implemented()
+        @test Number_UnitPrefix_UnitFactor__division_implemented()
+
         #- AbstractQuantity interface
         # 1. Unit conversion
         @test inBasicSIUnits_implemented()
@@ -456,6 +461,42 @@ function _getExamplesFor_Number_AbstractUnit_division()
         ( scalar, unitFactor, SimpleQuantity(scalar, inv(unitFactor) ) ),
         ( scalar, unit, SimpleQuantity(scalar, inv(unit)) ),
     ]
+end
+
+function Number_UnitPrefix_BaseUnit__multiplication_implemented()
+    number = TestingTools.generateRandomReal()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    returnedResult = number * unitPrefix * baseUnit
+    correctResult = number * (unitPrefix * baseUnit)
+    return returnedResult == correctResult
+end
+
+function Number_UnitPrefix_UnitFactor__multiplication_implemented()
+    number = TestingTools.generateRandomReal()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    unitFactor = UnitFactor(TestingTools.generateRandomBaseUnit())
+    returnedResult = number * unitPrefix * unitFactor
+    correctResult = number * (unitPrefix * unitFactor)
+    return returnedResult == correctResult
+end
+
+function Number_UnitPrefix_BaseUnit__division_implemented()
+    number = TestingTools.generateRandomReal()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    returnedResult = number / unitPrefix * baseUnit
+    correctResult = number / (unitPrefix * baseUnit)
+    return returnedResult == correctResult
+end
+
+function Number_UnitPrefix_UnitFactor__division_implemented()
+    number = TestingTools.generateRandomReal()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    unitFactor = UnitFactor(TestingTools.generateRandomBaseUnit())
+    returnedResult = number / unitPrefix * unitFactor
+    correctResult = number / (unitPrefix * unitFactor)
+    return returnedResult == correctResult
 end
 
 ## #- AbstractQuantity interface

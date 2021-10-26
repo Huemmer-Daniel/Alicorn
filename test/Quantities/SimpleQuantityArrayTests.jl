@@ -26,6 +26,12 @@ function run()
         @test AbstractArray_AbstractUnit_multiplication()
         @test AbstractArray_AbstractUnit_division()
 
+        @test Array_UnitPrefix_BaseUnit__multiplication_implemented()
+        @test Array_UnitPrefix_UnitFactor__multiplication_implemented()
+        @test Array_UnitPrefix_BaseUnit__division_implemented()
+        @test Array_UnitPrefix_UnitFactor__division_implemented()
+
+
         #- AbstractArray interface
         @test size_implemented()
         @test size_withDim_implemented()
@@ -436,6 +442,44 @@ function _getExamplesFor_AbstractArray_AbstractUnit_division()
         ( array3, unit, SimpleQuantityArray(array3, inv(unit)) ),
     ]
 end
+
+function Array_UnitPrefix_BaseUnit__multiplication_implemented()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    returnedResult = array * unitPrefix * baseUnit
+    correctResult = array * (unitPrefix * baseUnit)
+    return returnedResult == correctResult
+end
+
+function Array_UnitPrefix_UnitFactor__multiplication_implemented()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    unitFactor = UnitFactor(TestingTools.generateRandomBaseUnit())
+    returnedResult = array * unitPrefix * unitFactor
+    correctResult = array * (unitPrefix * unitFactor)
+    return returnedResult == correctResult
+end
+
+function Array_UnitPrefix_BaseUnit__division_implemented()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    returnedResult = array / unitPrefix * baseUnit
+    correctResult = array / (unitPrefix * baseUnit)
+    return returnedResult == correctResult
+end
+
+function Array_UnitPrefix_UnitFactor__division_implemented()
+    array = TestingTools.generateRandomReal(dim=(2,3))
+    number = TestingTools.generateRandomReal()
+    unitPrefix = TestingTools.generateRandomUnitPrefix()
+    unitFactor = UnitFactor(TestingTools.generateRandomBaseUnit())
+    returnedResult = array / unitPrefix * unitFactor
+    correctResult = array / (unitPrefix * unitFactor)
+    return returnedResult == correctResult
+end
+
 
 ## #- AbstractArray interface
 

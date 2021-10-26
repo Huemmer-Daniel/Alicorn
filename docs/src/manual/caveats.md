@@ -24,7 +24,7 @@ julia> T = 20 * ucat.degreeCelsius
 20 °C
 
 julia> inUnitsOf(T, ucat.kelvin)
-20.0 K
+20 K
 ```
 
 ## Only dimensions are compared

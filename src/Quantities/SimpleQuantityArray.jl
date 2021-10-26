@@ -87,12 +87,15 @@ Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityAr
 
 Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
+If `abstractUnit` is a product of a `UnitPrefix` and `BaseUnit`, they are first
+combined into a `SimpleQuantity`, which is then in turn combined with `value`.
+
 # Example
 ```jldoctest
 julia> ucat = UnitCatalogue() ;
 
-julia> [3.5, 4.6] * ucat.tesla
-2-element SimpleQuantityVector{Float64} of unit T:
+julia> [3.5, 4.6] * ucat.milli * ucat.tesla
+2-element SimpleQuantityVector{Float64} of unit mT:
  3.5
  4.6
 ```
@@ -106,12 +109,15 @@ end
 
 Combine the array `value` and `abstractUnit` to form a physical quantity of type `SimpleQuantityArray`.
 
+If `abstractUnit` is a product of a `UnitPrefix` and `BaseUnit`, they are first
+combined into a `SimpleQuantity`, which is then in turn combined with `value`.
+
 # Example
 ```jldoctest
 julia> ucat = UnitCatalogue() ;
 
-julia> [3.5, 4.6] / ucat.second
-2-element SimpleQuantityVector{Float64} of unit s^-1:
+julia> [3.5, 4.6] / ucat.nano * ucat.second
+2-element SimpleQuantityVector{Float64} of unit ns^-1:
  3.5
  4.6
 ```
@@ -120,6 +126,19 @@ function Base.:/(value::AbstractArray{T}, abstractUnit::AbstractUnit) where {T<:
     inverseAbstractUnit = inv(abstractUnit)
     return SimpleQuantityArray(value, inverseAbstractUnit)
 end
+
+# the following definitions allow to create a simple quantity by directly
+# multiplying (dividing) n::Array, pre::UnitPrefix, and base::Union{BaseUnit, UnitFactor}) without
+# parentheses:
+#  n * pre * base
+#  n / pre * base
+# instead of
+#  n * (pre * base)
+#  n / (pre * base)
+Base.:*(array::AbstractArray{T}, unitPrefix::UnitPrefix) where {T<:Number} = (array, unitPrefix, *)
+Base.:/(array::AbstractArray{T}, unitPrefix::UnitPrefix) where {T<:Number} = (array, unitPrefix, /)
+Base.:*(arrayWithUnitPrefix::Tuple{AbstractArray{T}, UnitPrefix, typeof(*)}, baseUnit::Union{BaseUnit, UnitFactor}) where {T<:Number} = arrayWithUnitPrefix[1] * ( arrayWithUnitPrefix[2] * baseUnit )
+Base.:*(arrayWithUnitPrefix::Tuple{AbstractArray{T}, UnitPrefix, typeof(/)}, baseUnit::Union{BaseUnit, UnitFactor}) where {T<:Number} = arrayWithUnitPrefix[1] / ( arrayWithUnitPrefix[2] * baseUnit )
 
 ## ## Methods implementing the interface of AbstractArray
 
