@@ -45,7 +45,7 @@ using .Quantities
 export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector, AbstractQuantityMatrix
 export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
 export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix
-export InternalUnits, internalUnitForDimension
+export InternalUnits, internalUnitFor, conversionFactor
 export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 export dimensionOf
 export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless

@@ -16,10 +16,15 @@ SimpleQuantity(::AbstractUnit)
 If no unit is passed to the constructor, `unitlessUnit` is used by default. If
 no value is passed to the constructor, the value is set to 1 by default.
 
+If called with a `Quantity` as argument, the `Quantity` is expressed in terms
+of the units used to store its value internally, see [`InternalUnits`](@ref).
+```
+SimpleQuantity(::Quantity)
+```
+
 If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
 accordingly:
 ```
-SimpleQuantity{T}(::SimpleQuantity) where {T<:Number}
 SimpleQuantity{T}(::Number, ::AbstractUnit) where {T<:Number}
 SimpleQuantity{T}(::Number) where {T<:Number}
 SimpleQuantity{T}(::AbstractUnit) where {T<:Number}
@@ -63,24 +68,10 @@ end
 SimpleQuantity(value::Number, abstractUnit::AbstractUnit) = SimpleQuantity(value, convertToUnit(abstractUnit))
 SimpleQuantity(value::Number) = SimpleQuantity(value, unitlessUnit)
 SimpleQuantity(abstractUnit::AbstractUnit) = SimpleQuantity(1, abstractUnit)
-SimpleQuantity(simpleQuantity::SimpleQuantity) = simpleQuantity
 
-SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantity(convert(T, simpleQuantity.value), simpleQuantity.unit)
 SimpleQuantity{T}(value::Number, abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity(convert(T, value), abstractUnit)
 SimpleQuantity{T}(value::Number) where {T<:Number} = SimpleQuantity(convert(T, value))
 SimpleQuantity{T}(abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantity(T(1), abstractUnit)
-
-
-## ## Type conversion
-
-"""
-    Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity}
-
-Convert `simpleQuantity` from type `SimpleQuantity{S} where S` to type `SimpleQuantity{T}`.
-
-Allows to convert, for instance, from `SimpleQuantity{Float64}` to `SimpleQuantity{UInt8}`.
-"""
-Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity} = simpleQuantity isa T ? simpleQuantity : T(simpleQuantity)
 
 
 ## ## Methods for creating a SimpleQuantity

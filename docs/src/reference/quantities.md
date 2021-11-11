@@ -90,12 +90,21 @@ Quantity
 ScalarQuantity
 ```
 
-### Construction and type conversion
+### Construction
 
 ```@docs
 Base.:*(::Number, ::AbstractUnit)
 Base.:/(::Number, ::AbstractUnit)
+```
+
+### Type conversion
+
+```@docs
+SimpleQuantity(::AbstractQuantity)
+SimpleQuantity{T}(::AbstractQuantity) where {T<:Number}
 Base.convert(::Type{T}, ::SimpleQuantity) where {T<:SimpleQuantity}
+Quantity(::AbstractQuantity)
+Quantity{T}(::AbstractQuantity) where {T<:Number}
 Base.convert(::Type{T}, ::Quantity) where {T<:Quantity}
 ```
 
@@ -223,7 +232,8 @@ Base.isapprox(::SimpleQuantityArray, ::SimpleQuantityArray)
 ```@docs
 InternalUnits
 Base.:(==)(::InternalUnits, ::InternalUnits)
-internalUnitForDimension(::Dimension, ::InternalUnits)
+internalUnitFor(::Dimension, ::InternalUnits)
+conversionFactor(::InternalUnits, ::InternalUnits)
 ```
 
 ```@meta

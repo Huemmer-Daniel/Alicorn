@@ -128,7 +128,7 @@ QuantityArray{T}(quantity::Quantity) where {T<:Number} = QuantityArray{T}([quant
 # from SimpleQuantityArray
 function QuantityArray(sqArray::SimpleQuantityArray, internalUnits::InternalUnits)
     dimension = dimensionOf(sqArray)
-    internalUnit = internalUnitForDimension(dimension, internalUnits)
+    internalUnit = internalUnitFor(dimension, internalUnits)
     internalValue = valueInUnitsOf(sqArray, internalUnit)
     internalValue = _attemptConversionToOriginalType(internalValue, typeof(sqArray.value))
     return QuantityArray(internalValue, dimension, internalUnits)

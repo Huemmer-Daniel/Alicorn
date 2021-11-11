@@ -134,7 +134,7 @@ Base.:^(a::SimpleQuantityArray, b::Real) = power(a, b)
 Base.:^(a::SimpleQuantityArray, b::Integer) = power(a, b)
 
 function power(sQuantity::SimpleQuantityType, exponent::Real)
-    exponentiatedValue = (sQuantity.value)^exponent
+    exponentiatedValue = Base.literal_pow(^, sQuantity.value, Val(exponent))
     exponentiatedUnit = (sQuantity.unit)^exponent
     return exponentiatedValue * exponentiatedUnit
 end

@@ -14,7 +14,7 @@ include("SimpleQuantityArray.jl")
 export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix
 
 include("InternalUnits.jl")
-export InternalUnits, internalUnitForDimension
+export InternalUnits, internalUnitFor, conversionFactor
 
 include("Quantity.jl")
 include("QuantityArray.jl")
@@ -22,6 +22,7 @@ export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 
 include("quantity_dimensions.jl")
 export dimensionOf
+include("quantity_typeConversion.jl")
 include("quantity_unitConversion.jl")
 export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless
 include("quantity_arithmetics.jl")

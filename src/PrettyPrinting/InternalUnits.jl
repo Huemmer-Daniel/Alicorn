@@ -42,6 +42,6 @@ function _generateShortString(internalUnit::SimpleQuantity, dimensionExponent::R
         return (isFirstElement, "")
     else
         separator = isFirstElement ? "" : ", "
-        return (false, separator * generatePrettyPrintingOutput(internalUnit))
+        return (false, separator * generatePrettyPrintingOutput(internalUnit) )
     end
 end

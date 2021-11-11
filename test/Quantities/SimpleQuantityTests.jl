@@ -13,14 +13,9 @@ function run()
         @test canConstructFromNumberAndAbstractUnit()
         @test canConstructFromNumber()
         @test canConstructFromAbstractUnit()
-        @test canConstructFromSimpleQuantity()
-        @test canConstructFromSimpleQuantity_TypeSpecified()
         @test canConstructFromNumberAndAbstractUnit_TypeSpecified()
         @test canConstructFromNumber_TypeSpecified()
         @test canConstructFromAbstractUnit_TypeSpecified()
-
-        # Type conversion
-        @test canConvertTypeParameter()
 
         # Methods for constructing a SimpleQuantity
         @test Number_AbstractUnit_multiplication()
@@ -33,9 +28,6 @@ function run()
 
         #- AbstractQuantity interface
         # 1. Unit conversion
-        @test inBasicSIUnits_implemented()
-        @test valueOfDimensionless_implemented()
-        test_valueOfDimensionless_ErrorsIfNotUnitless()
         @test SimpleQuantity_AbstractUnit_multiplication()
         @test AbstractUnit_SimpleQuantity_multiplication()
         @test SimpleQuantity_AbstractUnit_division()
@@ -251,33 +243,6 @@ function _getExamplesFor_canConstructFromAbstractUnit()
     return examples
 end
 
-function canConstructFromSimpleQuantity()
-    sq1 = TestingTools.generateRandomSimpleQuantity()
-    sq2 = SimpleQuantity(sq1)
-    return sq1==sq2
-end
-
-function canConstructFromSimpleQuantity_TypeSpecified()
-    value = 6.7
-    unit = TestingTools.generateRandomUnit()
-    sq_64 = SimpleQuantity(Float64(value), unit)
-    sq_32 = SimpleQuantity{Float32}( sq_64 )
-
-    correctFields = Dict([
-        ("value", Float32(value)),
-        ("unit", unit),
-        ("value type", Float32)
-    ])
-    return _verifyHasCorrectFieldsAndType(sq_32, correctFields)
-end
-
-function _verifyHasCorrectFieldsAndType(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
-    correctValue = (simpleQuantity.value == correctFields["value"])
-    correctUnit = (simpleQuantity.unit == correctFields["unit"])
-    correctType = isa(simpleQuantity.value, correctFields["value type"])
-    return correctValue && correctUnit && correctType
-end
-
 function canConstructFromNumberAndAbstractUnit_TypeSpecified()
     examples = _getExamplesFor_canConstructFromNumberAndAbstractUnit_TypeSpecified()
     return _checkConstructorExamplesIncludingType(examples)
@@ -325,6 +290,13 @@ function _checkConstructorExamplesIncludingType(examples::Array)
         correct &= _verifyHasCorrectFieldsAndType(simpleQuantity, correctFields)
     end
     return correct
+end
+
+function _verifyHasCorrectFieldsAndType(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
+    correctValue = (simpleQuantity.value == correctFields["value"])
+    correctUnit = (simpleQuantity.unit == correctFields["unit"])
+    correctType = isa(simpleQuantity.value, correctFields["value type"])
+    return correctValue && correctUnit && correctType
 end
 
 function canConstructFromNumber_TypeSpecified()
@@ -403,20 +375,6 @@ function _getExamplesFor_canConstructFromAbstractUnit_TypeSpecified()
     return examples
 end
 
-## ## Type conversion
-
-function canConvertTypeParameter()
-    examples = _getExamplesFor_canConvertTypeParameter()
-    return TestingTools.testDyadicFunction(Base.convert, examples)
-end
-
-function _getExamplesFor_canConvertTypeParameter()
-    examples = [
-        ( SimpleQuantity{Float32}, SimpleQuantity{Float64}(7.1, ucat.meter), SimpleQuantity{Float32}(7.1, ucat.meter) ),
-        ( SimpleQuantity{UInt16}, SimpleQuantity{Float64}(16, ucat.meter), SimpleQuantity{UInt16}(16, ucat.meter) ),
-        ( SimpleQuantity{Float16}, SimpleQuantity{Int64}(16, ucat.meter), SimpleQuantity{Float16}(16, ucat.meter) )
-    ]
-end
 
 ## #- Methods for constructing a SimpleQuantity
 
@@ -501,45 +459,6 @@ end
 
 ## #- AbstractQuantity interface
 ## 1. Unit conversion
-
-
-function inBasicSIUnits_implemented()
-    examples = _getExamplesFor_inBasicSIUnits()
-    return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
-end
-
-function _getExamplesFor_inBasicSIUnits()
-    # format: SimpleQuantity, SimpleQuantity expressed in terms of basic SI units
-    examples = [
-        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
-        ( 1 * Alicorn.meter, 1 * Alicorn.meter ),
-        ( 4.2 * ucat.joule, 4.2 * Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2 ),
-        ( -4.5 * (ucat.mega * ucat.henry)^2, -4.5e12 * Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4 ),
-        ( 1 * ucat.hour, 3600 * Alicorn.second )
-    ]
-    return examples
-end
-
-function valueOfDimensionless_implemented()
-    examples = _getExamplesFor_valueOfDimensionless()
-    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
-end
-
-function _getExamplesFor_valueOfDimensionless()
-    # format: quantity, correct result for valueOfDimensionless(quantity)
-    examples = [
-        (SimpleQuantity(7), 7),
-        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
-    ]
-    return examples
-end
-
-function test_valueOfDimensionless_ErrorsIfNotUnitless()
-    simpleQuantity = 7 * Alicorn.meter
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
-    @test_throws expectedError valueOfDimensionless(simpleQuantity)
-end
-
 
 function SimpleQuantity_AbstractUnit_multiplication()
     examples = _getExamplesFor_SimpleQuantity_AbstractUnit_multiplication()

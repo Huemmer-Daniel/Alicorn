@@ -40,8 +40,26 @@ function run()
         @test valueInUnitsOf_implemented_forQuantityArray_forSimpleQuantityAsTargetUnit()
 
         # inBasicSIUnits
+        @test inBasicSIUnits_implemented_forSimpleQuantity()
+
+        @test inBasicSIUnits_implemented_forQuantity()
+
+        @test inBasicSIUnits_implemented_forSimpleQuantityArray()
+
+        @test_skip inBasicSIUnits_implemented_forQuantityArray()
 
         # valueOfDimensionless
+        @test valueOfDimensionless_implemented_forSimpleQuantity()
+        test_valueOfDimensionless_ErrorsIfNotUnitless_forSimpleQuantity()
+
+        @test_skip valueOfDimensionless_implemented_forQuantity()
+        @test_skip test_valueOfDimensionless_ErrorsIfNotUnitless_forQuantity()
+
+        @test valueOfDimensionless_implemented_forSimpleQuantityArray()
+        test_valueOfDimensionless_ErrorsIfNotUnitless_forSimpleQuantityArray()
+
+        @test_skip valueOfDimensionless_implemented_forQuantityArray()
+        @test_skip test_valueOfDimensionless_ErrorsIfNotUnitless_forQuantityArray()
     end
 end
 
@@ -297,6 +315,103 @@ function _getExamplesFor_valueInUnitsOf_forQuantityArray_forSimpleQuantityAsTarg
         ( QuantityArray([2], Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), 10*ucat.second^2, [2e-7] )
     ]
     return examples
+end
+
+
+## inBasicSIUnits
+
+function inBasicSIUnits_implemented_forSimpleQuantity()
+    examples = _getExamplesFor_inBasicSIUnits_forSimpleQuantity()
+    return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
+end
+
+function _getExamplesFor_inBasicSIUnits_forSimpleQuantity()
+    # format: SimpleQuantity, SimpleQuantity expressed in terms of basic SI units
+    examples = [
+        ( 1 * Alicorn.unitlessUnit, 1 * Alicorn.unitlessUnit ),
+        ( 1 * Alicorn.meter, 1 * Alicorn.meter ),
+        ( 4.2 * ucat.joule, 4.2 * Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2 ),
+        ( -4.5 * (ucat.mega * ucat.henry)^2, -4.5e12 * Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4 ),
+        ( 1 * ucat.hour, 3600 * Alicorn.second )
+    ]
+    return examples
+end
+
+function inBasicSIUnits_implemented_forQuantity()
+    examples = _getExamplesFor_inBasicSIUnits_forQuantity()
+    return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
+end
+
+function _getExamplesFor_inBasicSIUnits_forQuantity()
+    # format: Quantity, Quantity as SimpleQuantity expressed in terms of basic SI units
+    examples = [
+        ( Quantity(1*Alicorn.unitlessUnit, intu), 1 * Alicorn.unitlessUnit ),
+        ( Quantity(1*Alicorn.meter, InternalUnits(length=2*ucat.milli*ucat.meter)), 1 * Alicorn.meter ),
+        ( 4.2 * ucat.joule, 4.2 * Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2 ),
+        ( -4.5 * (ucat.mega * ucat.henry)^2, -4.5e12 * Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4 ),
+        ( 1 * ucat.hour, 3600 * Alicorn.second )
+    ]
+    return examples
+end
+
+function inBasicSIUnits_implemented_forSimpleQuantityArray()
+    examples = _getExamplesFor_inBasicSIUnits_forSimpleQuantityArray()
+    return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
+end
+
+function _getExamplesFor_inBasicSIUnits_forSimpleQuantityArray()
+    # format: SimpleQuantityArray, SimpleQuantityArray expressed in terms of basic SI units
+    examples = [
+        ( ones(2,2) * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( ones(2,2) * Alicorn.meter, ones(2,2) * Alicorn.meter ),
+        ( [4.2] * ucat.joule, [4.2] * (Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2) ),
+        ( [-4.5, 2] * (ucat.mega * ucat.henry)^2, [-4.5e12, 2e12] * ( Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4) ),
+        ( [1 2] * ucat.hour, [3600 7200]* Alicorn.second )
+    ]
+    return examples
+end
+
+
+## valueOfDimensionless
+
+function valueOfDimensionless_implemented_forSimpleQuantity()
+    examples = _getExamplesFor_valueOfDimensionless_forSimpleQuantity()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
+end
+
+function _getExamplesFor_valueOfDimensionless_forSimpleQuantity()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantity(7), 7),
+        (SimpleQuantity(7, ucat.meter * (ucat.centi * ucat.meter)^-1 ), 700)
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless_forSimpleQuantity()
+    simpleQuantity = 7 * Alicorn.meter
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(simpleQuantity)
+end
+
+function valueOfDimensionless_implemented_forSimpleQuantityArray()
+    examples = _getExamplesFor_valueOfDimensionless_forSimpleQuantityArray()
+    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
+end
+
+function _getExamplesFor_valueOfDimensionless_forSimpleQuantityArray()
+    # format: quantity, correct result for valueOfDimensionless(quantity)
+    examples = [
+        (SimpleQuantityArray([2, 3]), [2, 3]),
+        (SimpleQuantityArray([2, 3], ucat.meter * (ucat.centi * ucat.meter)^-1 ), [200, 300])
+    ]
+    return examples
+end
+
+function test_valueOfDimensionless_ErrorsIfNotUnitless_forSimpleQuantityArray()
+    sqArray = [2, 3] * Alicorn.meter
+    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
+    @test_throws expectedError valueOfDimensionless(sqArray)
 end
 
 end # module

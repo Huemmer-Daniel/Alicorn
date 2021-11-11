@@ -4,6 +4,8 @@ using Alicorn
 using Test
 using ..TestingTools
 
+const ucat = UnitCatalogue()
+
 function run()
     @testset "InternalUnits" begin
         @test canInstanciateInternalUnitsWithoutArguments()
@@ -16,6 +18,8 @@ function run()
         InternalUnits_ErrorsIfInternalUnitsWrongDimension()
 
         @test equality_implemented()
+        @test internalUnitFor_implemented()
+        @test conversionFactor_implemented()
     end
 end
 
@@ -152,7 +156,6 @@ function _getExamplesFor_InternalUnits_ErrorsIfInternalUnitsWrongDimension()
     return invalidUnits
 end
 
-
 function equality_implemented()
     examples = _getExamplesFor_equality()
     return TestingTools.testDyadicFunction(Base.:(==), examples)
@@ -176,6 +179,39 @@ function _getExamplesFor_equality()
         ( internalUnits1, internalUnits1, true ),
         ( internalUnits1, internalUnits2, false ),
         ( internalUnits1, internalUnits1Copy, true )
+    ]
+    return examples
+end
+
+function internalUnitFor_implemented()
+    examples = _getExamplesFor_internalUnitFor()
+    return TestingTools.testDyadicFunction(internalUnitFor, examples)
+end
+
+function _getExamplesFor_internalUnitFor()
+    # format: d::Dimension, intu::InternalUnits, sq::SimpleQuantity, correct result for internalUnitFor(d)
+    examples = [
+        (Dimension(), InternalUnits(), 1*Alicorn.unitlessUnit),
+        (Dimension(L=1), InternalUnits(), 1*Alicorn.meter),
+        (Dimension(L=2), InternalUnits(length=2*ucat.milli*ucat.meter), 4 * (ucat.milli*ucat.meter)^2 ),
+        (Dimension(T=2, I=-1), InternalUnits(time=2*ucat.milli*ucat.second, current=0.5*ucat.kilo*ucat.ampere), 8 * (ucat.milli*ucat.second)^2 * (ucat.kilo*ucat.ampere)^-1 )
+    ]
+    return examples
+end
+
+function conversionFactor_implemented()
+    examples = _getExamplesFor_conversionFactor()
+    return TestingTools.testTriadicFunction(conversionFactor, examples)
+end
+
+function _getExamplesFor_conversionFactor()
+    # format: d::Dimension, intu1::InternalUnits, intu2::InternalUnits, f::Number, correct result for conversionFactor(d, intu1, intu2)
+    examples = [
+        (Dimension(), InternalUnits(), InternalUnits(), 1),
+        (Dimension(), InternalUnits(temperature=1*ucat.kelvin), InternalUnits(temperature=2*ucat.milli*ucat.kelvin), 1),
+        (Dimension(θ=1), InternalUnits(temperature=1*ucat.kelvin), InternalUnits(temperature=2*ucat.milli*ucat.kelvin), 500),
+        (Dimension(θ=-1.0), InternalUnits(temperature=1*ucat.kelvin), InternalUnits(temperature=2*ucat.milli*ucat.kelvin), 1/500),
+        (Dimension(θ=2, L=1), InternalUnits(length=1*ucat.meter, temperature=1*ucat.kelvin), InternalUnits(length=2*ucat.meter, temperature=2*ucat.milli*ucat.kelvin), 125000)
     ]
     return examples
 end

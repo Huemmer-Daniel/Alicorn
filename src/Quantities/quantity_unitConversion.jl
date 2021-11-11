@@ -33,7 +33,7 @@ function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
 end
 
 function inUnitsOf(quantity::Quantity, targetUnit::AbstractUnit)
-    internalUnit = internalUnitForDimension(quantity.dimension, quantity.internalUnits)
+    internalUnit = internalUnitFor(quantity.dimension, quantity.internalUnits)
     resultingSimpleQuantity = inUnitsOf(quantity.value * internalUnit, targetUnit)
     return resultingSimpleQuantity
 end
@@ -79,7 +79,7 @@ function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
 end
 
 function inUnitsOf(qArray::QuantityArray, targetUnit::AbstractUnit)
-    internalUnit = internalUnitForDimension(qArray.dimension, qArray.internalUnits)
+    internalUnit = internalUnitFor(qArray.dimension, qArray.internalUnits)
     resultingSimpleQuantityArray = inUnitsOf(qArray.value * internalUnit, targetUnit)
     return resultingSimpleQuantityArray
 end
@@ -149,6 +149,8 @@ function inBasicSIUnits(simpleQuantity::SimpleQuantity)
     resultingQuantity = SimpleQuantity( resultingValue, resultingBasicSIUnit )
     return resultingQuantity
 end
+
+inBasicSIUnits(quantity::Quantity) = inBasicSIUnits( SimpleQuantity(quantity) )
 
 """
     inBasicSIUnits(qArray::AbstractQuantity)::SimpleQuantityArray

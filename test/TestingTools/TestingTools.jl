@@ -179,6 +179,15 @@ function testDyadicFunction_Splat2ndArgs(func, examples::Array)
     return correct
 end
 
+function testTriadicFunction(func, examples::Array)
+    correct = true
+    for (input1, input2, input3, correctOutput) in examples
+        returnedOutput = func(input1, input2, input3)
+        correct &= (returnedOutput == correctOutput)
+    end
+    return correct
+end
+
 function initializeTestUnitCatalogue()
     unitPrefixes = getUnitPrefixTestSet()
     baseUnits = getBaseUnitTestSet()

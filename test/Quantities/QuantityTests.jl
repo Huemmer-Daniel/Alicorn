@@ -14,22 +14,11 @@ function run()
         @test canConstructFromNumberAndDimension()
         @test canConstructFromNumberAndIntU()
         @test canConstructFromNumber()
-        @test canConstructFromQuantity()
-        @test canConstructFromSimpleQuantityAndIntU()
-        @test canConstructFromSimpleQuantity()
-        @test canConstructFromNumberAndAbstractUnitAndIntU()
-        @test canConstructFromNumberAndAbstractUnit()
-        @test canConstructFromAbstractUnitAndIntU()
-        @test canConstructFromAbstractUnit()
-        @test canConstructFromQuantity_TypeSpecified()
         @test canConstructFromNumberAndDimensionAndIntU_TypeSpecified()
         @test canConstructFromNumberAndDimension_TypeSpecified()
         @test canConstructFromNumberAndIntU_TypeSpecified()
         @test canConstructFromNumber_TypeSpecified()
         @test InstanciationTriesToPreservesValueType()
-
-        # Type conversion
-        @test canConvertTypeParameter()
 
         # Arithmetics
         @test equality_implemented()
@@ -170,48 +159,6 @@ function _getExamplesFor_canConstructFromNumber()
     examples = [
         (q1, correctFields1),
         (q2, correctFields2)
-    ]
-    return examples
-end
-
-function canConstructFromSimpleQuantityAndIntU()
-    examples = _getExamplesFor_canConstructFromSimpleQuantityAndIntU()
-    return _checkConstructorExamples(examples)
-end
-
-function _getExamplesFor_canConstructFromSimpleQuantityAndIntU()
-    sQuantity = TestingTools.generateRandomSimpleQuantity()
-    sQuantityBaseSI = inBasicSIUnits(sQuantity)
-    q1 = Quantity(sQuantity, intu)
-    correctFields1 = Dict([
-        ("value", sQuantityBaseSI.value),
-        ("dimension", dimensionOf(sQuantityBaseSI)),
-        ("internal units", intu)
-    ])
-
-    examples = [
-        (q1, correctFields1)
-    ]
-    return examples
-end
-
-function canConstructFromSimpleQuantity()
-    examples = _getExamplesFor_canConstructFromSimpleQuantity()
-    return _checkConstructorExamples(examples)
-end
-
-function _getExamplesFor_canConstructFromSimpleQuantity()
-    sQuantity = TestingTools.generateRandomSimpleQuantity()
-    sQuantityBaseSI = inBasicSIUnits(sQuantity)
-    q1 = Quantity(sQuantity)
-    correctFields1 = Dict([
-        ("value", sQuantityBaseSI.value),
-        ("dimension", dimensionOf(sQuantityBaseSI)),
-        ("internal units", InternalUnits())
-    ])
-
-    examples = [
-        (q1, correctFields1)
     ]
     return examples
 end
@@ -398,53 +345,6 @@ function _getExamplesFor_canConstructFromAbstractUnit()
     return examples
 end
 
-function canConstructFromQuantity()
-    q1 = TestingTools.generateRandomQuantity()
-    q2 = Quantity(q1)
-    return q1==q2
-end
-
-function canConstructFromQuantity_TypeSpecified()
-    examples = _getExamplesFor_canConstructFromQuantity_TypeSpecified()
-    return _checkConstructorExamplesIncludingType(examples)
-end
-
-function _getExamplesFor_canConstructFromQuantity_TypeSpecified()
-    value = 6.7
-    dim = TestingTools.generateRandomDimension()
-    q_64 = Quantity(Float64(value), dim, intu)
-    q_32 = Quantity{Float32}( q_64 )
-
-    correctFields = Dict([
-        ("value", Float32(value)),
-        ("dimension", dim),
-        ("internal units", intu),
-        ("value type", Float32)
-    ])
-
-    examples = [
-        (q_32, correctFields)
-    ]
-    return examples
-end
-
-function _checkConstructorExamplesIncludingType(examples::Array)
-    correct = true
-    for (quantity, correctFields) in examples
-        correct &= _verifyHasCorrectFieldsAndType(quantity, correctFields)
-    end
-    return correct
-end
-
-function _verifyHasCorrectFieldsAndType(quantity::Quantity, correctFields::Dict{String,Any})
-    correctValue = (quantity.value == correctFields["value"])
-    correctDimension = (quantity.dimension == correctFields["dimension"])
-    correctIntU = (quantity.internalUnits == correctFields["internal units"])
-    correctType = isa(quantity.value, correctFields["value type"])
-    correct = correctValue && correctDimension && correctIntU && correctType
-    return correct
-end
-
 function canConstructFromNumberAndDimensionAndIntU_TypeSpecified()
     examples = _getExamplesFor_canConstructFromNumberAndDimensionAndIntU_TypeSpecified()
     return _checkConstructorExamplesIncludingType(examples)
@@ -476,6 +376,23 @@ function _getExamplesFor_canConstructFromNumberAndDimensionAndIntU_TypeSpecified
         (q2, correctFields2)
     ]
     return examples
+end
+
+function _checkConstructorExamplesIncludingType(examples::Array)
+    correct = true
+    for (quantity, correctFields) in examples
+        correct &= _verifyHasCorrectFieldsAndType(quantity, correctFields)
+    end
+    return correct
+end
+
+function _verifyHasCorrectFieldsAndType(quantity::Quantity, correctFields::Dict{String,Any})
+    correctValue = (quantity.value == correctFields["value"])
+    correctDimension = (quantity.dimension == correctFields["dimension"])
+    correctIntU = (quantity.internalUnits == correctFields["internal units"])
+    correctType = isa(quantity.value, correctFields["value type"])
+    correct = correctValue && correctDimension && correctIntU && correctType
+    return correct
 end
 
 function canConstructFromNumberAndDimension_TypeSpecified()
@@ -582,7 +499,7 @@ function InstanciationTriesToPreservesValueType()
 
     correct = true
     for (value, unit, intu, correctType) in examples
-        returnedType = typeof( Quantity(value, unit, intu).value )
+        returnedType = typeof( Quantity(value*unit, intu).value )
         correct &= returnedType==correctType
     end
     return correct
@@ -599,23 +516,6 @@ function _getExamplesFor_InstanciationTriesToPreservesValueType()
         ( Float32(3.5), ucat.meter, intu3, Float32 )
     ]
     return examples
-end
-
-
-## ## Type conversion
-
-function canConvertTypeParameter()
-    examples = _getExamplesFor_canConvertTypeParameter()
-    return TestingTools.testDyadicFunction(Base.convert, examples)
-end
-
-function _getExamplesFor_canConvertTypeParameter()
-    dim = Dimension(L=-1)
-    examples = [
-        ( Quantity{Float32}, Quantity{Float64}(7.1, dim, intu), Quantity(Float32(7.1), dim, intu) ),
-        ( Quantity{UInt16}, Quantity{Float64}(16, dim, intu), Quantity(UInt16(16), dim, intu) ),
-        ( Quantity{Float16}, Quantity{Int64}(16, dim, intu), Quantity(Float16(16), dim, intu) )
-    ]
 end
 
 

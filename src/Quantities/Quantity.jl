@@ -30,17 +30,10 @@ Quantity(::Number)
 If the type `T` is specified explicitly, Alicorn attempts to convert the `value`
 accordingly:
 ```
-Quantity{T}(::Quantity) where {T<:Number}
 Quantity{T}(::Number, ::Dimension, ::InternalUnits) where {T<:Number}
 Quantity{T}(::Number, ::Dimension) where {T<:Number}
 Quantity{T}(::Number, ::InternalUnits) where {T<:Number}
 Quantity{T}(::Number) where {T<:Number}
-```
-
-Construction from a `SimpleQuantity`:
-```
-Quantity(::SimpleQuantity{T}, ::InternalUnits) where {T<:Number}
-Quantity(::SimpleQuantity{T}) where {T<:Number}
 ```
 
 Construction from value and unit; if no unit is passed to the constructor, a
@@ -93,50 +86,17 @@ end
 Quantity(value::Number, dimension::Dimension) = Quantity(value, dimension, InternalUnits())
 Quantity(value::Number, internalUnits::InternalUnits) = Quantity(value, Dimension(), internalUnits)
 Quantity(value::Number) = Quantity(value, Dimension(), InternalUnits())
-Quantity(quantity::Quantity) = quantity
 
-Quantity{T}(quantity::Quantity) where {T<:Number} = Quantity(convert(T, quantity.value), quantity.dimension, quantity.internalUnits)
 Quantity{T}(value::Number, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = Quantity(convert(T, value), dimension, internalUnits)
 Quantity{T}(value::Number, dimension::Dimension) where {T<:Number} = Quantity{T}(value, dimension, InternalUnits())
 Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number} = Quantity{T}(value, Dimension(), internalUnits)
 Quantity{T}(value::Number) where {T<:Number} = Quantity{T}(value, Dimension(), InternalUnits())
 
-# from SimpleQuantity
-function Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnits) where T
-    dimension = dimensionOf(simpleQuantity)
-    internalUnit = internalUnitForDimension(dimension, internalUnits)
-    internalValue = valueInUnitsOf(simpleQuantity, internalUnit)
-    internalValue = _attemptConversionToOriginalType(internalValue, T)
-    return Quantity(internalValue, dimension, internalUnits)
-end
-
-function _attemptConversionToOriginalType(value::Number, T::Type)
-    try
-        value = convert(T, value)
-    catch
-    end
-    return value
-end
-
-Quantity(simpleQuantity::SimpleQuantity) = Quantity(simpleQuantity, InternalUnits())
-
 # from value and unit
-Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(value*unit, internalUnits)
-Quantity(value::Number, unit::AbstractUnit) = Quantity(value, unit, InternalUnits())
-Quantity(unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(1, unit, internalUnits)
-Quantity(unit::AbstractUnit) = Quantity(1, unit, InternalUnits())
-
-
-## ## Type conversion
-
-"""
-    Base.convert(::Type{T}, quantity::Quantity) where {T<:Quantity}
-
-Convert `quantity` from type `Quantity{S} where S` to type `Quantity{T}`.
-
-Allows to convert, for instance, from `Quantity{Float64}` to `Quantity{UInt8}`.
-"""
-Base.convert(::Type{T}, quantity::Quantity) where {T<:Quantity} = quantity isa T ? quantity : T(quantity)
+# Quantity(value::Number, unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(value*unit, internalUnits)
+# Quantity(value::Number, unit::AbstractUnit) = Quantity(value, unit, InternalUnits())
+# Quantity(unit::AbstractUnit, internalUnits::InternalUnits) = Quantity(1, unit, internalUnits)
+# Quantity(unit::AbstractUnit) = Quantity(1, unit, InternalUnits())
 
 
 ## Methods implementing the interface of AbstractQuantity

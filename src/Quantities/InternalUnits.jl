@@ -161,12 +161,12 @@ function Base.:(==)(internalUnits1::InternalUnits, internalUnits2::InternalUnits
 end
 
 """
-    internalUnitForDimension(dimension::Dimension, internalUnits::InternalUnits)
+    internalUnitFor(dimension::Dimension, internalUnits::InternalUnits)
 
 Returns a `SimpleQuantity` representing the unit in which quantities of physical
 dimension `dimension` are measured according to `internalUnits`.
 """
-function internalUnitForDimension(dimension::Dimension, internalUnits::InternalUnits)
+function internalUnitFor(dimension::Dimension, internalUnits::InternalUnits)
     Mexp = dimension.massExponent
     Lexp = dimension.lengthExponent
     Texp = dimension.timeExponent
@@ -185,4 +185,18 @@ function internalUnitForDimension(dimension::Dimension, internalUnits::InternalU
 
     internalUnit = Munit^Mexp * Lunit^Lexp * Tunit^Texp * Iunit^Iexp * θunit^Θexp * Nunit^Nexp * Junit^Jexp
     return internalUnit
+end
+
+"""
+    conversionFactor(dimension::Dimension, currentIntU::InternalUnits, targetIntU::InternalUnits)
+
+Returns the factor with which a value of physical dimension `dimension`
+expressed in units of `currentIntU` needs to be mutliplied in order to express
+it in units of `targetIntU`.
+"""
+function conversionFactor(dimension::Dimension, currentIntU::InternalUnits, targetIntU::InternalUnits)
+    currentInternalUnit = internalUnitFor(dimension, currentIntU)
+    targetInternalUnit = internalUnitFor(dimension, targetIntU)
+    conversionFactor = valueOfDimensionless(currentInternalUnit/targetInternalUnit)
+    return conversionFactor
 end

@@ -42,9 +42,6 @@ function run()
 
         #- AbstractQuantityArray interface
         # 1. Unit conversion
-        @test inBasicSIUnits_implemented()
-        @test valueOfDimensionless_implemented()
-        test_valueOfDimensionless_ErrorsIfNotUnitless()
         @test SimpleQuantityArray_AbstractUnit_multiplication()
         @test AbstractUnit_SimpleQuantityArray_multiplication()
         @test SimpleQuantityArray_AbstractUnit_division()
@@ -624,43 +621,6 @@ end
 
 ## #- AbstractQuantityArray interface
 ## 1. Unit conversion
-
-function inBasicSIUnits_implemented()
-    examples = _getExamplesFor_inBasicSIUnits()
-    return TestingTools.testMonadicFunction(inBasicSIUnits, examples)
-end
-
-function _getExamplesFor_inBasicSIUnits()
-    # format: SimpleQuantityArray, SimpleQuantityArray expressed in terms of basic SI units
-    examples = [
-        ( ones(2,2) * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
-        ( ones(2,2) * Alicorn.meter, ones(2,2) * Alicorn.meter ),
-        ( [4.2] * ucat.joule, [4.2] * (Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2) ),
-        ( [-4.5, 2] * (ucat.mega * ucat.henry)^2, [-4.5e12, 2e12] * ( Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4) ),
-        ( [1 2] * ucat.hour, [3600 7200]* Alicorn.second )
-    ]
-    return examples
-end
-
-function valueOfDimensionless_implemented()
-    examples = _getExamplesFor_valueOfDimensionless()
-    return TestingTools.testMonadicFunction(valueOfDimensionless, examples)
-end
-
-function _getExamplesFor_valueOfDimensionless()
-    # format: quantity, correct result for valueOfDimensionless(quantity)
-    examples = [
-        (SimpleQuantityArray([2, 3]), [2, 3]),
-        (SimpleQuantityArray([2, 3], ucat.meter * (ucat.centi * ucat.meter)^-1 ), [200, 300])
-    ]
-    return examples
-end
-
-function test_valueOfDimensionless_ErrorsIfNotUnitless()
-    sqArray = [2, 3] * Alicorn.meter
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("quantity is not dimensionless")
-    @test_throws expectedError valueOfDimensionless(sqArray)
-end
 
 function SimpleQuantityArray_AbstractUnit_multiplication()
     examples = _getExamplesFor_SimpleQuantityArray_AbstractUnit_multiplication()
