@@ -399,6 +399,18 @@ function squeezeOutUnits(sqArray::SimpleQuantityArray)
     return (unit, unitlessArray)
 end
 
+function squeezeOutUnits(extruded::Base.Broadcast.Extruded{T, K, D}) where {T<:SimpleQuantityArray, K<:Any, D<:Any}
+    sqArray = extruded.x
+    keeps = extruded.keeps
+    defaults = extruded.defaults
+
+    unit = sqArray.unit
+    unitlessArray = sqArray.value
+
+    extrudedWithoutUnits = Base.Broadcast.Extruded(unitlessArray, keeps, defaults)
+    return (unit, extrudedWithoutUnits)
+end
+
 function squeezeOutUnits(simpleQuantity::SimpleQuantity)
     unit = simpleQuantity.unit
     unitlessNumber = simpleQuantity.value
@@ -410,6 +422,8 @@ function squeezeOutUnits(any::Any)
 end
 
 # infer target units for different broadcastable operations on SimpleQuantityArrays
+
+
 
 inferTargetUnit(::typeof(abs), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
@@ -435,7 +449,12 @@ function inferTargetUnit(::typeof(*), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::
     return unit1 * unit2
 end
 
-function inferTargetUnit(::typeof(Base.literal_pow), arg1::Tuple{<:Any, <:Any}, arg2::Tuple{<:AbstractUnit, <:AbstractArray}, arg3::Tuple{<:Any, <:Base.RefValue{Val{exponent}}}) where exponent
+function inferTargetUnit(::typeof(Base.literal_pow), arg1::Tuple, arg2::Tuple{<:AbstractUnit, <:AbstractArray}, arg3::Tuple{<:Any, <:Base.RefValue{Val{exponent}}}) where exponent
+    unit = arg2[1]
+    return unit^exponent
+end
+
+function inferTargetUnit(::typeof(Base.literal_pow), arg1::Tuple, arg2::Tuple{<:AbstractUnit, <:Base.Broadcast.Extruded}, arg3::Tuple{<:Any, <:Base.RefValue{Val{exponent}}}) where exponent
     unit = arg2[1]
     return unit^exponent
 end

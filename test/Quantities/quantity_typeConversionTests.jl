@@ -30,10 +30,11 @@ function run()
         @test canConvertQuantityTypeParameter()
 
         # SimpleQuantityArray
-        @test_skip canConstructSimpleQuantityArrayFromSimpleQuantityArray()
-        @test_skip canConstructSimpleQuantityArrayFromQuantityArray()
-        @test_skip canConstructSimpleQuantityArrayFromSimpleQuantity()
-        @test_skip canConstructSimpleQuantityArrayFromQuantity()
+        @test canConstructSimpleQuantityArrayFromSimpleQuantityArray()
+        @test canConstructSimpleQuantityArrayFromQuantityArray()
+        @test canConstructSimpleQuantityArrayFromSimpleQuantity()
+        @test canConstructSimpleQuantityArrayFromQuantity()
+        # CONTINUE: implement tests
         @test_skip canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
         @test_skip canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
         @test_skip canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
@@ -355,6 +356,65 @@ function _getExamplesFor_canConvertQuantityTypeParameter()
         ( Quantity{UInt16}, Quantity{Float64}(16, dim, intu), Quantity(UInt16(16), dim, intu) ),
         ( Quantity{Float16}, Quantity{Int64}(16, dim, intu), Quantity(Float16(16), dim, intu) )
     ]
+end
+
+
+## SimpleQuantityArray
+
+function canConstructSimpleQuantityArrayFromSimpleQuantityArray()
+    sqArray1 = TestingTools.generateRandomSimpleQuantityArray()
+    sqArray2 = SimpleQuantityArray(sqArray1)
+    return sqArray1==sqArray2
+end
+
+function canConstructSimpleQuantityArrayFromQuantityArray()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
+    return _checkSimpleQuantityArrayConstructorExamples(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
+    intu = InternalUnits(length=2*ucat.milli*ucat.meter)
+    qArray = QuantityArray([5, 7] * ucat.meter, intu)
+    sqArray = SimpleQuantityArray(qArray)
+    correctFields = Dict([
+        ("value", [5000, 7000]),
+        ("unit", Unit(ucat.milli*ucat.meter))
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
+end
+
+function _checkSimpleQuantityArrayConstructorExamples(examples::Array)
+    correct = true
+    for (sqArray, correctFields) in examples
+        correct &= _verifySimpleQuantityArrayHasCorrectFields(sqArray, correctFields)
+    end
+    return correct
+end
+
+function _verifySimpleQuantityArrayHasCorrectFields(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
+    correctValue = (sqArray.value == correctFields["value"])
+    correctUnit = (sqArray.unit == correctFields["unit"])
+    correct = correctValue && correctUnit
+    return correct
+end
+
+function canConstructSimpleQuantityArrayFromSimpleQuantity()
+    sq = TestingTools.generateRandomSimpleQuantity()
+    sqArray1 = SimpleQuantityArray( [sq.value], sq.unit )
+    sqArray2 = SimpleQuantityArray(sq)
+    return sqArray1==sqArray2
+end
+
+function canConstructSimpleQuantityArrayFromQuantity()
+    q = TestingTools.generateRandomQuantity()
+    sq = SimpleQuantity(q)
+    sqArray1 = SimpleQuantityArray( [sq.value], sq.unit )
+    sqArray2 = SimpleQuantityArray(q)
+    return sqArray1==sqArray2
 end
 
 end # module

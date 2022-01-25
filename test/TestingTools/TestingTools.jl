@@ -55,6 +55,13 @@ function generateRandomNonzeroReal(; dim = 1)
     return randomReal
 end
 
+function generateRandomPositive()
+    randomPositive = 0
+    while randomPositive <= 0
+        randomPositive = generateRandomReal()
+    end
+    return randomPositive
+end
 function generateRandomComplex(; dim = 1)
     realPart = generateRandomReal(dim = dim)
     imagPart = generateRandomReal(dim = dim)
@@ -338,13 +345,13 @@ end
 
 function generateRandomInternalUnitsWithFields()
     ucat = UnitCatalogue()
-    randomMassUnit = generateRandomNonzeroReal() * (ucat.nano * ucat.gram)
-    randomLengthUnit = generateRandomNonzeroReal() * (ucat.deci * ucat.meter)
-    randomTimeUnit = generateRandomNonzeroReal() * (ucat.milli * ucat.second)
-    randomCurrentUnit = generateRandomNonzeroReal() * (ucat.tera * ucat.ampere)
-    randomTemperatureUnit = generateRandomNonzeroReal() * (ucat.deca * ucat.kelvin)
-    randomAmountUnit = generateRandomNonzeroReal() * (ucat.kilo * ucat.mol)
-    randomLuminousIntensityUnit = generateRandomNonzeroReal() * (ucat.micro * ucat.candela)
+    randomMassUnit = generateRandomPositive() * (ucat.nano * ucat.gram)
+    randomLengthUnit = generateRandomPositive() * (ucat.deci * ucat.meter)
+    randomTimeUnit = generateRandomPositive() * (ucat.milli * ucat.second)
+    randomCurrentUnit = generateRandomPositive() * (ucat.tera * ucat.ampere)
+    randomTemperatureUnit = generateRandomPositive() * (ucat.deca * ucat.kelvin)
+    randomAmountUnit = generateRandomPositive() * (ucat.kilo * ucat.mol)
+    randomLuminousIntensityUnit = generateRandomPositive() * (ucat.micro * ucat.candela)
 
     randomFields = Dict([
         ("massUnit", randomMassUnit),
