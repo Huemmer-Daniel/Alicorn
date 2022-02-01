@@ -27,4 +27,6 @@ include("quantity_unitConversion.jl")
 export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless
 include("quantity_arithmetics.jl")
 
+const defaultInternalUnits = InternalUnits()
+
 end # module

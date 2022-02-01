@@ -16,7 +16,6 @@ SimpleQuantityArray(::AbstractArray, ::AbstractUnit)
 SimpleQuantityArray(::AbstractArray)
 ```
 If no unit is passed to the constructor, `unitlessUnit` is used by default.
-
 ```
 SimpleQuantityArray{T}(::AbstractArray, ::AbstractUnit) where {T<:Number}
 SimpleQuantityArray{T}(::AbstractArray) where {T<:Number}
@@ -59,18 +58,6 @@ SimpleQuantityArray(value::AbstractArray{T}) where {T<:Number} = SimpleQuantityA
 
 SimpleQuantityArray{T}(value::AbstractArray, abstractUnit::AbstractUnit) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, value), abstractUnit)
 SimpleQuantityArray{T}(value::AbstractArray) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, value) )
-
-
-## ## Type conversion
-
-"""
-    Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray}
-
-Convert `sqArray` from type `SimpleQuantityArray{S} where S` to type `SimpleQuantityArray{T}`.
-
-Allows to convert, for instance, from `SimpleQuantityArray{Float64}` to `SimpleQuantityArray{UInt8}`.
-"""
-Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray} = sqArray isa T ? sqArray : T(sqArray)
 
 
 ## ## Methods for creating a SimpleQuantityArray

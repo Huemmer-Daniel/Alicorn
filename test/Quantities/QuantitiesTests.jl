@@ -18,10 +18,10 @@ function run()
         # SimpleQuantityTests.run()
         # SimpleQuantityArrayTests.run()
         #
-        InternalUnitsTests.run()
+        # InternalUnitsTests.run()
         # QuantityTests.run()
         # QuantityArrayTests.run()
-        #
+
         quantity_typeConversionTests.run()
         # quantity_unitConversionTests.run()
     end

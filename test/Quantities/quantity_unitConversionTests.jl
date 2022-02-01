@@ -5,7 +5,7 @@ using Test
 using ..TestingTools
 
 const ucat = UnitCatalogue()
-const intu = InternalUnits()
+const defaultInternalUnits = InternalUnits()
 
 function run()
     @testset "quantity_unitConversion" begin
@@ -99,7 +99,7 @@ end
 function _getExamplesFor_inUnitsOf_forQuantity()
     # format:  Quantity, Unit, SimpleQuantity expressed in units of Unit
     examples = [
-        ( Quantity(5, Dimension(), InternalUnits()), Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit ),
+        ( Quantity(5, Dimension(), defaultInternalUnits), Alicorn.unitlessUnit, 5 * Alicorn.unitlessUnit ),
         ( Quantity(700, Dimension(L=1), InternalUnits(length=1*(ucat.centi*ucat.meter))), ucat.milli*ucat.meter, 7000 * (ucat.milli*ucat.meter) ),
         ( Quantity(2, Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), ucat.second^2, 2e-6 * ucat.second^2 )
     ]
@@ -148,7 +148,7 @@ end
 function _getExamplesFor_inUnitsOf_forQuantityArray()
     # format: QuantityArray, Unit, SimpleQuantityArray expressed in units of Unit
     examples = [
-        ( QuantityArray(ones(2,2), Dimension(), InternalUnits()), Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
+        ( QuantityArray(ones(2,2), Dimension(), defaultInternalUnits), Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
         ( QuantityArray([700], Dimension(L=1), InternalUnits(length=1*(ucat.centi*ucat.meter))), ucat.milli*ucat.meter, [7000] * (ucat.milli*ucat.meter) ),
         ( QuantityArray([2], Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), ucat.second^2, [2e-6] * ucat.second^2 )
     ]
@@ -156,7 +156,7 @@ function _getExamplesFor_inUnitsOf_forQuantityArray()
 end
 
 function test_inUnitsOf_ErrorsForMismatchedUnits_forQuantityArray()
-    qArray = QuantityArray([7, 2] * Alicorn.meter, intu)
+    qArray = QuantityArray([7, 2] * Alicorn.meter, defaultInternalUnits)
     mismatchedUnit = Alicorn.second
     expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
     @test_throws expectedError inUnitsOf(qArray, mismatchedUnit)
@@ -212,7 +212,7 @@ end
 function _getExamplesFor_valueInUnitsOf_forQuantity()
     # format: Quantity, Unit, value of Quantity expressed in units of Unit
     examples = [
-        ( Quantity(5, Dimension(), InternalUnits()), Alicorn.unitlessUnit, 5 ),
+        ( Quantity(5, Dimension(), defaultInternalUnits), Alicorn.unitlessUnit, 5 ),
         ( Quantity(700, Dimension(L=1), InternalUnits(length=1*(ucat.centi*ucat.meter))), ucat.milli*ucat.meter, 7000 ),
         ( Quantity(2, Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), ucat.second^2, 2e-6 )
     ]
@@ -234,7 +234,7 @@ end
 function _getExamplesFor_valueInUnitsOf_forQuantity_forSimpleQuantityAsTargetUnit()
     # format: Quantity, SimpleQuantity, value of Quantity expressed in units of SimpleQuantity
     examples = [
-        ( Quantity(5, Dimension(), InternalUnits()), 3 * Alicorn.unitlessUnit, 5/3 ),
+        ( Quantity(5, Dimension(), defaultInternalUnits), 3 * Alicorn.unitlessUnit, 5/3 ),
         ( Quantity(700, Dimension(L=1), InternalUnits(length=1*(ucat.centi*ucat.meter))), 2 * (ucat.milli*ucat.meter), 3500 ),
         ( Quantity(2, Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), 10 * (ucat.second^2), 2e-7 )
     ]
@@ -288,7 +288,7 @@ end
 function _getExamplesFor_valueInUnitsOf_forQuantityArray()
     # format: QuantityArray, Unit, value of QuantityArray expressed in units of Unit
     examples = [
-        ( QuantityArray(ones(2,2), Dimension(), InternalUnits()), Alicorn.unitlessUnit, ones(2,2) ),
+        ( QuantityArray(ones(2,2), Dimension(), defaultInternalUnits), Alicorn.unitlessUnit, ones(2,2) ),
         ( QuantityArray([700], Dimension(L=1), InternalUnits(length=1*(ucat.centi*ucat.meter))), ucat.milli*ucat.meter, [7000] ),
         ( QuantityArray([2], Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), ucat.second^2, [2e-6] )
     ]
@@ -296,7 +296,7 @@ function _getExamplesFor_valueInUnitsOf_forQuantityArray()
 end
 
 function test_valueInUnitsOf_ErrorsForMismatchedUnits_forQuantityArray()
-    qArray = QuantityArray([7, 2] * Alicorn.meter, intu)
+    qArray = QuantityArray([7, 2] * Alicorn.meter, defaultInternalUnits)
     mismatchedUnit = Alicorn.second
     expectedError = Alicorn.Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree")
     @test_throws expectedError valueInUnitsOf(qArray, mismatchedUnit)
@@ -310,7 +310,7 @@ end
 function _getExamplesFor_valueInUnitsOf_forQuantityArray_forSimpleQuantityAsTargetUnit()
     # format: QuantityArray, Unit, value of QuantityArray expressed in units of Unit
     examples = [
-        ( QuantityArray(ones(2,2), Dimension(), InternalUnits()), 2 * Alicorn.unitlessUnit, ones(2,2) / 2 ),
+        ( QuantityArray(ones(2,2), Dimension(), defaultInternalUnits), 2 * Alicorn.unitlessUnit, ones(2,2) / 2 ),
         ( QuantityArray([700], Dimension(L=1), InternalUnits(length=1*(ucat.centi*ucat.meter))), 2*(ucat.milli*ucat.meter), [3500] ),
         ( QuantityArray([2], Dimension(T=2), InternalUnits(time=1*(ucat.milli * ucat.second))), 10*ucat.second^2, [2e-7] )
     ]
@@ -345,7 +345,7 @@ end
 function _getExamplesFor_inBasicSIUnits_forQuantity()
     # format: Quantity, Quantity as SimpleQuantity expressed in terms of basic SI units
     examples = [
-        ( Quantity(1*Alicorn.unitlessUnit, intu), 1 * Alicorn.unitlessUnit ),
+        ( Quantity(1*Alicorn.unitlessUnit, defaultInternalUnits), 1 * Alicorn.unitlessUnit ),
         ( Quantity(1*Alicorn.meter, InternalUnits(length=2*ucat.milli*ucat.meter)), 1 * Alicorn.meter ),
         ( 4.2 * ucat.joule, 4.2 * Alicorn.kilogram * Alicorn.meter^2 / Alicorn.second^2 ),
         ( -4.5 * (ucat.mega * ucat.henry)^2, -4.5e12 * Alicorn.kilogram^2 * Alicorn.meter^4 * Alicorn.second^-4 * Alicorn.ampere^-4 ),

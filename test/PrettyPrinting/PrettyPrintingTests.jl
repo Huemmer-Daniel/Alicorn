@@ -4,6 +4,8 @@ using Alicorn
 using Test
 using ..TestingTools
 
+const defaultInternalUnits = InternalUnits()
+
 function run()
     @testset "PrettyPrinting" begin
         @test prettyPrintScientificNumber()
@@ -286,7 +288,6 @@ end
 
 function _getQuantityExamples()
     ucat = UnitCatalogue()
-    intu = InternalUnits()
     unit = (ucat.kilo * ucat.gram) * (ucat.tera * ucat.henry)
 
     int = 712
@@ -295,7 +296,7 @@ function _getQuantityExamples()
 
     examples = [
         # dimensionless
-        ( Quantity( int, Alicorn.unitlessUnit, intu ), """Alicorn.Quantities.Quantity{Int64} of dimension 1 in units of (1):\n 712""" ),
+        ( Quantity( int, Alicorn.unitlessUnit, defaultInternalUnits ), """Alicorn.Quantities.Quantity{Int64} of dimension 1 in units of (1):\n 712""" ),
         # integer
         ( Quantity( int, unit, intu ), """Alicorn.Quantities.Quantity{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg^2, 1 m^2, 1 s^-2, 1 A^-2):\n 712000000000000""" ),
         # float
@@ -314,7 +315,6 @@ end
 
 function _getQuantityArrayExamples()
     ucat = UnitCatalogue()
-    intu = InternalUnits()
     unit = (ucat.kilo * ucat.gram) * (ucat.tera * ucat.henry)
 
     array1 = [1, 2]
@@ -323,13 +323,13 @@ function _getQuantityArrayExamples()
     array4 = zeros(Int32, 1,2,2)
 
     examples = [
-        ( QuantityArray( array1, unit, intu),
+        ( QuantityArray( array1, defaultInternalUnits, intu),
         """2-element Alicorn.Quantities.QuantityVector{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1000000000000\n 2000000000000"""),
-        ( QuantityArray( array2, unit, intu),
+        ( QuantityArray( array2, defaultInternalUnits, intu),
         """1×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12"""),
-        ( QuantityArray( array3, unit, intu),
+        ( QuantityArray( array3, defaultInternalUnits, intu),
         """2×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12\n 3.4e12  5.0e12"""),
-        ( QuantityArray( array4, unit, intu),
+        ( QuantityArray( array4, defaultInternalUnits, intu),
         """1×2×2 Alicorn.Quantities.QuantityArray{Int32, 3} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n[:, :, 1] =\n 0  0\n\n[:, :, 2] =\n 0  0""")
         ]
 end

@@ -5,19 +5,21 @@ using Test
 using ..TestingTools
 
 const ucat = UnitCatalogue()
-const intu = InternalUnits()
+const defaultInternalUnits = InternalUnits()
+const intu2 = InternalUnits(length=2*ucat.meter)
+const lengthDim = Dimension(L=1)
 
 function run()
     @testset "quantity_typeConversion" begin
 
-        # SimpleQuantity
+        # SimpleQuantity: TODO - clean up, test types
         @test canConstructSimpleQuantityFromSimpleQuantity()
         @test canConstructSimpleQuantityFromQuantity()
         @test canConstructSimpleQuantityFromSimpleQuantity_TypeSpecified()
         @test canConstructSimpleQuantityFromQuantity_TypeSpecified()
         @test canConvertSimpleQuantityTypeParameter()
 
-        # Quantity
+        # Quantity: TODO - clean up, test types
         @test canConstructQuantityFromQuantityAndIntU()
         @test canConstructQuantityFromQuantity()
         @test canConstructQuantityFromSimpleQuantityAndIntU()
@@ -29,19 +31,35 @@ function run()
         test_QuantityWithTypeSpecified_errorsIfTypeUnsuitable()
         @test canConvertQuantityTypeParameter()
 
-        # SimpleQuantityArray
+        # SimpleQuantityArray: TODO - clean up, test types
         @test canConstructSimpleQuantityArrayFromSimpleQuantityArray()
         @test canConstructSimpleQuantityArrayFromQuantityArray()
         @test canConstructSimpleQuantityArrayFromSimpleQuantity()
         @test canConstructSimpleQuantityArrayFromQuantity()
-        # CONTINUE: implement tests
-        @test_skip canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
-        @test_skip canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
-        @test_skip canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
-        @test_skip canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
-        @test_skip canConvertSimpleQuantityArrayTypeParameter()
+        @test canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+        @test canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+        @test canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
+        @test canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
+        @test canConvertSimpleQuantityArrayTypeParameter()
 
-
+        # QuantityArray
+        @test canConstructQuantityArrayFromQuantityArrayAndIntU()
+        @test canConstructQuantityArrayFromQuantityArray()
+        @test canConstructQuantityArrayFromSimpleQuantityArrayAndIntU()
+        @test canConstructQuantityArrayFromSimpleQuantityArray()
+        @test canConstructQuantityArrayFromQuantityAndIntU()
+        @test canConstructQuantityArrayFromQuantity()
+        @test canConstructQuantityArrayFromSimpleQuantityAndIntU()
+        @test canConstructQuantityArrayFromSimpleQuantity()
+        @test canConstructQuantityArrayFromQuantityArrayAndIntU_TypeSpecified()
+        @test canConstructQuantityArrayFromQuantityArray_TypeSpecified()
+        @test canConstructQuantityArrayFromSimpleQuantityArrayAndIntU_TypeSpecified()
+        @test canConstructQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+        @test canConstructQuantityArrayFromQuantityAndIntU_TypeSpecified()
+        @test canConstructQuantityArrayFromQuantity_TypeSpecified()
+        @test canConstructQuantityArrayFromSimpleQuantityAndIntU_TypeSpecified()
+        @test canConstructQuantityArrayFromSimpleQuantity_TypeSpecified()
+        @test canConvertQuantityArrayTypeParameter()
     end
 end
 
@@ -59,8 +77,8 @@ function canConstructSimpleQuantityFromQuantity()
 end
 
 function _getExamplesFor_canConstructSimpleQuantityFromQuantity()
-    intu = InternalUnits(length=2*ucat.milli*ucat.meter)
-    quantity = Quantity(5 * ucat.meter, intu)
+    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
+    quantity = Quantity(5 * ucat.meter, intu2)
     sq = SimpleQuantity(quantity)
     correctFields = Dict([
         ("value", 5000),
@@ -115,8 +133,8 @@ function canConstructSimpleQuantityFromQuantity_TypeSpecified()
 end
 
 function _getExamplesFor_canConstructSimpleQuantityFromQuantity_TypeSpecified()
-    intu = InternalUnits(length=2*ucat.milli*ucat.meter)
-    quantity = Quantity(5.0 * ucat.meter, intu)
+    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
+    quantity = Quantity(5.0 * ucat.meter, intu2)
     sq = SimpleQuantity{Int32}(quantity)
     correctFields = Dict([
         ("value", 5000),
@@ -156,8 +174,8 @@ end
 function canConstructQuantityFromQuantityAndIntU()
     intu2 = InternalUnits(length=2*ucat.meter)
     q2 = Quantity(4*ucat.meter^2, intu2)
-    q1 = Quantity(q2, intu)
-    return q1 == Quantity(4*ucat.meter^2, intu)
+    q1 = Quantity(q2, defaultInternalUnits)
+    return q1 == Quantity(4*ucat.meter^2, defaultInternalUnits)
 end
 
 function canConstructQuantityFromQuantity()
@@ -190,11 +208,11 @@ end
 function _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU()
     sQuantity = TestingTools.generateRandomSimpleQuantity()
     sQuantityBaseSI = inBasicSIUnits(sQuantity)
-    q1 = Quantity(sQuantity, intu)
+    q1 = Quantity(sQuantity, defaultInternalUnits)
     correctFields1 = Dict([
         ("value", sQuantityBaseSI.value),
         ("dimension", dimensionOf(sQuantityBaseSI)),
-        ("internal units", intu)
+        ("internal units", defaultInternalUnits)
     ])
 
     examples = [
@@ -215,7 +233,7 @@ function _getExamplesFor_canConstructQuantityFromSimpleQuantity()
     correctFields1 = Dict([
         ("value", sQuantityBaseSI.value),
         ("dimension", dimensionOf(sQuantityBaseSI)),
-        ("internal units", InternalUnits())
+        ("internal units", defaultInternalUnits)
     ])
 
     examples = [
@@ -232,12 +250,12 @@ end
 function _getExamplesFor_canConstructQuantityFromQuantityandIntU_TypeSpecified()
     intu2 = InternalUnits(length=2*ucat.meter)
     q_64_intu2 = Quantity(Float64(4)*ucat.meter^2, intu2)
-    q_32_intu1 = Quantity{Float32}( q_64_intu2, intu )
+    q_32_intu1 = Quantity{Float32}( q_64_intu2, defaultInternalUnits )
 
     correctFields = Dict([
         ("value", Float32(4)),
         ("dimension", Dimension(L=2)),
-        ("internal units", intu),
+        ("internal units", defaultInternalUnits),
         ("value type", Float32)
     ])
 
@@ -255,13 +273,13 @@ end
 function _getExamplesFor_canConstructQuantityFromQuantity_TypeSpecified()
     value = 6.7
     dim = TestingTools.generateRandomDimension()
-    q_64 = Quantity(Float64(value), dim, intu)
+    q_64 = Quantity(Float64(value), dim, defaultInternalUnits)
     q_32 = Quantity{Float32}( q_64 )
 
     correctFields = Dict([
         ("value", Float32(value)),
         ("dimension", dim),
-        ("internal units", intu),
+        ("internal units", defaultInternalUnits),
         ("value type", Float32)
     ])
 
@@ -323,7 +341,7 @@ function _getExamplesFor_canConstructQuantityFromSimpleQuantity_TypeSpecified()
     correctFields1 = Dict([
         ("value", Float32(4) ),
         ("dimension", Dimension(L=2)),
-        ("internal units", InternalUnits()),
+        ("internal units", defaultInternalUnits),
         ("value type", Float32)
     ])
 
@@ -336,7 +354,7 @@ end
 function test_QuantityWithTypeSpecified_errorsIfTypeUnsuitable()
     intu2 = InternalUnits(length=2*ucat.meter)
     sq_64 = SimpleQuantity(Float64(4.2)*ucat.meter^2)
-    q_64 = Quantity(Float64(4.2)*ucat.meter^2, intu)
+    q_64 = Quantity(Float64(4.2)*ucat.meter^2, defaultInternalUnits)
     expectedError = InexactError
     @test_throws expectedError Quantity{Int64}(q_64, intu2)
     @test_throws expectedError Quantity{Int64}(q_64)
@@ -352,9 +370,9 @@ end
 function _getExamplesFor_canConvertQuantityTypeParameter()
     dim = Dimension(L=-1)
     examples = [
-        ( Quantity{Float32}, Quantity{Float64}(7.1, dim, intu), Quantity(Float32(7.1), dim, intu) ),
-        ( Quantity{UInt16}, Quantity{Float64}(16, dim, intu), Quantity(UInt16(16), dim, intu) ),
-        ( Quantity{Float16}, Quantity{Int64}(16, dim, intu), Quantity(Float16(16), dim, intu) )
+        ( Quantity{Float32}, Quantity{Float64}(7.1, dim, defaultInternalUnits), Quantity(Float32(7.1), dim, defaultInternalUnits) ),
+        ( Quantity{UInt16}, Quantity{Float64}(16, dim, defaultInternalUnits), Quantity(UInt16(16), dim, defaultInternalUnits) ),
+        ( Quantity{Float16}, Quantity{Int64}(16, dim, defaultInternalUnits), Quantity(Float16(16), dim, defaultInternalUnits) )
     ]
 end
 
@@ -373,8 +391,8 @@ function canConstructSimpleQuantityArrayFromQuantityArray()
 end
 
 function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
-    intu = InternalUnits(length=2*ucat.milli*ucat.meter)
-    qArray = QuantityArray([5, 7] * ucat.meter, intu)
+    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
+    qArray = QuantityArray([2500, 3500], Dimension(L=1), intu2)
     sqArray = SimpleQuantityArray(qArray)
     correctFields = Dict([
         ("value", [5000, 7000]),
@@ -415,6 +433,472 @@ function canConstructSimpleQuantityArrayFromQuantity()
     sqArray1 = SimpleQuantityArray( [sq.value], sq.unit )
     sqArray2 = SimpleQuantityArray(q)
     return sqArray1==sqArray2
+end
+
+function canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    value = [6.7, 5.4]
+    unit = TestingTools.generateRandomUnit()
+    sqArray_64 = SimpleQuantityArray(Array{Float64}(value), unit)
+    sqArray_32 = SimpleQuantityArray{Float32}( sqArray_64 )
+
+    correctFields = Dict([
+        ("value", Array{Float32}(value)),
+        ("unit", unit),
+        ("value type", Array{Float32})
+    ])
+    return _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray_32, correctFields)
+end
+
+function _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
+    correctValue = (sqArray.value == correctFields["value"])
+    correctUnit = (sqArray.unit == correctFields["unit"])
+    correctType = isa(sqArray.value, correctFields["value type"])
+    return correctValue && correctUnit && correctType
+end
+
+function canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
+    quantityArray = QuantityArray([2.5, 3.5], Dimension(L=1), intu2)
+    sqArray = SimpleQuantityArray{Int32}(quantityArray)
+    correctFields = Dict([
+        ("value", [5, 7]),
+        ("unit", Unit(ucat.milli*ucat.meter)),
+        ("value type", Array{Int32}),
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
+end
+
+function _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples::Array)
+    correct = true
+    for (sqArray, correctFields) in examples
+        correct &= _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray, correctFields)
+    end
+    return correct
+end
+
+function canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
+    value = 6.7
+    unit = TestingTools.generateRandomUnit()
+    sq_64 = SimpleQuantity(Float64(value), unit)
+    sqArray_32 = SimpleQuantityArray{Float32}( sq_64 )
+
+    correctFields = Dict([
+        ("value", Array{Float32}([value])),
+        ("unit", unit),
+        ("value type", Array{Float32})
+    ])
+    return _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray_32, correctFields)
+end
+
+function canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
+    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
+    quantity = Quantity(5.0 * ucat.meter, intu2)
+    sqArray = SimpleQuantityArray{Int32}(quantity)
+    correctFields = Dict([
+        ("value", [5000]),
+        ("unit", Unit(ucat.milli*ucat.meter)),
+        ("value type", Array{Int32}),
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
+end
+
+function canConvertSimpleQuantityArrayTypeParameter()
+    examples = _getExamplesFor_canConvertSimpleQuantityArrayTypeParameter()
+    return TestingTools.testDyadicFunction(Base.convert, examples)
+end
+
+function _getExamplesFor_canConvertSimpleQuantityArrayTypeParameter()
+    examples = [
+        ( SimpleQuantityArray{Float32}, SimpleQuantityArray{Float64}([7.1], ucat.meter), SimpleQuantityArray{Float32}([7.1], ucat.meter) ),
+        ( SimpleQuantityArray{UInt16}, SimpleQuantityArray{Float64}([16], ucat.meter), SimpleQuantityArray{UInt16}([16], ucat.meter) ),
+        ( SimpleQuantityArray{Float16}, SimpleQuantityArray{Int64}([16], ucat.meter), SimpleQuantityArray{Float16}([16], ucat.meter) )
+    ]
+end
+
+## QuantityArray
+
+function _checkQuantityArrayConstructorExamplesIncludingType(examples::Array)
+    correct = true
+    for (sqArray, correctFields) in examples
+        correct &= _verifyQuantityArrayHasCorrectFieldsandType(sqArray, correctFields)
+    end
+    return correct
+end
+
+function _verifyQuantityArrayHasCorrectFieldsandType(qArray::QuantityArray, correctFields::Dict{String,Any})
+    correctValue = (qArray.value == correctFields["value"])
+    correctDimension = (qArray.dimension == correctFields["dimension"])
+    correctIntU = (qArray.internalUnits == correctFields["internal units"])
+    correctType = isa(qArray.value, correctFields["value type"])
+    correct = correctValue && correctDimension && correctIntU && correctType
+    return correct
+end
+
+function canConstructQuantityArrayFromQuantityArrayAndIntU()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantityArrayAndIntU()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantityArrayAndIntU()
+    quantityArray = QuantityArray(Array{Int32}([4, 8]), lengthDim, defaultInternalUnits)
+    returnedArray = QuantityArray(quantityArray, intu2)
+    correctFields = Dict([
+        ("value", [2, 4]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantityArray()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantityArray()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantityArray()
+    quantityArray = QuantityArray(Array{Int32}([4, 8]), lengthDim, intu2)
+    returnedArray = QuantityArray(quantityArray)
+    correctFields = Dict([
+        ("value", [4, 8]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantityArrayAndIntU()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArrayAndIntU()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArrayAndIntU()
+    sqArray = Array{Int32}([4, 2]) * ucat.meter
+    returnedArray1 = QuantityArray(sqArray, intu2)
+    correctFields1 = Dict([
+        ("value", [2, 1]),
+        ("dimension", dimensionOf(sqArray)),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray1, correctFields1)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantityArray()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArray()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArray()
+    sqArray = Array{Int32}([4, 2]) * ucat.meter
+    returnedArray1 = QuantityArray(sqArray)
+    correctFields1 = Dict([
+        ("value", [4, 2]),
+        ("dimension", dimensionOf(sqArray)),
+        ("internal units", defaultInternalUnits),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray1, correctFields1)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantityAndIntU()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantityAndIntU()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantityAndIntU()
+    quantity = Quantity(Int32(4), lengthDim, defaultInternalUnits)
+    returnedArray = QuantityArray(quantity, intu2)
+    correctFields = Dict([
+        ("value", [2]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantity()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantity()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantity()
+    quantity = Quantity(Int32(4), lengthDim, intu2)
+    returnedArray = QuantityArray(quantity)
+    correctFields = Dict([
+        ("value", [4]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantityAndIntU()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityAndIntU()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityAndIntU()
+    sQuantity = Int32(4) * ucat.meter
+    returnedArray = QuantityArray(sQuantity, intu2)
+    correctFields = Dict([
+        ("value", [2]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantity()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantity()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantity()
+    sQuantity = Int32(4) * ucat.meter
+    returnedArray = QuantityArray(sQuantity)
+    correctFields = Dict([
+        ("value", [4]),
+        ("dimension", lengthDim),
+        ("internal units", defaultInternalUnits),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantityArrayAndIntU_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantityArrayAndIntU_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantityArrayAndIntU_TypeSpecified()
+    quantityArray = QuantityArray(Array{Float32}([4, 8]), lengthDim, defaultInternalUnits)
+    returnedArray = QuantityArray{Int32}(quantityArray, intu2)
+    correctFields = Dict([
+        ("value", [2, 4]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantityArray_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantityArray_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantityArray_TypeSpecified()
+    quantityArray = QuantityArray(Array{Float32}([-4, 8]), lengthDim, intu2)
+    returnedArray = QuantityArray{Int32}(quantityArray)
+    correctFields = Dict([
+        ("value", [-4, 8]),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantityArrayAndIntU_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArrayAndIntU_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArrayAndIntU_TypeSpecified()
+    sqArray = Array{Float64}([-2.2, 4.6]) * ucat.meter
+    returnedArray = QuantityArray{Float32}(sqArray, intu2)
+    correctFields = Dict([
+        ("value", Array{Float32}([-1.1, 2.3])),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    sqArray = Array{Float64}([-2.2, 4.6]) * ucat.meter
+    returnedArray = QuantityArray{Float32}(sqArray)
+    correctFields = Dict([
+        ("value", Array{Float32}([-2.2, 4.6])),
+        ("dimension", lengthDim),
+        ("internal units", defaultInternalUnits),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantityAndIntU_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantityAndIntU_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantityAndIntU_TypeSpecified()
+    quantity = Quantity{Float64}(-4.4, lengthDim, defaultInternalUnits)
+    returnedArray = QuantityArray{Float32}(quantity, intu2)
+    correctFields = Dict([
+        ("value", Array{Float32}([-2.2])),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromQuantity_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromQuantity_TypeSpecified()
+    quantity = Quantity{Float64}(-4.4, lengthDim, intu2)
+    returnedArray = QuantityArray{Float32}(quantity)
+    correctFields = Dict([
+        ("value", Array{Float32}([-4.4])),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantityAndIntU_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityAndIntU_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantityAndIntU_TypeSpecified()
+    simpleQuantity = Int64(-7) * ucat.meter
+    returnedArray = QuantityArray{Float32}(simpleQuantity, intu2)
+    correctFields = Dict([
+        ("value", Array{Float32}([-3.5])),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityArrayFromSimpleQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityArrayFromSimpleQuantity_TypeSpecified()
+    return _checkQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityArrayFromSimpleQuantity_TypeSpecified()
+    simpleQuantity = Int64(-7) * ucat.meter
+    returnedArray = QuantityArray{Float32}(simpleQuantity)
+    correctFields = Dict([
+        ("value", Array{Float32}([-7.0])),
+        ("dimension", lengthDim),
+        ("internal units", defaultInternalUnits),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedArray, correctFields)
+    ]
+    return examples
+end
+
+function canConvertQuantityArrayTypeParameter()
+    examples = _getExamplesFor_canConvertQuantityArrayTypeParameter()
+    return TestingTools.testDyadicFunction(Base.convert, examples)
+end
+
+function _getExamplesFor_canConvertQuantityArrayTypeParameter()
+    examples = [
+        ( QuantityArray{Float32}, QuantityArray{Float64}([7.1], lengthDim, intu2), QuantityArray{Float32}([7.1], lengthDim, intu2) ),
+        ( QuantityArray{UInt16}, QuantityArray{Float64}([16], lengthDim, intu2), QuantityArray{UInt16}([16],lengthDim, intu2) ),
+        ( QuantityArray{Float16}, QuantityArray{Int64}([16], lengthDim, intu2), QuantityArray{Float16}([16], lengthDim, intu2) )
+    ]
 end
 
 end # module

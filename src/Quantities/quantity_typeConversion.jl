@@ -39,7 +39,8 @@ SimpleQuantity{T}(quantity::Quantity) where {T<:Number} = SimpleQuantity{T}( Sim
 """
     Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity}
 
-Convert `simpleQuantity` from type `SimpleQuantity{S} where S` to type `SimpleQuantity{T}`.
+Convert `simpleQuantity` from type `SimpleQuantity{S} where S` to any subtype
+`T` of `SimpleQuantity`
 
 Allows to convert, for instance, from `SimpleQuantity{Float64}` to `SimpleQuantity{UInt8}`.
 """
@@ -54,8 +55,7 @@ Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity
 
 Construct a `Quantity` from a physical quantity of any implementation of `AbstractQuantity`.
 
-If no `InternalUnits` are specified, they are constructed by calling
-`InternalUnits()`, which returns basic SI units.
+If no `InternalUnits` are specified, they are constructed using basic SI units.
 """
 function Quantity(::AbstractQuantity, ::InternalUnits) end
 function Quantity(::AbstractQuantity) end
@@ -77,7 +77,7 @@ function Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnit
     return Quantity(internalValue, dimension, internalUnits)
 end
 
-function _attemptConversionToOriginalType(T::Type, value::Number)
+function _attemptConversionToOriginalType(T::Type, value::Union{Number, AbstractArray})
     try
         value = convert(T, value)
     catch
@@ -85,7 +85,7 @@ function _attemptConversionToOriginalType(T::Type, value::Number)
     return value
 end
 
-Quantity(simpleQuantity::SimpleQuantity) = Quantity(simpleQuantity, InternalUnits())
+Quantity(simpleQuantity::SimpleQuantity) = Quantity(simpleQuantity, defaultInternalUnits)
 
 """
     Quantity{T}(::AbstractQuantity, ::InternalUnits) where {T<:Number}
@@ -120,12 +120,13 @@ function Quantity{T}(simpleQuantity::SimpleQuantity, internalUnits::InternalUnit
     return Quantity(internalValue, dimension, internalUnits)
 end
 
-Quantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = Quantity{T}(simpleQuantity::SimpleQuantity, InternalUnits())
+Quantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = Quantity{T}(simpleQuantity::SimpleQuantity, defaultInternalUnits)
 
 """
     Base.convert(::Type{T}, quantity::Quantity) where {T<:Quantity}
 
-Convert `quantity` from type `Quantity{S} where S` to type `Quantity{T}`.
+Convert `quantity` from type `Quantity{S} where S` to any type `T` of
+`Quantity`.
 
 Allows to convert, for instance, from `Quantity{Float64}` to `Quantity{UInt8}`.
 """
@@ -165,6 +166,10 @@ Construct a `SimpleQuantityArray{T}` with specified type `T` from a physical qua
 of any implementation of `AbstractQuantityArray`.
 
 See `SimpleQuantityArray(::AbstractQuantityArray)` for details.
+
+# Raises Exceptions
+- `InexactError`: if the value of `AbstractQuantityArray` cannot be
+represented as type `Array{T}`.
 """
 function SimpleQuantityArray{T}(quantityArray::AbstractQuantityArray) where {T<:Number} end
 SimpleQuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, sqArray.value), sqArray.unit)
@@ -176,8 +181,174 @@ SimpleQuantityArray{T}(qArray::QuantityArray) where {T<:Number} = SimpleQuantity
 Construct a 1x1 `SimpleQuantityArray{T}` with specified type `T` from a physical quantity
 of any implementation of `AbstractQuantity`.
 
-See `SimpleQuantityArray(::AbstractQuantityArray)` for details.
+See `SimpleQuantityArray(::AbstractQuantity)` for details.
+
+# Raises Exceptions
+- `InexactError`: if the value of `AbstractQuantity` cannot be
+represented as type `Array{T}`.
 """
-function SimpleQuantityArray{T}(quantity::AbstractQuantity) where {T<:Quantity} end
+function SimpleQuantityArray{T}(quantity::AbstractQuantity) where {T<:Number} end
 SimpleQuantityArray{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantityArray{T}([simpleQuantity.value], simpleQuantity.unit)
 SimpleQuantityArray{T}(quantity::Quantity) where {T<:Number} = SimpleQuantityArray{T}( SimpleQuantityArray(quantity) )
+
+"""
+    Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray}
+
+Convert `sqArray` from type `SimpleQuantityArray{S} where S` to any subtype `T`
+of `SimpleQuantityArray`.
+
+Allows to convert, for instance, from `SimpleQuantityArray{Float64}` to `SimpleQuantityVector{UInt8}`.
+"""
+Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray} = sqArray isa T ? sqArray : T(sqArray)
+
+
+## QuantityArray
+
+"""
+    QuantityArray(::AbstractQuantityArray, ::InternalUnits)
+    QuantityArray(::AbstractQuantityArray)
+
+Construct a `QuantityArray` from a physical quantity of any implementation of `AbstractQuantityArray`.
+
+If no `InternalUnits` are specified, they are inferred from the
+`AbstractQuantityArray` if possible. Else, basic SI units are used.
+"""
+function QuantityArray(::AbstractQuantityArray, ::InternalUnits) end
+function QuantityArray(::AbstractQuantityArray) end
+
+function QuantityArray(qArray::QuantityArray{T}, internalUnits::InternalUnits) where T
+    convFactor = conversionFactor(qArray.dimension, qArray.internalUnits, internalUnits)
+    value = qArray.value * convFactor
+    value = _attemptConversionToOriginalType(typeof(qArray.value), value)
+    return QuantityArray(value, qArray.dimension, internalUnits)
+end
+QuantityArray(qArray::QuantityArray) = qArray
+
+function QuantityArray(sqArray::SimpleQuantityArray{T}, internalUnits::InternalUnits) where T
+    dimension = dimensionOf(sqArray)
+    internalUnit = internalUnitFor(dimension, internalUnits)
+    internalValue = valueInUnitsOf(sqArray, internalUnit)
+    internalValue = _attemptConversionToOriginalType(typeof(sqArray.value), internalValue)
+    return QuantityArray(internalValue, dimension, internalUnits)
+end
+QuantityArray(sqArray::SimpleQuantityArray) = QuantityArray(sqArray, defaultInternalUnits)
+
+"""
+    QuantityArray(quantity::AbstractQuantity, ::InternalUnits)
+    QuantityArray(quantity::AbstractQuantity)
+
+Construct a 1x1 `QuantityArray` from a physical quantity of any implementation
+of `AbstractQuantity`.
+
+See `QuantityArray(::AbstractQuantityArray)` for details.
+"""
+function QuantityArray(::AbstractQuantity, ::InternalUnits) end
+function QuantityArray(::AbstractQuantity) end
+
+function QuantityArray(quantity::Quantity{T}, internalUnits::InternalUnits) where T
+    q_inIntu = Quantity(quantity, internalUnits)
+    return QuantityArray( Array([q_inIntu.value]), q_inIntu.dimension, q_inIntu.internalUnits )
+end
+
+function QuantityArray(quantity::Quantity)
+    return QuantityArray( Array([quantity.value]), quantity.dimension, quantity.internalUnits )
+end
+
+function QuantityArray(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits)
+    sqArray = SimpleQuantityArray(simpleQuantity)
+    return QuantityArray( sqArray, internalUnits )
+end
+
+function QuantityArray(simpleQuantity::SimpleQuantity)
+    sqArray = SimpleQuantityArray(simpleQuantity)
+    return QuantityArray( sqArray )
+end
+
+"""
+    QuantityArray{T}(::AbstractQuantityArray, ::InternalUnits) where {T<:Number}
+    QuantityArray{T}(::AbstractQuantityArray) where {T<:Number}
+
+Construct a `QuantityArray{T}` with specified type `T` from a physical quantity
+of any implementation of `AbstractQuantityArray`.
+
+See `QuantityArray(::AbstractQuantityArray, ::InternalUnits)` for details.
+
+# Raises Exceptions
+- `InexactError`: if the internal value of `AbstractQuantityArray` cannot be
+represented as type `Array{T}`.
+"""
+function QuantityArray{T}(::AbstractQuantityArray, ::InternalUnits) where {T<:Number} end
+function QuantityArray{T}(::AbstractQuantityArray) where {T<:Number} end
+
+function QuantityArray{T}(qArray::QuantityArray, internalUnits::InternalUnits) where {T<:Number}
+    convFactor = conversionFactor(qArray.dimension, qArray.internalUnits, internalUnits)
+    value = qArray.value * convFactor
+    value = convert(Array{T}, value)
+    return QuantityArray(value, qArray.dimension, internalUnits)
+end
+
+function QuantityArray{T}(qArray::QuantityArray) where {T<:Number}
+    value = convert(Array{T}, qArray.value)
+    return QuantityArray(value, qArray.dimension, qArray.internalUnits)
+end
+
+function QuantityArray{T}(sqArray::SimpleQuantityArray, internalUnits::InternalUnits) where {T<:Number}
+    dimension = dimensionOf(sqArray)
+    internalUnit = internalUnitFor(dimension, internalUnits)
+    internalValue = valueInUnitsOf(sqArray, internalUnit)
+    internalValue = convert(Array{T}, internalValue)
+    return QuantityArray(internalValue, dimension, internalUnits)
+end
+
+QuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number} = QuantityArray{T}(sqArray::SimpleQuantityArray, defaultInternalUnits)
+
+
+"""
+    QuantityArray{T}(::AbstractQuantity, ::InternalUnits) where {T<:Number}
+    QuantityArray{T}(::AbstractQuantity) where {T<:Number}
+
+Construct a `QuantityArray{T}` with specified type `T` from a physical quantity
+of any implementation of `AbstractQuantity`.
+
+See `QuantityArray(::AbstractQuantity, ::InternalUnits)` for details.
+
+# Raises Exceptions
+- `InexactError`: if the internal value of `AbstractQuantityArray` cannot be
+represented as type `Array{T}`.
+"""
+function QuantityArray{T}(::AbstractQuantity, ::InternalUnits) where {T<:Number} end
+function QuantityArray{T}(::AbstractQuantity) where {T<:Number} end
+
+function QuantityArray{T}(quantity::Quantity, internalUnits::InternalUnits) where {T<:Number}
+    convFactor = conversionFactor(quantity.dimension, quantity.internalUnits, internalUnits)
+    value = Array([quantity.value * convFactor])
+    value = convert(Array{T}, value)
+    return QuantityArray(value, quantity.dimension, internalUnits)
+end
+
+function QuantityArray{T}(quantity::Quantity) where {T<:Number}
+    value = Array([quantity.value])
+    value = convert(Array{T}, value)
+    return QuantityArray(value, quantity.dimension, quantity.internalUnits)
+end
+
+function QuantityArray{T}(simpleQuantity::SimpleQuantity, internalUnits::InternalUnits) where {T<:Number}
+    dimension = dimensionOf(simpleQuantity)
+    internalUnit = internalUnitFor(dimension, internalUnits)
+    internalValue = valueInUnitsOf(simpleQuantity, internalUnit)
+    internalValue = Array([internalValue])
+    internalValue = convert(Array{T}, internalValue)
+    return QuantityArray(internalValue, dimension, internalUnits)
+end
+
+QuantityArray{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = QuantityArray{T}(simpleQuantity, defaultInternalUnits)
+
+"""
+    Base.convert(::Type{T}, qArray::QuantityArray) where {T<:QuantityArray}
+
+Convert `qArray` from type `QuantityArray{S} where S` to any subtype `T` of
+`QuantityArray`.
+
+Allows to convert, for instance, from `QuantityArray{Float64}` to `QuantityVector{UInt8}`.
+"""
+Base.convert(::Type{T}, qArray::QuantityArray) where {T<:QuantityArray} = qArray isa T ? qArray : T(qArray)
