@@ -15,15 +15,15 @@ include("quantity_unitConversionTests.jl")
 
 function run()
     @testset "Quantities" begin
-        # SimpleQuantityTests.run()
-        # SimpleQuantityArrayTests.run()
-        #
-        # InternalUnitsTests.run()
-        # QuantityTests.run()
-        # QuantityArrayTests.run()
+        SimpleQuantityTests.run()
+        SimpleQuantityArrayTests.run()
+
+        InternalUnitsTests.run()
+        QuantityTests.run()
+        QuantityArrayTests.run()
 
         quantity_typeConversionTests.run()
-        # quantity_unitConversionTests.run()
+        quantity_unitConversionTests.run()
     end
 end
 

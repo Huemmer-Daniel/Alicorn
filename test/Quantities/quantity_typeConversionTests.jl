@@ -12,14 +12,14 @@ const lengthDim = Dimension(L=1)
 function run()
     @testset "quantity_typeConversion" begin
 
-        # SimpleQuantity: TODO - clean up, test types
+        # SimpleQuantity
         @test canConstructSimpleQuantityFromSimpleQuantity()
         @test canConstructSimpleQuantityFromQuantity()
         @test canConstructSimpleQuantityFromSimpleQuantity_TypeSpecified()
         @test canConstructSimpleQuantityFromQuantity_TypeSpecified()
         @test canConvertSimpleQuantityTypeParameter()
 
-        # Quantity: TODO - clean up, test types
+        # Quantity
         @test canConstructQuantityFromQuantityAndIntU()
         @test canConstructQuantityFromQuantity()
         @test canConstructQuantityFromSimpleQuantityAndIntU()
@@ -28,10 +28,9 @@ function run()
         @test canConstructQuantityFromQuantity_TypeSpecified()
         @test canConstructQuantityFromSimpleQuantityAndIntU_TypeSpecified()
         @test canConstructQuantityFromSimpleQuantity_TypeSpecified()
-        test_QuantityWithTypeSpecified_errorsIfTypeUnsuitable()
         @test canConvertQuantityTypeParameter()
 
-        # SimpleQuantityArray: TODO - clean up, test types
+        # SimpleQuantityArray
         @test canConstructSimpleQuantityArrayFromSimpleQuantityArray()
         @test canConstructSimpleQuantityArrayFromQuantityArray()
         @test canConstructSimpleQuantityArrayFromSimpleQuantity()
@@ -63,90 +62,8 @@ function run()
     end
 end
 
+
 ## SimpleQuantity
-
-function canConstructSimpleQuantityFromSimpleQuantity()
-    sq1 = TestingTools.generateRandomSimpleQuantity()
-    sq2 = SimpleQuantity(sq1)
-    return sq1==sq2
-end
-
-function canConstructSimpleQuantityFromQuantity()
-    examples = _getExamplesFor_canConstructSimpleQuantityFromQuantity()
-    return _checkSimpleQuantityConstructorExamples(examples)
-end
-
-function _getExamplesFor_canConstructSimpleQuantityFromQuantity()
-    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
-    quantity = Quantity(5 * ucat.meter, intu2)
-    sq = SimpleQuantity(quantity)
-    correctFields = Dict([
-        ("value", 5000),
-        ("unit", Unit(ucat.milli*ucat.meter))
-    ])
-
-    examples = [
-        (sq, correctFields)
-    ]
-    return examples
-end
-
-function _checkSimpleQuantityConstructorExamples(examples::Array)
-    correct = true
-    for (simpleQuantity, correctFields) in examples
-        correct &= _verifySimpleQuantityHasCorrectFields(simpleQuantity, correctFields)
-    end
-    return correct
-end
-
-function _verifySimpleQuantityHasCorrectFields(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
-    correctValue = (simpleQuantity.value == correctFields["value"])
-    correctUnit = (simpleQuantity.unit == correctFields["unit"])
-    correct = correctValue && correctUnit
-    return correct
-end
-
-function canConstructSimpleQuantityFromSimpleQuantity_TypeSpecified()
-    value = 6.7
-    unit = TestingTools.generateRandomUnit()
-    sq_64 = SimpleQuantity(Float64(value), unit)
-    sq_32 = SimpleQuantity{Float32}( sq_64 )
-
-    correctFields = Dict([
-        ("value", Float32(value)),
-        ("unit", unit),
-        ("value type", Float32)
-    ])
-    return _verifySimpleQuantityHasCorrectFieldsAndType(sq_32, correctFields)
-end
-
-function _verifySimpleQuantityHasCorrectFieldsAndType(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
-    correctValue = (simpleQuantity.value == correctFields["value"])
-    correctUnit = (simpleQuantity.unit == correctFields["unit"])
-    correctType = isa(simpleQuantity.value, correctFields["value type"])
-    return correctValue && correctUnit && correctType
-end
-
-function canConstructSimpleQuantityFromQuantity_TypeSpecified()
-    examples = _getExamplesFor_canConstructSimpleQuantityFromQuantity_TypeSpecified()
-    return _checkSimpleQuantityConstructorExamplesIncludingType(examples)
-end
-
-function _getExamplesFor_canConstructSimpleQuantityFromQuantity_TypeSpecified()
-    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
-    quantity = Quantity(5.0 * ucat.meter, intu2)
-    sq = SimpleQuantity{Int32}(quantity)
-    correctFields = Dict([
-        ("value", 5000),
-        ("unit", Unit(ucat.milli*ucat.meter)),
-        ("value type", Int32),
-    ])
-
-    examples = [
-        (sq, correctFields)
-    ]
-    return examples
-end
 
 function _checkSimpleQuantityConstructorExamplesIncludingType(examples::Array)
     correct = true
@@ -156,6 +73,93 @@ function _checkSimpleQuantityConstructorExamplesIncludingType(examples::Array)
     return correct
 end
 
+function _verifySimpleQuantityHasCorrectFieldsAndType(simpleQuantity::SimpleQuantity, correctFields::Dict{String,Any})
+    correctValue = (simpleQuantity.value == correctFields["value"])
+    correctUnit = (simpleQuantity.unit == correctFields["unit"])
+    correctType = isa(simpleQuantity.value, correctFields["value type"])
+    return correctValue && correctUnit && correctType
+end
+
+function canConstructSimpleQuantityFromSimpleQuantity()
+    examples = _getExamplesFor_canConstructSimpleQuantityFromSimpleQuantity()
+    return _checkSimpleQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityFromSimpleQuantity()
+    sq = SimpleQuantity{Float32}( -6.7, ucat.meter )
+    returnedSq = SimpleQuantity(sq)
+    correctFields = Dict([
+        ("value", Float32(-6.7)),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Float32)
+    ])
+
+    examples = [
+        (returnedSq, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityFromQuantity()
+    examples = _getExamplesFor_canConstructSimpleQuantityFromQuantity()
+    return _checkSimpleQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityFromQuantity()
+    quantity = Quantity{Int32}(5, lengthDim, intu2)
+    returnedSq = SimpleQuantity(quantity)
+    correctFields = Dict([
+        ("value", Int32(10) ),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedSq, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityFromSimpleQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructSimpleQuantityFromSimpleQuantity_TypeSpecified()
+    return _checkSimpleQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityFromSimpleQuantity_TypeSpecified()
+    sq = SimpleQuantity{Float64}( -6.7, ucat.meter )
+    returnedSq = SimpleQuantity{Float32}(sq)
+    correctFields = Dict([
+        ("value", Float32(-6.7)),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Float32)
+    ])
+
+    examples = [
+        (returnedSq, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityFromQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructSimpleQuantityFromQuantity_TypeSpecified()
+    return _checkSimpleQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityFromQuantity_TypeSpecified()
+    quantity = Quantity{Int64}(5, lengthDim, intu2)
+    returnedSq = SimpleQuantity{Int32}(quantity)
+    correctFields = Dict([
+        ("value", Int32(10) ),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedSq, correctFields)
+    ]
+    return examples
+end
+
 function canConvertSimpleQuantityTypeParameter()
     examples = _getExamplesFor_canConvertSimpleQuantityTypeParameter()
     return TestingTools.testDyadicFunction(Base.convert, examples)
@@ -163,131 +167,13 @@ end
 
 function _getExamplesFor_canConvertSimpleQuantityTypeParameter()
     examples = [
-        ( SimpleQuantity{Float32}, SimpleQuantity{Float64}(7.1, ucat.meter), SimpleQuantity{Float32}(7.1, ucat.meter) ),
+        ( SimpleQuantity{Float32}, SimpleQuantity{Float64}(-7.1, ucat.meter), SimpleQuantity{Float32}(-7.1, ucat.meter) ),
         ( SimpleQuantity{UInt16}, SimpleQuantity{Float64}(16, ucat.meter), SimpleQuantity{UInt16}(16, ucat.meter) ),
         ( SimpleQuantity{Float16}, SimpleQuantity{Int64}(16, ucat.meter), SimpleQuantity{Float16}(16, ucat.meter) )
     ]
 end
 
 ## Quantity
-
-function canConstructQuantityFromQuantityAndIntU()
-    intu2 = InternalUnits(length=2*ucat.meter)
-    q2 = Quantity(4*ucat.meter^2, intu2)
-    q1 = Quantity(q2, defaultInternalUnits)
-    return q1 == Quantity(4*ucat.meter^2, defaultInternalUnits)
-end
-
-function canConstructQuantityFromQuantity()
-    q1 = TestingTools.generateRandomQuantity()
-    q2 = Quantity(q1)
-    return q1==q2
-end
-
-function canConstructQuantityFromSimpleQuantityAndIntU()
-    examples = _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU()
-    return _checkQuantityConstructorExamples(examples)
-end
-
-function _checkQuantityConstructorExamples(examples::Array)
-    correct = true
-    for (quantity, correctFields) in examples
-        correct &= _verifyQuantityHasCorrectFields(quantity, correctFields)
-    end
-    return correct
-end
-
-function _verifyQuantityHasCorrectFields(quantity::Quantity, correctFields::Dict{String,Any})
-    correctValue = (quantity.value == correctFields["value"])
-    correctDimension = (quantity.dimension == correctFields["dimension"])
-    correctIntU = (quantity.internalUnits == correctFields["internal units"])
-    correct = correctValue && correctDimension && correctIntU
-    return correct
-end
-
-function _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU()
-    sQuantity = TestingTools.generateRandomSimpleQuantity()
-    sQuantityBaseSI = inBasicSIUnits(sQuantity)
-    q1 = Quantity(sQuantity, defaultInternalUnits)
-    correctFields1 = Dict([
-        ("value", sQuantityBaseSI.value),
-        ("dimension", dimensionOf(sQuantityBaseSI)),
-        ("internal units", defaultInternalUnits)
-    ])
-
-    examples = [
-        (q1, correctFields1)
-    ]
-    return examples
-end
-
-function canConstructQuantityFromSimpleQuantity()
-    examples = _getExamplesFor_canConstructQuantityFromSimpleQuantity()
-    return _checkQuantityConstructorExamples(examples)
-end
-
-function _getExamplesFor_canConstructQuantityFromSimpleQuantity()
-    sQuantity = TestingTools.generateRandomSimpleQuantity()
-    sQuantityBaseSI = inBasicSIUnits(sQuantity)
-    q1 = Quantity(sQuantity)
-    correctFields1 = Dict([
-        ("value", sQuantityBaseSI.value),
-        ("dimension", dimensionOf(sQuantityBaseSI)),
-        ("internal units", defaultInternalUnits)
-    ])
-
-    examples = [
-        (q1, correctFields1)
-    ]
-    return examples
-end
-
-function canConstructQuantityFromQuantityAndIntU_TypeSpecified()
-    examples = _getExamplesFor_canConstructQuantityFromQuantityandIntU_TypeSpecified()
-    return _checkQuantityConstructorExamplesIncludingType(examples)
-end
-
-function _getExamplesFor_canConstructQuantityFromQuantityandIntU_TypeSpecified()
-    intu2 = InternalUnits(length=2*ucat.meter)
-    q_64_intu2 = Quantity(Float64(4)*ucat.meter^2, intu2)
-    q_32_intu1 = Quantity{Float32}( q_64_intu2, defaultInternalUnits )
-
-    correctFields = Dict([
-        ("value", Float32(4)),
-        ("dimension", Dimension(L=2)),
-        ("internal units", defaultInternalUnits),
-        ("value type", Float32)
-    ])
-
-    examples = [
-        (q_32_intu1, correctFields)
-    ]
-    return examples
-end
-
-function canConstructQuantityFromQuantity_TypeSpecified()
-    examples = _getExamplesFor_canConstructQuantityFromQuantity_TypeSpecified()
-    return _checkQuantityConstructorExamplesIncludingType(examples)
-end
-
-function _getExamplesFor_canConstructQuantityFromQuantity_TypeSpecified()
-    value = 6.7
-    dim = TestingTools.generateRandomDimension()
-    q_64 = Quantity(Float64(value), dim, defaultInternalUnits)
-    q_32 = Quantity{Float32}( q_64 )
-
-    correctFields = Dict([
-        ("value", Float32(value)),
-        ("dimension", dim),
-        ("internal units", defaultInternalUnits),
-        ("value type", Float32)
-    ])
-
-    examples = [
-        (q_32, correctFields)
-    ]
-    return examples
-end
 
 function _checkQuantityConstructorExamplesIncludingType(examples::Array)
     correct = true
@@ -306,25 +192,150 @@ function _verifyQuantityHasCorrectFieldsAndType(quantity::Quantity, correctField
     return correct
 end
 
+function canConstructQuantityFromQuantityAndIntU()
+    examples = _getExamplesFor_canConstructQuantityFromQuantityAndIntU()
+    return _checkQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityFromQuantityAndIntU()
+    quantity = Quantity{Int32}(10, lengthDim, defaultInternalUnits)
+    returnedQuantity = Quantity(quantity, intu2)
+    correctFields = Dict([
+        ("value", Int32(5) ),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedQuantity, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityFromQuantity()
+    examples = _getExamplesFor_canConstructQuantityFromQuantity()
+    return _checkQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityFromQuantity()
+    quantity = Quantity{Int32}(10, lengthDim, intu2)
+    returnedQuantity = Quantity(quantity)
+    correctFields = Dict([
+        ("value", Int32(10) ),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedQuantity, correctFields)
+    ]
+    return examples
+end
+
+
+function canConstructQuantityFromSimpleQuantityAndIntU()
+    examples = _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU()
+    return _checkQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU()
+    sQuantity = SimpleQuantity{Int32}(-10, ucat.meter)
+    returnedQuantity = Quantity(sQuantity, intu2)
+    correctFields = Dict([
+        ("value", Int32(-5) ),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedQuantity, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityFromSimpleQuantity()
+    examples = _getExamplesFor_canConstructQuantityFromSimpleQuantity()
+    return _checkQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityFromSimpleQuantity()
+    sQuantity = SimpleQuantity{Int32}(-10, ucat.meter)
+    returnedQuantity = Quantity(sQuantity)
+    correctFields = Dict([
+        ("value", Int32(-10) ),
+        ("dimension", lengthDim),
+        ("internal units", defaultInternalUnits),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedQuantity, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityFromQuantityAndIntU_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityFromQuantityAndIntU_TypeSpecified()
+    return _checkQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityFromQuantityAndIntU_TypeSpecified()
+    quantity = Quantity{Int64}(10, lengthDim, defaultInternalUnits)
+    returnedQuantity = Quantity{Int32}(quantity, intu2)
+    correctFields = Dict([
+        ("value", Int32(5) ),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Int32)
+    ])
+
+    examples = [
+        (returnedQuantity, correctFields)
+    ]
+    return examples
+end
+
+function canConstructQuantityFromQuantity_TypeSpecified()
+    examples = _getExamplesFor_canConstructQuantityFromQuantity_TypeSpecified()
+    return _checkQuantityConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructQuantityFromQuantity_TypeSpecified()
+    quantity = Quantity{Float64}(-9.2, lengthDim, intu2)
+    returnedQuantity = Quantity{Float32}(quantity)
+    correctFields = Dict([
+        ("value", Float32(-9.2) ),
+        ("dimension", lengthDim),
+        ("internal units", intu2),
+        ("value type", Float32)
+    ])
+
+    examples = [
+        (returnedQuantity, correctFields)
+    ]
+    return examples
+end
+
 function canConstructQuantityFromSimpleQuantityAndIntU_TypeSpecified()
     examples = _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU_TypeSpecified()
     return _checkQuantityConstructorExamplesIncludingType(examples)
 end
 
 function _getExamplesFor_canConstructQuantityFromSimpleQuantityAndIntU_TypeSpecified()
-    intu2 = InternalUnits(length=0.5*ucat.meter)
-    sq_64 = SimpleQuantity(Float64(4)*ucat.meter^2)
-
-    q1_32_intu2 = Quantity{Float32}(sq_64, intu2)
-    correctFields1 = Dict([
-        ("value", Float32(16) ),
-        ("dimension", Dimension(L=2)),
+    sQuantity = SimpleQuantity{Int64}(-10, ucat.meter)
+    returnedQuantity = Quantity{Int32}(sQuantity, intu2)
+    correctFields = Dict([
+        ("value", Int32(-5) ),
+        ("dimension", lengthDim),
         ("internal units", intu2),
-        ("value type", Float32)
+        ("value type", Int32)
     ])
 
     examples = [
-        (q1_32_intu2, correctFields1)
+        (returnedQuantity, correctFields)
     ]
     return examples
 end
@@ -335,31 +346,19 @@ function canConstructQuantityFromSimpleQuantity_TypeSpecified()
 end
 
 function _getExamplesFor_canConstructQuantityFromSimpleQuantity_TypeSpecified()
-    sq_64 = SimpleQuantity(Float64(4)*ucat.meter^2)
-
-    q1_32 = Quantity{Float32}(sq_64)
-    correctFields1 = Dict([
-        ("value", Float32(4) ),
-        ("dimension", Dimension(L=2)),
+    sQuantity = SimpleQuantity{Int64}(-10, ucat.meter)
+    returnedQuantity = Quantity{Int32}(sQuantity)
+    correctFields = Dict([
+        ("value", Int32(-10) ),
+        ("dimension", lengthDim),
         ("internal units", defaultInternalUnits),
-        ("value type", Float32)
+        ("value type", Int32)
     ])
 
     examples = [
-        (q1_32, correctFields1)
+        (returnedQuantity, correctFields)
     ]
     return examples
-end
-
-function test_QuantityWithTypeSpecified_errorsIfTypeUnsuitable()
-    intu2 = InternalUnits(length=2*ucat.meter)
-    sq_64 = SimpleQuantity(Float64(4.2)*ucat.meter^2)
-    q_64 = Quantity(Float64(4.2)*ucat.meter^2, defaultInternalUnits)
-    expectedError = InexactError
-    @test_throws expectedError Quantity{Int64}(q_64, intu2)
-    @test_throws expectedError Quantity{Int64}(q_64)
-    @test_throws expectedError Quantity{Int64}(sq_64, intu2)
-    @test_throws expectedError Quantity{Int64}(sq_64)
 end
 
 function canConvertQuantityTypeParameter()
@@ -379,74 +378,12 @@ end
 
 ## SimpleQuantityArray
 
-function canConstructSimpleQuantityArrayFromSimpleQuantityArray()
-    sqArray1 = TestingTools.generateRandomSimpleQuantityArray()
-    sqArray2 = SimpleQuantityArray(sqArray1)
-    return sqArray1==sqArray2
-end
-
-function canConstructSimpleQuantityArrayFromQuantityArray()
-    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
-    return _checkSimpleQuantityArrayConstructorExamples(examples)
-end
-
-function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
-    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
-    qArray = QuantityArray([2500, 3500], Dimension(L=1), intu2)
-    sqArray = SimpleQuantityArray(qArray)
-    correctFields = Dict([
-        ("value", [5000, 7000]),
-        ("unit", Unit(ucat.milli*ucat.meter))
-    ])
-
-    examples = [
-        (sqArray, correctFields)
-    ]
-    return examples
-end
-
-function _checkSimpleQuantityArrayConstructorExamples(examples::Array)
+function _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples::Array)
     correct = true
     for (sqArray, correctFields) in examples
-        correct &= _verifySimpleQuantityArrayHasCorrectFields(sqArray, correctFields)
+        correct &= _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray, correctFields)
     end
     return correct
-end
-
-function _verifySimpleQuantityArrayHasCorrectFields(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
-    correctValue = (sqArray.value == correctFields["value"])
-    correctUnit = (sqArray.unit == correctFields["unit"])
-    correct = correctValue && correctUnit
-    return correct
-end
-
-function canConstructSimpleQuantityArrayFromSimpleQuantity()
-    sq = TestingTools.generateRandomSimpleQuantity()
-    sqArray1 = SimpleQuantityArray( [sq.value], sq.unit )
-    sqArray2 = SimpleQuantityArray(sq)
-    return sqArray1==sqArray2
-end
-
-function canConstructSimpleQuantityArrayFromQuantity()
-    q = TestingTools.generateRandomQuantity()
-    sq = SimpleQuantity(q)
-    sqArray1 = SimpleQuantityArray( [sq.value], sq.unit )
-    sqArray2 = SimpleQuantityArray(q)
-    return sqArray1==sqArray2
-end
-
-function canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
-    value = [6.7, 5.4]
-    unit = TestingTools.generateRandomUnit()
-    sqArray_64 = SimpleQuantityArray(Array{Float64}(value), unit)
-    sqArray_32 = SimpleQuantityArray{Float32}( sqArray_64 )
-
-    correctFields = Dict([
-        ("value", Array{Float32}(value)),
-        ("unit", unit),
-        ("value type", Array{Float32})
-    ])
-    return _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray_32, correctFields)
 end
 
 function _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray::SimpleQuantityArray, correctFields::Dict{String,Any})
@@ -456,19 +393,38 @@ function _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray::SimpleQuanti
     return correctValue && correctUnit && correctType
 end
 
-function canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
-    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+function canConstructSimpleQuantityArrayFromSimpleQuantityArray()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantityArray()
     return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
 end
 
-function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
-    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
-    quantityArray = QuantityArray([2.5, 3.5], Dimension(L=1), intu2)
-    sqArray = SimpleQuantityArray{Int32}(quantityArray)
+function _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantityArray()
+    sqArray = SimpleQuantityArray{Float32}( [-6.7 7.6], ucat.meter )
+    returnedSqArray = SimpleQuantityArray(sqArray)
     correctFields = Dict([
-        ("value", [5, 7]),
-        ("unit", Unit(ucat.milli*ucat.meter)),
-        ("value type", Array{Int32}),
+        ("value", Array{Float32}([-6.7 7.6])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Float32})
+    ])
+
+    examples = [
+        (returnedSqArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityArrayFromQuantityArray()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray()
+    qArray = QuantityArray{Int32}([2500, -3500], lengthDim, intu2)
+    sqArray = SimpleQuantityArray(qArray)
+    correctFields = Dict([
+        ("value", Array{Int32}([5000, -7000])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Int32})
     ])
 
     examples = [
@@ -477,41 +433,117 @@ function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSp
     return examples
 end
 
-function _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples::Array)
-    correct = true
-    for (sqArray, correctFields) in examples
-        correct &= _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray, correctFields)
-    end
-    return correct
+function canConstructSimpleQuantityArrayFromSimpleQuantity()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantity()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantity()
+    sQuantity = SimpleQuantity{Int32}(-350, ucat.meter)
+    sqArray = SimpleQuantityArray(sQuantity)
+    correctFields = Dict([
+        ("value", Array{Int32}([-350])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityArrayFromQuantity()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantity()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantity()
+    quantity = Quantity{Int32}(-350, lengthDim, intu2)
+    sqArray = SimpleQuantityArray(quantity)
+    correctFields = Dict([
+        ("value", Array{Int32}([-700])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantityArray_TypeSpecified()
+    sqArray = SimpleQuantityArray{Float64}( [-6 7], ucat.meter )
+    returnedSqArray = SimpleQuantityArray{Int32}(sqArray)
+    correctFields = Dict([
+        ("value", Array{Int32}([-6 7])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (returnedSqArray, correctFields)
+    ]
+    return examples
+end
+
+function canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
+end
+
+function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantityArray_TypeSpecified()
+    qArray = QuantityArray{Float64}([2500, -3500], lengthDim, intu2)
+    sqArray = SimpleQuantityArray{Int32}(qArray)
+    correctFields = Dict([
+        ("value", Array{Int32}([5000, -7000])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Int32})
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
 end
 
 function canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
-    value = 6.7
-    unit = TestingTools.generateRandomUnit()
-    sq_64 = SimpleQuantity(Float64(value), unit)
-    sqArray_32 = SimpleQuantityArray{Float32}( sq_64 )
-
-    correctFields = Dict([
-        ("value", Array{Float32}([value])),
-        ("unit", unit),
-        ("value type", Array{Float32})
-    ])
-    return _verifySimpleQuantityArrayHasCorrectFieldsAndType(sqArray_32, correctFields)
+    examples = _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
+    return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
 end
 
+function _getExamplesFor_canConstructSimpleQuantityArrayFromSimpleQuantity_TypeSpecified()
+    sQuantity = SimpleQuantity{Float64}(350, ucat.meter)
+    sqArray = SimpleQuantityArray{UInt32}(sQuantity)
+    correctFields = Dict([
+        ("value", Array{UInt32}([350])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{UInt32})
+    ])
+
+    examples = [
+        (sqArray, correctFields)
+    ]
+    return examples
+end
 function canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
     examples = _getExamplesFor_canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
     return _checkSimpleQuantityArrayConstructorExamplesIncludingType(examples)
 end
 
 function _getExamplesFor_canConstructSimpleQuantityArrayFromQuantity_TypeSpecified()
-    intu2 = InternalUnits(length=2*ucat.milli*ucat.meter)
-    quantity = Quantity(5.0 * ucat.meter, intu2)
+    quantity = Quantity{Float64}(-350, lengthDim, intu2)
     sqArray = SimpleQuantityArray{Int32}(quantity)
     correctFields = Dict([
-        ("value", [5000]),
-        ("unit", Unit(ucat.milli*ucat.meter)),
-        ("value type", Array{Int32}),
+        ("value", Array{Int32}([-700])),
+        ("unit", Unit(ucat.meter)),
+        ("value type", Array{Int32})
     ])
 
     examples = [
@@ -532,6 +564,7 @@ function _getExamplesFor_canConvertSimpleQuantityArrayTypeParameter()
         ( SimpleQuantityArray{Float16}, SimpleQuantityArray{Int64}([16], ucat.meter), SimpleQuantityArray{Float16}([16], ucat.meter) )
     ]
 end
+
 
 ## QuantityArray
 

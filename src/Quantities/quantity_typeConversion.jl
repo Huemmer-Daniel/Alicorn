@@ -21,8 +21,22 @@ julia> sq = SimpleQuantity(q)
 ```
 """
 function SimpleQuantity(::AbstractQuantity) end
+
 SimpleQuantity(simpleQuantity::SimpleQuantity) = simpleQuantity
-SimpleQuantity(quantity::Quantity) = quantity.value * internalUnitFor(quantity.dimension, quantity.internalUnits)
+
+function SimpleQuantity(quantity::Quantity{T}) where T
+    sQuantity = quantity.value * internalUnitFor(quantity.dimension, quantity.internalUnits)
+    value = _attemptConversionToType(T, sQuantity.value)
+    return SimpleQuantity(value, sQuantity.unit)
+end
+
+function _attemptConversionToType(T::Type, value::Union{Number, AbstractArray})
+    try
+        value = convert(T, value)
+    catch
+    end
+    return value
+end
 
 """
     SimpleQuantity{T}(::AbstractQuantity) where {T<:Number}
@@ -33,8 +47,14 @@ of any implementation of `AbstractQuantity`.
 See `SimpleQuantity(::AbstractQuantity)` for details.
 """
 function SimpleQuantity{T}(::AbstractQuantity) where {T<:Number} end
+
 SimpleQuantity{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantity(convert(T, simpleQuantity.value), simpleQuantity.unit)
-SimpleQuantity{T}(quantity::Quantity) where {T<:Number} = SimpleQuantity{T}( SimpleQuantity(quantity) )
+
+function SimpleQuantity{T}(quantity::Quantity) where {T<:Number}
+    sQuantity = quantity.value * internalUnitFor(quantity.dimension, quantity.internalUnits)
+    value = convert(T, sQuantity.value)
+    return SimpleQuantity(value, sQuantity.unit)
+end
 
 """
     Base.convert(::Type{T}, simpleQuantity::SimpleQuantity) where {T<:SimpleQuantity}
@@ -63,7 +83,7 @@ function Quantity(::AbstractQuantity) end
 function Quantity(quantity::Quantity{T}, internalUnits::InternalUnits) where T
     convFactor = conversionFactor(quantity.dimension, quantity.internalUnits, internalUnits)
     value = quantity.value * convFactor
-    value = _attemptConversionToOriginalType(T, value)
+    value = _attemptConversionToType(T, value)
     return Quantity(value, quantity.dimension, internalUnits)
 end
 
@@ -73,16 +93,8 @@ function Quantity(simpleQuantity::SimpleQuantity{T}, internalUnits::InternalUnit
     dimension = dimensionOf(simpleQuantity)
     internalUnit = internalUnitFor(dimension, internalUnits)
     internalValue = valueInUnitsOf(simpleQuantity, internalUnit)
-    internalValue = _attemptConversionToOriginalType(T, internalValue)
+    internalValue = _attemptConversionToType(T, internalValue)
     return Quantity(internalValue, dimension, internalUnits)
-end
-
-function _attemptConversionToOriginalType(T::Type, value::Union{Number, AbstractArray})
-    try
-        value = convert(T, value)
-    catch
-    end
-    return value
 end
 
 Quantity(simpleQuantity::SimpleQuantity) = Quantity(simpleQuantity, defaultInternalUnits)
@@ -145,19 +157,34 @@ If `quantityArray` is of type `QuantityArray`, it is expressed in terms of the S
 specified by `quantityArray.InternalUnits`.
 """
 function SimpleQuantityArray(quantityArray::AbstractQuantityArray) end
+
 SimpleQuantityArray(sqArray::SimpleQuantityArray) = sqArray
-SimpleQuantityArray(qArray::QuantityArray) = qArray.value * internalUnitFor(qArray.dimension, qArray.internalUnits)
+
+function SimpleQuantityArray(qArray::QuantityArray{T}) where T
+    sqArray = qArray.value * internalUnitFor(qArray.dimension, qArray.internalUnits)
+    value = sqArray.value
+    value = _attemptConversionToType(Array{T}, value)
+    return SimpleQuantityArray(value, sqArray.unit)
+end
 
 """
     SimpleQuantityArray(quantity::AbstractQuantity)
 
-Construct a 1x1 `SimpleQuantityArray` from a physical quantity of any implementation of `AbstractQuantity`.
+Construct a 1x1 `SimpleQuantityArray` from a physical quantity of any
+implementation of `AbstractQuantity`.
 
 See `SimpleQuantityArray(::AbstractQuantityArray)` for details.
 """
 function SimpleQuantityArray(quantity::AbstractQuantity) end
+
 SimpleQuantityArray(simpleQuantity::SimpleQuantity) = SimpleQuantityArray([simpleQuantity.value], simpleQuantity.unit)
-SimpleQuantityArray(quantity::Quantity) = [quantity.value] * internalUnitFor(quantity.dimension, quantity.internalUnits)
+
+function SimpleQuantityArray(quantity::Quantity{T}) where T
+    sqArray = [quantity.value] * internalUnitFor(quantity.dimension, quantity.internalUnits)
+    value = sqArray.value
+    value = _attemptConversionToType(Array{T}, value)
+    return SimpleQuantityArray(value, sqArray.unit)
+end
 
 """
     SimpleQuantityArray{T}(::AbstractQuantityArray) where {T<:Number}
@@ -172,14 +199,20 @@ See `SimpleQuantityArray(::AbstractQuantityArray)` for details.
 represented as type `Array{T}`.
 """
 function SimpleQuantityArray{T}(quantityArray::AbstractQuantityArray) where {T<:Number} end
-SimpleQuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number} = SimpleQuantityArray( convert(Array{T}, sqArray.value), sqArray.unit)
-SimpleQuantityArray{T}(qArray::QuantityArray) where {T<:Number} = SimpleQuantityArray{T}( SimpleQuantityArray(qArray) )
+
+SimpleQuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number} = SimpleQuantityArray(convert(Array{T}, sqArray.value), sqArray.unit)
+
+function SimpleQuantityArray{T}(qArray::QuantityArray) where {T<:Number}
+    sqArray = qArray.value * internalUnitFor(qArray.dimension, qArray.internalUnits)
+    value = convert(Array{T}, sqArray.value)
+    return SimpleQuantityArray(value, sqArray.unit)
+end
 
 """
     SimpleQuantityArray{T}(quantity::AbstractQuantity) where {T<:Number}
 
-Construct a 1x1 `SimpleQuantityArray{T}` with specified type `T` from a physical quantity
-of any implementation of `AbstractQuantity`.
+Construct a 1x1 `SimpleQuantityArray{T}` with specified type `T` from a physical
+quantity of any implementation of `AbstractQuantity`.
 
 See `SimpleQuantityArray(::AbstractQuantity)` for details.
 
@@ -188,8 +221,15 @@ See `SimpleQuantityArray(::AbstractQuantity)` for details.
 represented as type `Array{T}`.
 """
 function SimpleQuantityArray{T}(quantity::AbstractQuantity) where {T<:Number} end
-SimpleQuantityArray{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantityArray{T}([simpleQuantity.value], simpleQuantity.unit)
-SimpleQuantityArray{T}(quantity::Quantity) where {T<:Number} = SimpleQuantityArray{T}( SimpleQuantityArray(quantity) )
+
+SimpleQuantityArray{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantityArray{T}(Array{T}([simpleQuantity.value]), simpleQuantity.unit)
+
+function SimpleQuantityArray{T}(quantity::Quantity) where {T<:Number}
+    sqArray = [quantity.value] * internalUnitFor(quantity.dimension, quantity.internalUnits)
+    value = sqArray.value
+    value = convert(Array{T}, value)
+    return SimpleQuantityArray(value, sqArray.unit)
+end
 
 """
     Base.convert(::Type{T}, sqArray::SimpleQuantityArray) where {T<:SimpleQuantityArray}
@@ -219,7 +259,7 @@ function QuantityArray(::AbstractQuantityArray) end
 function QuantityArray(qArray::QuantityArray{T}, internalUnits::InternalUnits) where T
     convFactor = conversionFactor(qArray.dimension, qArray.internalUnits, internalUnits)
     value = qArray.value * convFactor
-    value = _attemptConversionToOriginalType(typeof(qArray.value), value)
+    value = _attemptConversionToType(typeof(qArray.value), value)
     return QuantityArray(value, qArray.dimension, internalUnits)
 end
 QuantityArray(qArray::QuantityArray) = qArray
@@ -228,7 +268,7 @@ function QuantityArray(sqArray::SimpleQuantityArray{T}, internalUnits::InternalU
     dimension = dimensionOf(sqArray)
     internalUnit = internalUnitFor(dimension, internalUnits)
     internalValue = valueInUnitsOf(sqArray, internalUnit)
-    internalValue = _attemptConversionToOriginalType(typeof(sqArray.value), internalValue)
+    internalValue = _attemptConversionToType(typeof(sqArray.value), internalValue)
     return QuantityArray(internalValue, dimension, internalUnits)
 end
 QuantityArray(sqArray::SimpleQuantityArray) = QuantityArray(sqArray, defaultInternalUnits)

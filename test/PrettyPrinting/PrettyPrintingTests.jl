@@ -4,6 +4,7 @@ using Alicorn
 using Test
 using ..TestingTools
 
+const ucat = UnitCatalogue()
 const defaultInternalUnits = InternalUnits()
 
 function run()
@@ -20,8 +21,8 @@ function run()
         @test simpleQuantityArrayPrettyPrinting()
         @test DimensionPrettyPrinting()
         @test InternalUnits_PrettyPrinting()
-        @test QuantityPrettyPrinting()
-        @test QuantityArrayPrettyPrinting()
+        @test_skip QuantityPrettyPrinting()
+        @test_skip QuantityArrayPrettyPrinting()
     end
 end
 
@@ -131,7 +132,6 @@ function baseUnitPrettyPrinting()
 end
 
 function _getBaseUnitExamples()
-    ucat = UnitCatalogue()
     examples = [
         (ucat.newton, "BaseUnit newton (1 N = 1 kg m s^-2)"),
         (ucat.electronvolt, "BaseUnit electronvolt (1 eV = 1.6e-19 kg m^2 s^-2)"),
@@ -148,7 +148,6 @@ function unitFactorPrettyPrinting()
 end
 
 function _getUnitFactorExamples()
-    ucat = UnitCatalogue()
     examples = [
         (UnitFactor(ucat.nano, ucat.meter, 2), "UnitFactor nm^2"),
         (UnitFactor(ucat.tera, ucat.mol, -pi), "UnitFactor Tmol^-3.1"),
@@ -182,7 +181,6 @@ function unitPrettyPrinting()
 end
 
 function _getUnitExamples()
-    ucat = UnitCatalogue()
     examples = [
         ( Alicorn.unitlessUnit, "Unit <unitless>"),
         ( Unit(ucat.gram), "Unit g"),
@@ -200,7 +198,6 @@ function simpleQuantityPrettyPrinting()
 end
 
 function _getSimpleQuantityExamples()
-    ucat = UnitCatalogue()
     unit = (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2)
 
     int = 712
@@ -223,7 +220,6 @@ function simpleQuantityArrayPrettyPrinting()
 end
 
 function _getSimpleQuantityArrayExamples()
-    ucat = UnitCatalogue()
     unit = (ucat.kilo * ucat.gram)^pi * (ucat.tera * ucat.henry)^(-2)
 
     array1 = [1, 2]
@@ -272,7 +268,6 @@ function InternalUnits_PrettyPrinting()
 end
 
 function _getInternalUnitsExamples()
-    ucat = UnitCatalogue()
     examples = [
     ( InternalUnits(mass=1*ucat.gram, length=2*ucat.meter, time=3*ucat.second, current=4*ucat.ampere, temperature=5*ucat.kelvin, amount=6*ucat.mol, luminousIntensity=7*ucat.candela ),
      "InternalUnits\n mass unit:               1 g\n length unit:             2 m\n time unit:               3 s\n current unit:            4 A\n temperature unit:        5 K\n amount unit:             6 mol\n luminous intensity unit: 7 cd" )
@@ -287,8 +282,8 @@ function QuantityPrettyPrinting()
 end
 
 function _getQuantityExamples()
-    ucat = UnitCatalogue()
-    unit = (ucat.kilo * ucat.gram) * (ucat.tera * ucat.henry)
+    dim = Dimension(M=1, T=-2)
+    intu2 = InternalUnits(mass=1*ucat.milli*ucat.gram, time=1*ucat.second)
 
     int = 712
     float = 4.345193
@@ -296,13 +291,13 @@ function _getQuantityExamples()
 
     examples = [
         # dimensionless
-        ( Quantity( int, Alicorn.unitlessUnit, defaultInternalUnits ), """Alicorn.Quantities.Quantity{Int64} of dimension 1 in units of (1):\n 712""" ),
+        ( Quantity( int, Dimension(), defaultInternalUnits ), """Alicorn.Quantities.Quantity{Int64} of dimension 1 in units of (1):\n 712""" ),
         # integer
-        ( Quantity( int, unit, intu ), """Alicorn.Quantities.Quantity{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg^2, 1 m^2, 1 s^-2, 1 A^-2):\n 712000000000000""" ),
+        ( Quantity( int, dim, intu2 ), """Alicorn.Quantities.Quantity{Int64} of dimension M^1 T^-2 in units of (1 mg, 1 s):\n 712000000000000""" ),
         # float
-        # ( Quantity( float, unit, intu ), "Alicorn.Quantities.Quantity{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 4.345193e12" ),
+        # ( Quantity( float, unit, defaultInternalUnits ), "Alicorn.Quantities.Quantity{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 4.345193e12" ),
         # # complex
-        # ( Quantity( complex, unit, intu ), "Alicorn.Quantities.Quantity{ComplexF64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12 + 3.0e12im" )
+        # ( Quantity( complex, unit, defaultInternalUnits ), "Alicorn.Quantities.Quantity{ComplexF64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12 + 3.0e12im" )
     ]
 end
 
@@ -314,7 +309,6 @@ function QuantityArrayPrettyPrinting()
 end
 
 function _getQuantityArrayExamples()
-    ucat = UnitCatalogue()
     unit = (ucat.kilo * ucat.gram) * (ucat.tera * ucat.henry)
 
     array1 = [1, 2]
@@ -323,13 +317,13 @@ function _getQuantityArrayExamples()
     array4 = zeros(Int32, 1,2,2)
 
     examples = [
-        ( QuantityArray( array1, defaultInternalUnits, intu),
+        ( QuantityArray( array1, defaultInternalUnits, defaultInternalUnits),
         """2-element Alicorn.Quantities.QuantityVector{Int64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1000000000000\n 2000000000000"""),
-        ( QuantityArray( array2, defaultInternalUnits, intu),
+        ( QuantityArray( array2, defaultInternalUnits, defaultInternalUnits),
         """1×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12"""),
-        ( QuantityArray( array3, defaultInternalUnits, intu),
+        ( QuantityArray( array3, defaultInternalUnits, defaultInternalUnits),
         """2×2 Alicorn.Quantities.QuantityMatrix{Float64} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n 1.0e12  2.0e12\n 3.4e12  5.0e12"""),
-        ( QuantityArray( array4, defaultInternalUnits, intu),
+        ( QuantityArray( array4, defaultInternalUnits, defaultInternalUnits),
         """1×2×2 Alicorn.Quantities.QuantityArray{Int32, 3} of dimension M^2 L^2 T^-2 I^-2 in units of (1 kg, 1 m, 1 s, 1 A):\n[:, :, 1] =\n 0  0\n\n[:, :, 2] =\n 0  0""")
         ]
 end
