@@ -12,6 +12,7 @@ include("QuantityArrayTests.jl")
 
 include("quantity_typeConversionTests.jl")
 include("quantity_unitConversionTests.jl")
+include("quantity_unit_arithmeticsTests.jl")
 
 function run()
     @testset "Quantities" begin
@@ -24,6 +25,8 @@ function run()
 
         quantity_typeConversionTests.run()
         quantity_unitConversionTests.run()
+
+        quantity_unit_arithmeticsTests.run()
     end
 end
 

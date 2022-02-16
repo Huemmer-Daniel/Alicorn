@@ -446,6 +446,8 @@ function inferTargetUnit(::typeof(Base.literal_pow), arg1::Tuple, arg2::Tuple{<:
     return unit^exponent
 end
 
+inferTargetUnit(::typeof(sqrt), arg::Tuple{<:AbstractUnit, <:Any}) = sqrt(arg[1])
+
 inferTargetUnit(::typeof(real), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
 inferTargetUnit(::typeof(imag), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]

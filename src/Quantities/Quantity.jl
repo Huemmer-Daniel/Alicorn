@@ -84,13 +84,13 @@ end
 ## External constructors
 
 Quantity(value::Number, dimension::Dimension) = Quantity(value, dimension, defaultInternalUnits)
-Quantity(value::Number, internalUnits::InternalUnits) = Quantity(value, Dimension(), internalUnits)
-Quantity(value::Number) = Quantity(value, Dimension(), defaultInternalUnits)
+Quantity(value::Number, internalUnits::InternalUnits) = Quantity(value, dimensionless, internalUnits)
+Quantity(value::Number) = Quantity(value, dimensionless, defaultInternalUnits)
 
 Quantity{T}(value::Number, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = Quantity(convert(T, value), dimension, internalUnits)
 Quantity{T}(value::Number, dimension::Dimension) where {T<:Number} = Quantity{T}(value, dimension, defaultInternalUnits)
-Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number} = Quantity{T}(value, Dimension(), internalUnits)
-Quantity{T}(value::Number) where {T<:Number} = Quantity{T}(value, Dimension(), defaultInternalUnits)
+Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number} = Quantity{T}(value, dimensionless, internalUnits)
+Quantity{T}(value::Number) where {T<:Number} = Quantity{T}(value, dimensionless, defaultInternalUnits)
 
 
 ## Methods implementing the interface of AbstractQuantity

@@ -9,39 +9,41 @@ Express `quantity` as an object of type `SimpleQuantity` in terms of the unit sp
 """
 function inUnitsOf(quantity::AbstractQuantity, unit::AbstractUnit)::SimpleQuantity end
 
-function inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
+inUnitsOf(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit) = (simpleQuantity.unit == targetUnit) ? simpleQuantity : _inUnitsOf(simpleQuantity, targetUnit)
+
+function _inUnitsOf(simpleQuantity::SimpleQuantity{T}, targetUnit::AbstractUnit) where T
+    targetUnit = Unit(targetUnit)
+
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
 
-    if originalUnit == targetUnit
-        resultingSimpleQuantity = simpleQuantity
-    else
-        (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
-        (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
+    (originalUnitPrefactor, originalBaseUnitExponents) = convertToBasicSIAsExponents(originalUnit)
+    (targetUnitPrefactor, targetBaseUnitExponents) = convertToBasicSIAsExponents(targetUnit)
 
-        _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
-        conversionFactor = originalUnitPrefactor / targetUnitPrefactor
+    _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
+    conversionFactor = originalUnitPrefactor / targetUnitPrefactor
 
-        resultingValue = originalValue * conversionFactor
-        try
-            resultingValue = convert(typeof(originalValue), resultingValue)
-        catch
-        end
-        resultingSimpleQuantity = SimpleQuantity( resultingValue, targetUnit )
-    end
-    return resultingSimpleQuantity
-end
+    resultingValue = originalValue * conversionFactor
+    resultingValue = _attemptConversionToType(T, resultingValue)
 
-function inUnitsOf(quantity::Quantity, targetUnit::AbstractUnit)
-    internalUnit = internalUnitFor(quantity.dimension, quantity.internalUnits)
-    resultingSimpleQuantity = inUnitsOf(quantity.value * internalUnit, targetUnit)
-    return resultingSimpleQuantity
+    resultingSimpleQuantity = SimpleQuantity( resultingValue, targetUnit )
 end
 
 function _assertDimensionsMatch(baseUnitExponents1::BaseUnitExponents, baseUnitExponents2::BaseUnitExponents)
     if baseUnitExponents1 != baseUnitExponents2
         throw( Exceptions.DimensionMismatchError("dimensions of the quantity and the desired unit do not agree") )
     end
+end
+
+function inUnitsOf(quantity::Quantity{T}, targetUnit::AbstractUnit) where T
+    quantityInternalUnit = internalUnitFor(quantity.dimension, quantity.internalUnits)
+    quantityAsSimpleQuantity = quantity.value * quantityInternalUnit
+
+    resultingValue = _attemptConversionToType(T, quantityAsSimpleQuantity.value)
+    resultingUnit = quantityAsSimpleQuantity.unit
+
+    resultingSimpleQuantity = inUnitsOf(resultingValue * resultingUnit, targetUnit)
+    return resultingSimpleQuantity
 end
 
 """
@@ -54,8 +56,8 @@ Express `qArray` as an object of type `SimpleQuantityArray` in terms of the unit
 """
 function inUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit)::SimpleQuantityArray end
 
-function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
-    originalvalue = sqArray.value
+function inUnitsOf(sqArray::SimpleQuantityArray{T}, targetUnit::AbstractUnit) where T
+    originalValue = sqArray.value
     originalUnit = sqArray.unit
 
     if originalUnit == targetUnit
@@ -68,20 +70,23 @@ function inUnitsOf(sqArray::SimpleQuantityArray, targetUnit::AbstractUnit)
         _assertDimensionsMatch(originalBaseUnitExponents, targetBaseUnitExponents)
         conversionFactor = originalUnitPrefactor / targetUnitPrefactor
 
-        resultingvalue = originalvalue .* conversionFactor
-        try
-            resultingValue = convert(typeof(originalValue), resultingValue)
-        catch
-        end
-        resultingSimpleQuantityArray = SimpleQuantityArray( resultingvalue, targetUnit )
+        resultingValue = originalValue .* conversionFactor
+        resultingValue = _attemptConversionToType(Array{T}, resultingValue)
+
+        resultingSimpleQuantityArray = SimpleQuantityArray( resultingValue, targetUnit )
     end
     return resultingSimpleQuantityArray
 end
 
-function inUnitsOf(qArray::QuantityArray, targetUnit::AbstractUnit)
+function inUnitsOf(qArray::QuantityArray{T}, targetUnit::AbstractUnit) where T
     internalUnit = internalUnitFor(qArray.dimension, qArray.internalUnits)
-    resultingSimpleQuantityArray = inUnitsOf(qArray.value * internalUnit, targetUnit)
-    return resultingSimpleQuantityArray
+    sqArray = qArray.value * internalUnit
+
+    resultingValue = _attemptConversionToType(Array{T}, sqArray.value)
+    resultingUnit = sqArray.unit
+
+    resultingSqQuantity = inUnitsOf(resultingValue * resultingUnit, targetUnit)
+    return resultingSqQuantity
 end
 
 
@@ -106,7 +111,11 @@ The result is equivalent to `valueOfDimensionless(quantity / simpleQuantity)`.
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantity` and `simpleQuantity` do not agree
 """
-valueInUnitsOf(quantity::AbstractQuantity, simpleQuantity::SimpleQuantity) = valueInUnitsOf(quantity, simpleQuantity.unit) / simpleQuantity.value
+function valueInUnitsOf(quantity::AbstractQuantity{T}, simpleQuantity::SimpleQuantity) where T
+    resultingValue = valueInUnitsOf(quantity, simpleQuantity.unit) / simpleQuantity.value
+    resultingValue = _attemptConversionToType(T, resultingValue)
+    return resultingValue
+end
 
 """
     valueInUnitsOf(qArray::AbstractQuantityArray, unit::AbstractUnit)
@@ -128,7 +137,35 @@ The result is equivalent to `valueOfDimensionless(quantityArray / simpleQuantity
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if the dimensions of `quantityArray` and `simpleQuantity` do not agree
 """
-valueInUnitsOf(qArray::AbstractQuantityArray, simpleQuantity::SimpleQuantity) = valueInUnitsOf(qArray, simpleQuantity.unit) / simpleQuantity.value
+function valueInUnitsOf(qArray::AbstractQuantityArray{T}, simpleQuantity::SimpleQuantity) where T
+    resultingValue = valueInUnitsOf(qArray, simpleQuantity.unit) / simpleQuantity.value
+    resultingValue = _attemptConversionToType(Array{T}, resultingValue)
+    return resultingValue
+end
+
+## inInternalUnitsOf
+
+"""
+    inInternalUnitsOf(quantity::Quantity{T}, targetIntU::InternalUnits) where T
+
+Returns a new `Quantity{S}` corresponding to `quantity`, but stored using
+`targetIntU` as new internal units.
+
+The value type `S` of the returned quantity is identical to `T`, if possible.
+"""
+inInternalUnitsOf(quantity::Quantity, targetIntU::InternalUnits) = Quantity(quantity, targetIntU)
+
+
+"""
+    inInternalUnitsOf(qArray::QuantityArray{T}, targetIntU::InternalUnits) where T
+
+Returns a new `QuantityArray` corresponding to `qArray`, but stored using
+`targetIntU` as new internal units.
+
+The value type `S` of the returned quantity array is identical to `T`, if
+possible.
+"""
+inInternalUnitsOf(qArray::QuantityArray, targetIntU::InternalUnits) = QuantityArray(qArray, targetIntU)
 
 
 ## inBasicSIUnits
@@ -139,13 +176,14 @@ Express `quantity` as an object of type `SimpleQuantity` using the seven basic S
 """
 function inBasicSIUnits(quantity::AbstractQuantity)::SimpleQuantity end
 
-function inBasicSIUnits(simpleQuantity::SimpleQuantity)
+function inBasicSIUnits(simpleQuantity::SimpleQuantity{T}) where T
     originalValue = simpleQuantity.value
     originalUnit = simpleQuantity.unit
 
     ( conversionFactor, resultingBasicSIUnit ) = convertToBasicSI(originalUnit)
 
     resultingValue = originalValue * conversionFactor
+    resultingValue = _attemptConversionToType(T, resultingValue)
     resultingQuantity = SimpleQuantity( resultingValue, resultingBasicSIUnit )
     return resultingQuantity
 end
@@ -159,16 +197,19 @@ Express `qArray` as an object of type `SimpleQuantityArray` using the seven basi
 """
 function inBasicSIUnits(qArray::AbstractQuantityArray)::SimpleQuantityArray end
 
-function inBasicSIUnits(sqArray::SimpleQuantityArray)
+function inBasicSIUnits(sqArray::SimpleQuantityArray{T}) where T
     originalvalue = sqArray.value
     originalUnit = sqArray.unit
 
     ( conversionFactor, resultingBasicSIUnit ) = convertToBasicSI(originalUnit)
 
-    resultingvalue = originalvalue * conversionFactor
-    resultingQuantity = SimpleQuantityArray( resultingvalue, resultingBasicSIUnit )
+    resultingValue = originalvalue * conversionFactor
+    resultingValue = _attemptConversionToType(Array{T}, resultingValue)
+    resultingQuantity = SimpleQuantityArray( resultingValue, resultingBasicSIUnit )
     return resultingQuantity
 end
+
+inBasicSIUnits(qArray::QuantityArray) = inBasicSIUnits( SimpleQuantityArray(qArray) )
 
 
 ## valueOfDimensionless
@@ -188,7 +229,7 @@ function valueOfDimensionless(simpleQuantity::SimpleQuantity)
     return value
 end
 
-function _convertToUnitless(quantity)
+function _convertToUnitless(quantity::Union{AbstractQuantity, AbstractQuantityArray})
     try
         quantity = inUnitsOf(quantity, unitlessUnit)
     catch exception
@@ -201,7 +242,16 @@ function _convertToUnitless(quantity)
     return quantity
 end
 
-valueOfDimensionless(number::Number) = number
+function valueOfDimensionless(quantity::Quantity)
+    _verifyIsDimensionless(quantity)
+    return quantity.value
+end
+
+function _verifyIsDimensionless(quantity::Union{Quantity, QuantityArray})
+    if quantity.dimension != dimensionless
+        throw(Exceptions.DimensionMismatchError("quantity is not dimensionless"))
+    end
+end
 
 """
     valueOfDimensionless(qArray::AbstractQuantityArray)
@@ -219,67 +269,7 @@ function valueOfDimensionless(sqArray::SimpleQuantityArray)
     return value
 end
 
-valueOfDimensionless(array::Array{<:Number}) = array
-
-
-## Quantity-Unit arithmetics
-
-"""
-    Base.:*(quantity::AbstractQuantity, unit::AbstractUnit)
-    Base.:*(unit::AbstractUnit, quantity::AbstractQuantity)
-
-Modify the unit of `quantity` by multiplying it with `unit`.
-"""
-function Base.:*(quantity::AbstractQuantity, unit::AbstractUnit) end
-function Base.:*(unit::AbstractUnit, quantity::AbstractQuantity) end
-
-"""
-    Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit)
-    Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray)
-
-Modify the unit of `qArray` by multiplying it with `unit`.
-"""
-function Base.:*(qArray::AbstractQuantityArray, unit::AbstractUnit) end
-function Base.:*(unit::AbstractUnit, qArray::AbstractQuantityArray) end
-
-function Base.:*(simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}, abstractUnit::AbstractUnit)
-    value = simpleQuantity.value
-    productUnit = simpleQuantity.unit * abstractUnit
-    return value * productUnit
-end
-
-function Base.:*(abstractUnit::AbstractUnit, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
-    value = simpleQuantity.value
-    productUnit = abstractUnit * simpleQuantity.unit
-    return value * productUnit
-end
-
-"""
-    Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
-    Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)
-
-Modify the unit of `quantity` by dividing it by `unit`, or vice versa.
-"""
-function Base.:/(quantity::AbstractQuantity, unit::AbstractUnit) end
-function Base.:/(unit::AbstractUnit, quantity::AbstractQuantity) end
-
-"""
-    Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit)
-    Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray)
-
-Modify the unit of `qArray` by dividing it by `unit`, or vice versa.
-"""
-function Base.:/(qArray::AbstractQuantityArray, unit::AbstractUnit) end
-function Base.:/(unit::AbstractUnit, qArray::AbstractQuantityArray) end
-
-function Base.:/(simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray}, abstractUnit::AbstractUnit)
-    value = simpleQuantity.value
-    unitQuotient = simpleQuantity.unit / abstractUnit
-    return value * unitQuotient
-end
-
-function Base.:/(abstractUnit::AbstractUnit, simpleQuantity::Union{SimpleQuantity, SimpleQuantityArray})
-    value = inv(simpleQuantity.value)
-    unitQuotient = abstractUnit / simpleQuantity.unit
-    return value * unitQuotient
+function valueOfDimensionless(qArray::QuantityArray)
+    _verifyIsDimensionless(qArray)
+    return qArray.value
 end

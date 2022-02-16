@@ -66,14 +66,14 @@ const QuantityMatrix{T} = QuantityArray{T,2}
 
 QuantityArray(value::AbstractArray{T}, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = QuantityArray( Array(value), dimension, internalUnits)
 QuantityArray(value::AbstractArray{T}, dimension::Dimension) where {T<:Number} = QuantityArray( Array(value), dimension, defaultInternalUnits)
-QuantityArray(value::AbstractArray{T}, internalUnits::InternalUnits) where {T<:Number} = QuantityArray( Array(value), Dimension(), internalUnits)
-QuantityArray(value::AbstractArray{T}) where {T<:Number} = QuantityArray( Array(value), Dimension(), defaultInternalUnits)
+QuantityArray(value::AbstractArray{T}, internalUnits::InternalUnits) where {T<:Number} = QuantityArray( Array(value), dimensionless, internalUnits)
+QuantityArray(value::AbstractArray{T}) where {T<:Number} = QuantityArray( Array(value), dimensionless, defaultInternalUnits)
 
 
 QuantityArray{T}(value::AbstractArray, dimension::Dimension, internalUnits::InternalUnits) where {T<:Number} = QuantityArray(convert(Array{T}, value), dimension, internalUnits)
 QuantityArray{T}(value::AbstractArray, dimension::Dimension) where {T<:Number} = QuantityArray(convert(Array{T}, value), dimension, defaultInternalUnits)
-QuantityArray{T}(value::AbstractArray, internalUnits::InternalUnits) where {T<:Number} = QuantityArray(convert(Array{T}, value), Dimension(), internalUnits)
-QuantityArray{T}(value::AbstractArray) where {T<:Number} = QuantityArray(convert(Array{T}, value), Dimension(), defaultInternalUnits)
+QuantityArray{T}(value::AbstractArray, internalUnits::InternalUnits) where {T<:Number} = QuantityArray(convert(Array{T}, value), dimensionless, internalUnits)
+QuantityArray{T}(value::AbstractArray) where {T<:Number} = QuantityArray(convert(Array{T}, value), dimensionless, defaultInternalUnits)
 
 ## Arithemtics
 

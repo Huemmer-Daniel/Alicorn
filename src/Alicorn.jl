@@ -48,7 +48,7 @@ export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantity
 export InternalUnits, internalUnitFor, conversionFactor
 export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 export dimensionOf
-export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless
+export inUnitsOf, valueInUnitsOf, inInternalUnitsOf, inBasicSIUnits, valueOfDimensionless
 
 include("PrettyPrinting/PrettyPrinting.jl")
 

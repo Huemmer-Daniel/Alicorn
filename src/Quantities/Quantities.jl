@@ -24,9 +24,12 @@ include("quantity_dimensions.jl")
 export dimensionOf
 include("quantity_typeConversion.jl")
 include("quantity_unitConversion.jl")
-export inUnitsOf, valueInUnitsOf, inBasicSIUnits, valueOfDimensionless
+export inUnitsOf, valueInUnitsOf, inInternalUnitsOf, inBasicSIUnits, valueOfDimensionless
+include("quantity_unit_arithmetics.jl")
+
 include("quantity_arithmetics.jl")
 
 const defaultInternalUnits = InternalUnits()
+const dimensionless = Dimension()
 
 end # module
