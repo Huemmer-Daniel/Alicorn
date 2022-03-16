@@ -27,12 +27,6 @@ function run()
         @test Number_UnitPrefix_UnitFactor__division_implemented()
 
         #- AbstractQuantity interface
-        # 1. Unit conversion
-        @test SimpleQuantity_AbstractUnit_multiplication()
-        @test AbstractUnit_SimpleQuantity_multiplication()
-        @test SimpleQuantity_AbstractUnit_division()
-        @test AbstractUnit_SimpleQuantity_division()
-
         # 2. Arithemtic unary and binary operators
         @test unaryPlus_implemented()
         @test unaryMinus_implemented()
@@ -458,95 +452,6 @@ function Number_UnitPrefix_UnitFactor__division_implemented()
 end
 
 ## #- AbstractQuantity interface
-## 1. Unit conversion
-
-function SimpleQuantity_AbstractUnit_multiplication()
-    examples = _getExamplesFor_SimpleQuantity_AbstractUnit_multiplication()
-    return TestingTools.testDyadicFunction(Base.:*, examples)
-end
-
-function _getExamplesFor_SimpleQuantity_AbstractUnit_multiplication()
-    value = TestingTools.generateRandomReal()
-    unit1 = TestingTools.generateRandomUnit()
-    baseUnit = TestingTools.generateRandomBaseUnit()
-    unitFactor = TestingTools.generateRandomUnitFactor()
-    unit2 = TestingTools.generateRandomUnit()
-
-    # format: factor1, factor2, correct result for factor1 * factor2
-    # where factor1 is a SimpleQuanity and factor2 is an AbstractUnit
-    examples = [
-        ( SimpleQuantity(value, unit1), baseUnit, SimpleQuantity( value, unit1 * baseUnit ) ),
-        ( SimpleQuantity(value, unit1), unitFactor, SimpleQuantity( value, unit1 * unitFactor ) ),
-        ( SimpleQuantity(value, unit1), unit2, SimpleQuantity( value, unit1 * unit2 ) )
-    ]
-    return examples
-end
-
-function AbstractUnit_SimpleQuantity_multiplication()
-    examples = _getExamplesFor_AbstractUnit_SimpleQuantity_multiplication()
-    return TestingTools.testDyadicFunction(Base.:*, examples)
-end
-
-function _getExamplesFor_AbstractUnit_SimpleQuantity_multiplication()
-    value = TestingTools.generateRandomReal()
-    unit1 = TestingTools.generateRandomUnit()
-    baseUnit = TestingTools.generateRandomBaseUnit()
-    unitFactor = TestingTools.generateRandomUnitFactor()
-    unit2 = TestingTools.generateRandomUnit()
-
-    # format: factor1, factor2, correct result for factor1 * factor2
-    # where factor1 is an AbstractUnit and factor2 is a SimpleQuanity
-    examples = [
-        ( baseUnit, SimpleQuantity(value, unit1), SimpleQuantity( value, baseUnit * unit1 ) ),
-        ( unitFactor, SimpleQuantity(value, unit1), SimpleQuantity( value, unitFactor * unit1 ) ),
-        ( unit2, SimpleQuantity(value, unit1), SimpleQuantity( value, unit2 * unit1 ) )
-    ]
-    return examples
-end
-
-function SimpleQuantity_AbstractUnit_division()
-    examples = _getExamplesFor_SimpleQuantity_AbstractUnit_division()
-    return TestingTools.testDyadicFunction(Base.:/, examples)
-end
-
-function _getExamplesFor_SimpleQuantity_AbstractUnit_division()
-    value = TestingTools.generateRandomReal()
-    unit1 = TestingTools.generateRandomUnit()
-    baseUnit = TestingTools.generateRandomBaseUnit()
-    unitFactor = TestingTools.generateRandomUnitFactor()
-    unit2 = TestingTools.generateRandomUnit()
-
-    # format: dividend, divisor, correct result for dividend / divisor
-    # where dividend is a SimpleQuanity and divisor is an AbstractUnit
-    examples = [
-        ( SimpleQuantity(value, unit1), baseUnit, SimpleQuantity( value, unit1 / baseUnit ) ),
-        ( SimpleQuantity(value, unit1), unitFactor, SimpleQuantity( value, unit1 / unitFactor ) ),
-        ( SimpleQuantity(value, unit1), unit2, SimpleQuantity( value, unit1 / unit2 ) )
-    ]
-    return examples
-end
-
-function AbstractUnit_SimpleQuantity_division()
-    examples = _getExamplesFor_AbstractUnit_SimpleQuantity_division()
-    return TestingTools.testDyadicFunction(Base.:/, examples)
-end
-
-function _getExamplesFor_AbstractUnit_SimpleQuantity_division()
-    value = TestingTools.generateRandomReal()
-    unit1 = TestingTools.generateRandomUnit()
-    baseUnit = TestingTools.generateRandomBaseUnit()
-    unitFactor = TestingTools.generateRandomUnitFactor()
-    unit2 = TestingTools.generateRandomUnit()
-
-    # format: dividend, divisor, correct result for dividend / divisor
-    # where dividend is an AbstractUnit and divisor is a SimpleQuanity
-    examples = [
-        ( baseUnit, SimpleQuantity(value, unit1), SimpleQuantity( 1/value, baseUnit / unit1  ) ),
-        ( unitFactor, SimpleQuantity(value, unit1), SimpleQuantity( 1/value, unitFactor / unit1  ) ),
-        ( unit2, SimpleQuantity(value, unit1), SimpleQuantity( 1/value, unit2 / unit1  ) )
-    ]
-    return examples
-end
 
 ## 2. Arithemtic unary and binary operators
 

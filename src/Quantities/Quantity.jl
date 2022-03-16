@@ -80,7 +80,6 @@ mutable struct Quantity{T<:Number} <: AbstractQuantity{T}
     end
 end
 
-
 ## External constructors
 
 Quantity(value::Number, dimension::Dimension) = Quantity(value, dimension, defaultInternalUnits)
@@ -91,22 +90,3 @@ Quantity{T}(value::Number, dimension::Dimension, internalUnits::InternalUnits) w
 Quantity{T}(value::Number, dimension::Dimension) where {T<:Number} = Quantity{T}(value, dimension, defaultInternalUnits)
 Quantity{T}(value::Number, internalUnits::InternalUnits) where {T<:Number} = Quantity{T}(value, dimensionless, internalUnits)
 Quantity{T}(value::Number) where {T<:Number} = Quantity{T}(value, dimensionless, defaultInternalUnits)
-
-
-## Methods implementing the interface of AbstractQuantity
-
-"""
-    Base.:(==)(quantity1::Quantity, quantity2::Quantity)
-
-Compare two `Quantity` objects.
-
-The two quantities are equal if their values, their dimensions, and their internal units are equal.
-Note that the units are not converted during the comparison.
-"""
-function Base.:(==)(quantity1::Quantity, quantity2::Quantity)
-    valuesEqual = ( quantity1.value == quantity2.value )
-    dimensionsEqual = ( quantity1.dimension == quantity2.dimension )
-    internalUnitsEqual = ( quantity1.internalUnits == quantity2.internalUnits )
-    isEqual = valuesEqual && dimensionsEqual && internalUnitsEqual
-    return isEqual
-end
