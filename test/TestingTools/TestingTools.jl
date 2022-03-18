@@ -172,7 +172,16 @@ function testDyadicFunction(func, examples::Array)
     correct = true
     for (input1, input2, correctOutput) in examples
         returnedOutput = func(input1, input2)
-        correct &= (returnedOutput == correctOutput)
+        exampleCorrect = (returnedOutput == correctOutput)
+        if ~exampleCorrect
+            println("Test of dyadic function failed:")
+            @show func
+            @show input1
+            @show input2
+            @show correctOutput
+            @show returnedOutput
+        end
+        correct &= exampleCorrect
     end
     return correct
 end

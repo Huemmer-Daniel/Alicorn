@@ -32,12 +32,13 @@ include("quantity_typeConversion.jl")
 include("quantity_unitConversion.jl")
 export inUnitsOf, valueInUnitsOf, inInternalUnitsOf, inBasicSIUnits, valueOfDimensionless
 
-include("quantity_basics.jl") # needs testing
+include("quantity_basics.jl")
 include("quantity_abstractArray.jl")
-include("quantity_arrayBasics.jl") # needs implementing and testing
+include("quantity_arrayBasics.jl")
 
-include("quantity_math.jl") # needs implementing and testing
 include("quantity_unit_arithmetics.jl") # needs implementing and testing
+include("quantity_math.jl") # needs implementing and testing
+include("quantity_arrayMath.jl") # needs implementing and testing
 include("quantity_broadcasting.jl") # needs testing
 
 const dimensionless = Dimension()

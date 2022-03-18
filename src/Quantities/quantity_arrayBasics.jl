@@ -1,50 +1,35 @@
+## eltype
 Base.eltype(sqArray::SimpleQuantityArray{T}) where T = SimpleQuantity{T}
 Base.eltype(sqArray::QuantityArray{T}) where T = Quantity{T}
 
-## TODO below
-
-Base.circshift(sqArray::SimpleQuantityArray, shifts::Real) = circshift(sqArray.value, shifts) * sqArray.unit
-Base.circshift(sqArray::SimpleQuantityArray, shifts::Base.DimsInteger) = circshift(sqArray.value, shifts) * sqArray.unit
-Base.circshift(sqArray::SimpleQuantityArray, shifts) = circshift(sqArray.value, shifts) * sqArray.unit
-
-Base.deleteat!(sqArray::SimpleQuantityArray, inds) = deleteat!(sqArray.value, inds)
-
-
-# method documented in Base
-function Base.findmax(sqArray::SimpleQuantityArray; dims=:)
-    unit = sqArray.unit
-    array = sqArray.value
-
-    (maxVal, maxIndex) = findmax(array, dims=dims)
-
-    return (maxVal * unit, maxIndex)
+## deleteat!
+function Base.deleteat!(sqArray::SimpleQuantityVector, inds)
+    deleteat!(sqArray.value, inds)
+    return sqArray
 end
 
-# method documented in Base
-function Base.findmin(sqArray::SimpleQuantityArray; dims=:)
-    unit = sqArray.unit
-    array = sqArray.value
-
-    (minVal, minIndex) = findmin(array, dims=dims)
-
-    return (minVal * unit, minIndex)
+function Base.deleteat!(qArray::QuantityVector, inds)
+    deleteat!(qArray.value, inds)
+    return qArray
 end
 
-function Base.transpose(sqArray::SimpleQuantityArray)
-    unit = sqArray.unit
-    value = transpose(sqArray.value)
-    return SimpleQuantityArray(value, unit)
-end
-
+## repeat
 function Base.repeat(sqArray::SimpleQuantityArray; inner=nothing, outer=nothing)
-    unit = sqArray.unit
     array = sqArray.value
-
     repeatedArray = repeat(array; inner=inner, outer=outer)
-
-    return repeatedArray * unit
+    return SimpleQuantityArray( repeatedArray, sqArray.unit )
 end
 
 function Base.repeat(sqArray::SimpleQuantityArray, counts...)
     return repeat(sqArray, outer=counts)
+end
+
+function Base.repeat(qArray::QuantityArray; inner=nothing, outer=nothing)
+    array = qArray.value
+    repeatedArray = repeat(array; inner=inner, outer=outer)
+    return QuantityArray(repeatedArray, qArray.dimension, qArray.internalUnits )
+end
+
+function Base.repeat(qArray::QuantityArray, counts...)
+    return repeat(qArray, outer=counts)
 end
