@@ -16,12 +16,6 @@ function run()
 
         @test Number_Dimension_multiplication_implemented()
         @test addition_implemented()
-
-        @test dimensionOf_implementedForUnits()
-        @test dimensionOf_implementedForSimpleQuantity()
-        @test_skip dimensionOf_implementedForQuantityArray()
-        @test_skip dimensionOf_implementedForQuantity()
-        @test_skip dimensionOf_implementedForQuantityArray()
     end
 end
 
@@ -165,68 +159,6 @@ function _getExamplesFor_addition()
         ( Dimension(I=-2), Dimension(I=7), Dimension(I=5) ),
         ( Dimension(N=-2), Dimension(N=7), Dimension(N=5) ),
         ( Dimension(J=3, N=-2), Dimension(N=7, J=-1), Dimension(N=5, J=2) )
-    ]
-    return examples
-end
-
-function dimensionOf_implementedForUnits()
-    examples = _getExamplesFor_dimensionOf_forUnits()
-    return TestingTools.testMonadicFunction(dimensionOf, examples)
-end
-
-struct MockUnitForDimension <: AbstractUnit
-    unitFactor::UnitFactor
-end
-
-function Alicorn.Units.convertToUnit(mockUnit::MockUnitForDimension)
-    return convertToUnit(mockUnit.unitFactor)
-end
-
-function _getExamplesFor_dimensionOf_forUnits()
-    ucat = UnitCatalogue()
-
-    # format: object of type AbstractUnit, corresponding Dimension
-    examples = [
-        # BaseUnit
-        ( Alicorn.unitlessBaseUnit, Dimension( ) ),
-        ( ucat.joule, Dimension( M=1, L=2, T=-2 ) ),
-        # UnitFactor
-        ( Alicorn.unitlessUnitFactor, Dimension( ) ),
-        ( ucat.tera * ucat.farad, Dimension( M=-1, L=-2, T=4, I=2 ) ),
-        # Unit
-        ( Alicorn.unitlessUnit, Dimension( ) ),
-        ( (ucat.nano * ucat.siemens) / ucat.mol * ucat.candela^2 * ucat.kelvin^-3, Dimension( M=-1, L=-2, T=3, I=2, N=-1, J=2, θ=-3 ) ),
-        # AbstractUnit
-        ( MockUnitForDimension( (ucat.nano * ucat.siemens) ), Dimension( M=-1, L=-2, T=3, I=2 ) ),
-    ]
-    return examples
-end
-
-function dimensionOf_implementedForSimpleQuantity()
-    examples = _getExamplesFor_dimensionOf_forSimpleQuantity()
-    return TestingTools.testMonadicFunction(dimensionOf, examples)
-end
-
-struct MockQuantityForDimension{T} <: AbstractQuantity{T}
-    value::T
-    unit::Unit
-end
-
-function Alicorn.Quantities.inBasicSIUnits(mockQuantity::MockQuantityForDimension)
-    mockUnit = mockQuantity.unit
-    return 1 * mockUnit
-end
-
-function _getExamplesFor_dimensionOf_forSimpleQuantity()
-    ucat = UnitCatalogue()
-
-    # format: object of type AbstractQuantity, corresponding Dimension
-    examples = [
-        # SimpleQuantity
-        ( 1 * Alicorn.unitlessUnit, Dimension() ),
-        ( 1 * ucat.henry, Dimension(M=1, L=2, T=-2, I=-2) ),
-        # AbstractQuantity
-        ( MockQuantityForDimension( 1, Unit(ucat.henry) ), Dimension(M=1, L=2, T=-2, I=-2)  )
     ]
     return examples
 end

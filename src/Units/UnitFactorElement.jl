@@ -1,4 +1,3 @@
-export UnitFactorElement
 """
     UnitFactorElement = Union{UnitPrefix, BaseUnit}
 

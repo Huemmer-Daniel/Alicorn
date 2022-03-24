@@ -1,6 +1,5 @@
 using ..Utils
 
-export BaseUnit
 @doc raw"""
     BaseUnit <: AbstractUnit
 
@@ -137,8 +136,6 @@ function Base.cbrt(baseUnit::BaseUnit)
 end
 
 ## Constants of type BaseUnit
-
-export unitlessBaseUnit
 """
 Constant of type `BaseUnit` indicating the absence of a unit.
 
@@ -146,7 +143,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.unitless
 """
 const unitlessBaseUnit = BaseUnit( name="unitless", symbol="<unitless>", prefactor=1, exponents=BaseUnitExponents() )
 
-export gram
 """
 Constant of type `BaseUnit` representing the gram.
 
@@ -154,7 +150,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.gram`.
 """
 const gram = BaseUnit( name="gram", symbol="g", prefactor=1e-3, exponents=BaseUnitExponents(kg=1) )
 
-export meter
 """
 Constant of type `BaseUnit` representing the meter.
 
@@ -162,7 +157,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.meter`.
 """
 const meter = BaseUnit( name="meter", symbol="m", prefactor=1, exponents=BaseUnitExponents(m=1) )
 
-export second
 """
 Constant of type `BaseUnit` representing the second.
 
@@ -170,7 +164,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.second`.
 """
 const second = BaseUnit( name="second", symbol="s", prefactor=1, exponents=BaseUnitExponents(s=1) )
 
-export ampere
 """
 Constant of type `BaseUnit` representing the ampere.
 
@@ -178,7 +171,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.ampere`.
 """
 const ampere = BaseUnit( name="ampere", symbol="A", prefactor=1, exponents=BaseUnitExponents(A=1) )
 
-export kelvin
 """
 Constant of type `BaseUnit` representing the kelvin.
 
@@ -186,7 +178,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.kelvin`.
 """
 const kelvin = BaseUnit( name="kelvin", symbol="K", prefactor=1, exponents=BaseUnitExponents(K=1) )
 
-export mol
 """
 Constant of type `BaseUnit` representing the mol.
 
@@ -194,7 +185,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.mol`.
 """
 const mol = BaseUnit( name="mol", symbol="mol", prefactor=1, exponents=BaseUnitExponents(mol=1) )
 
-export candela
 """
 Constant of type `BaseUnit` representing the candela.
 

@@ -1,7 +1,6 @@
 using ..Utils
 using ..Exceptions
 
-export UnitCatalogue
 @doc raw"""
     UnitCatalogue
 
@@ -210,7 +209,6 @@ end
 
 ## Methods
 
-export listUnitPrefixes
 """
     listUnitPrefixes(unitCatalogue::UnitCatalogue)
 
@@ -232,7 +230,6 @@ function listUnitPrefixes(unitCatalogue::UnitCatalogue)
     return getfield(unitCatalogue, :prefixCatalogue)
 end
 
-export listBaseUnits
 """
     listBaseUnits(unitCatalogue::UnitCatalogue)
 
@@ -254,7 +251,6 @@ function listBaseUnits(unitCatalogue::UnitCatalogue)
     return getfield(unitCatalogue, :baseUnitCatalogue)
 end
 
-export listUnitPrefixNames
 """
     listUnitPrefixNames(unitCatalogue::UnitCatalogue)
 
@@ -266,7 +262,6 @@ function listUnitPrefixNames(unitCatalogue::UnitCatalogue)
     return sort!(knownPrefixNames)
 end
 
-export listBaseUnitNames
 """
     listBaseUnitNames(unitCatalogue::UnitCatalogue)
 
@@ -278,7 +273,6 @@ function listBaseUnitNames(unitCatalogue::UnitCatalogue)
     return sort!(knownBaseUnitsNames)
 end
 
-export providesUnitPrefix
 """
     providesUnitPrefix(unitCatalogue::UnitCatalogue, name::String)
 
@@ -291,7 +285,6 @@ function providesUnitPrefix(unitCatalogue::UnitCatalogue, name::String)
     return Utils.isElementOf(name, listUnitPrefixNames(unitCatalogue))
 end
 
-export providesBaseUnit
 """
     providesBaseUnit(unitCatalogue::UnitCatalogue, name::String)
 
@@ -304,7 +297,6 @@ function providesBaseUnit(unitCatalogue::UnitCatalogue, name::String)
     return Utils.isElementOf(name, listBaseUnitNames(unitCatalogue))
 end
 
-export add!
 """
     add!(unitCatalogue::UnitCatalogue, unitPrefix::UnitPrefix)
     add!(unitCatalogue::UnitCatalogue, baseUnit::BaseUnit)
@@ -347,7 +339,6 @@ function add!(unitCatalogue::UnitCatalogue, baseUnit::BaseUnit)
     return unitCatalogue
 end
 
-export remove!
 """
     remove!(unitCatalogue::UnitCatalogue, name::String)
 

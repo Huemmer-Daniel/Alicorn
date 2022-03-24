@@ -28,8 +28,6 @@ function Base.:*(abstractUnit::AbstractUnit, simpleQuantity::Union{SimpleQuantit
     return value * productUnit
 end
 
-Base.:*(quantity::Union{Quantity, QuantityArray}, abstractUnit::AbstractUnit) = quantity * SimpleQuantity(abstractUnit)
-
 """
     Base.:/(quantity::AbstractQuantity, unit::AbstractUnit)
     Base.:/(unit::AbstractUnit, quantity::AbstractQuantity)

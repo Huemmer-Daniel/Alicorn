@@ -1,6 +1,5 @@
 using ..Utils
 
-export UnitFactor
 @doc raw"""
     UnitFactor <: AbstractUnit
 
@@ -211,8 +210,6 @@ function Base.cbrt(unitFactor::UnitFactor)
 end
 
 ## Constants of type UnitFactor
-
-export unitlessUnitFactor
 """
 Constant of type `UnitFactor` indicating the absence of a unit.
 
@@ -220,7 +217,6 @@ The constant is not exported by Alicorn but can be accessed as `Alicorn.unitless
 """
 const unitlessUnitFactor = UnitFactor( emptyUnitPrefix, unitlessBaseUnit, 1)
 
-export kilogram
 """
 Constant of type `UnitFactor` representing the kilogram.
 

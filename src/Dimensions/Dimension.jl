@@ -1,6 +1,5 @@
 using ..Utils
 
-export Dimension
 @doc raw"""
     Dimension
 
@@ -82,6 +81,8 @@ function _tryCastingExponentsToInt(exponents::Tuple)
     exponents = map(Utils.tryCastingToInt, exponents)
     return exponents
 end
+
+function dimensionOf(unitOrQuantity) end
 
 ## Methods
 

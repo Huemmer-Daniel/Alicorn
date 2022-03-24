@@ -1,6 +1,5 @@
 using ..Utils
 
-export BaseUnitExponents
 @doc raw"""
     BaseUnitExponents
 
@@ -81,7 +80,6 @@ end
 # objects of type BaseUnitExponents act as scalars in broadcasting
 Base.broadcastable(baseUnitExponents::BaseUnitExponents) = Ref(baseUnitExponents)
 
-export convertToUnit
 """
     convertToUnit(baseUnitExponents::BaseUnitExponents)
 

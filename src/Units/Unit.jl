@@ -1,4 +1,3 @@
-export Unit
 @doc raw"""
     Unit <: AbstractUnit
 
@@ -328,7 +327,6 @@ end
 
 ## Constants of type UnitFactor
 
-export unitlessUnit
 """
 Constant of type `Unit` indicating the absence of a unit.
 

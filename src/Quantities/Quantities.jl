@@ -1,9 +1,8 @@
 module Quantities
 
 using ..Exceptions
-using ..Units
 using ..Dimensions
-
+using ..Units
 
 include("AbstractQuantity.jl")
 include("AbstractQuantityArray.jl")
@@ -27,7 +26,6 @@ const QuantityType = Union{Quantity, QuantityArray}
 const DimensionlessType = Union{Number, AbstractArray{<:Number}}
 
 include("quantity_dimensions.jl")
-export dimensionOf
 include("quantity_typeConversion.jl")
 include("quantity_unitConversion.jl")
 export inUnitsOf, valueInUnitsOf, inInternalUnitsOf, inBasicSIUnits, valueOfDimensionless
@@ -36,7 +34,7 @@ include("quantity_basics.jl")
 include("quantity_abstractArray.jl")
 include("quantity_arrayBasics.jl")
 
-include("quantity_unit_arithmetics.jl") # needs implementing and testing
+include("quantity_unit_arithmetics.jl")
 include("quantity_math.jl") # needs implementing and testing
 include("quantity_arrayMath.jl") # needs implementing and testing
 include("quantity_broadcasting.jl") # needs testing

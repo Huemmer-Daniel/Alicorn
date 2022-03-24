@@ -1,4 +1,3 @@
-export AbstractUnit
 """
     AbstractUnit <: AbstractUnitElement
 
@@ -58,8 +57,6 @@ Base.broadcastable(abstractUnit::AbstractUnit) = Ref(abstractUnit)
 ## 2. Interface
 # the following functions need to be extended for concrete implementations of
 # AbstractUnit
-
-export convertToUnit
 """
     convertToUnit(abstractUnit::AbstractUnit)::Unit
 
@@ -70,7 +67,6 @@ function convertToUnit(abstractUnit::AbstractUnit)::Unit
     error("subtype $subtype of AbstractUnit misses an implementation of the convertToUnit function")
 end
 
-export convertToBasicSI
 """
     convertToBasicSI(abstractUnit::AbstractUnit)
 
@@ -87,7 +83,6 @@ function convertToBasicSI(abstractUnit::AbstractUnit)
    error("subtype $subtype of AbstractUnit misses an implementation of the convertToBasicSI function")
 end
 
-export convertToBasicSIAsExponents
 """
      convertToBasicSIAsExponents(abstractUnit::AbstractUnit)
 

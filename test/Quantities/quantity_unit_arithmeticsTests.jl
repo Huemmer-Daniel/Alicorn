@@ -19,17 +19,11 @@ function run()
     @test SimpleQuantity_AbstractUnit_division()
     @test AbstractUnit_SimpleQuantity_division()
 
-    # Quantity
-    @test_skip Quantity_AbstractUnit_multiplication()
-
     # SimpleQuantityArray
     @test SimpleQuantityArray_AbstractUnit_multiplication()
     @test AbstractUnit_SimpleQuantityArray_multiplication()
     @test SimpleQuantityArray_AbstractUnit_division()
     @test AbstractUnit_SimpleQuantityArray_division()
-
-    # QuantityArray
-
     end
 end
 
