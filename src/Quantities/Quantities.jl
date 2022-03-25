@@ -20,7 +20,6 @@ include("Quantity.jl")
 include("QuantityArray.jl")
 export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 
-
 const SimpleQuantityType = Union{SimpleQuantity, SimpleQuantityArray}
 const QuantityType = Union{Quantity, QuantityArray}
 const DimensionlessType = Union{Number, AbstractArray{<:Number}}
@@ -35,12 +34,11 @@ include("quantity_abstractArray.jl")
 include("quantity_arrayBasics.jl")
 
 include("quantity_unit_arithmetics.jl")
-include("quantity_math.jl") # needs implementing and testing
-include("quantity_arrayMath.jl") # needs implementing and testing
-include("quantity_broadcasting.jl") # needs testing
+include("quantity_math.jl") # TODO needs implementing and testing
+include("quantity_arrayMath.jl") # TODO needs implementing and testing
+include("quantity_broadcasting.jl") # TODO needs testing
 
-const dimensionless = Dimension()
 const defaultInternalUnits = InternalUnits()
-
+const dimensionless = Dimension()
 
 end # module

@@ -19,6 +19,9 @@ include("quantity_abstractArrayTests.jl")
 include("quantity_arrayBasicsTests.jl")
 
 include("quantity_unit_arithmeticsTests.jl")
+include("quantity_mathTests.jl")
+include("quantity_arrayMathTests.jl")
+include("quantity_broadcastingTests.jl")
 
 function run()
     @testset "Quantities" begin
@@ -38,9 +41,9 @@ function run()
         quantity_arrayBasicsTests.run()
 
         quantity_unit_arithmeticsTests.run()
-        # quantity_mathTests.run()
-        # quantity_arrayMathTests.run()
-        # quantity_broadcastingTests.run()
+        quantity_mathTests.run()
+        quantity_arrayMathTests.run()
+        quantity_broadcastingTests.run()
     end
 end
 
