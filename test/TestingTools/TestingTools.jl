@@ -163,7 +163,15 @@ function testMonadicFunction(func, examples::Array)
     correct = true
     for (input, correctOutput) in examples
         returnedOutput = func(input)
-        correct &= (returnedOutput == correctOutput)
+        exampleCorrect = (returnedOutput == correctOutput)
+        if ~exampleCorrect
+            println("Test of monadic function failed:")
+            @show func
+            @show input
+            @show correctOutput
+            @show returnedOutput
+        end
+        correct &= exampleCorrect
     end
     return correct
 end

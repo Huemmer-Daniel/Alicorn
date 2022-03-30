@@ -35,7 +35,7 @@ include("quantity_arrayBasics.jl")
 
 include("quantity_unit_arithmetics.jl")
 include("quantity_math.jl") # TODO needs implementing and testing
-include("quantity_arrayMath.jl") # TODO needs implementing and testing
+include("quantity_arrayMath.jl")
 include("quantity_broadcasting.jl") # TODO needs testing
 
 const defaultInternalUnits = InternalUnits()
