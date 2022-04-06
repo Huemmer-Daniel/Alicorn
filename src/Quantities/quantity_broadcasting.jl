@@ -1,13 +1,9 @@
-## TODO below
-
-## SimpleQuantityArray
-
 # Broadcasting style
 Base.BroadcastStyle(::Type{<:SimpleQuantityArray}) = Broadcast.ArrayStyle{SimpleQuantityArray}()
+Base.BroadcastStyle(::Type{<:QuantityArray}) = Broadcast.ArrayStyle{QuantityArray}()
 
 # contruct destination array
 function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, ::Type{SimpleQuantity{ElType}}) where ElType
-    # we do not want to convert any units here, if necessary this was already done upstream
     (targetUnit, unitlessBroadcasted) = squeezeOutUnits(bc)
     targetSqArray = SimpleQuantityArray( similar(Array{ElType}, axes(unitlessBroadcasted)) , targetUnit)
     return targetSqArray
@@ -60,8 +56,6 @@ end
 
 # infer target units for different broadcastable operations on SimpleQuantityArrays
 
-
-
 inferTargetUnit(::typeof(abs), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
 inferTargetUnit(::typeof(angle), arg::Tuple{<:AbstractUnit, <:Any}) = unitlessUnit
@@ -104,7 +98,10 @@ inferTargetUnit(::typeof(imag), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 
 inferTargetUnit(::typeof(isless), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple{<:AbstractUnit, <:Any}) = unitlessUnit
 
+
 # broadcastable operations on SimpleQuantityArrays that require eager evaluation
+
+## SimpleQuantityArray eager evaluation
 
 # addition of two SimpleQuantityArray
 function Broadcast.broadcasted(::typeof(+), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)

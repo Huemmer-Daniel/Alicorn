@@ -22,6 +22,7 @@ export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 
 const SimpleQuantityType = Union{SimpleQuantity, SimpleQuantityArray}
 const QuantityType = Union{Quantity, QuantityArray}
+const AbstractQuantityType = Union{AbstractQuantity, AbstractQuantityArray}
 const DimensionlessType = Union{Number, AbstractArray{<:Number}}
 
 include("quantity_dimensions.jl")

@@ -1,18 +1,224 @@
-## Unary operators
+## Arithmetic unary operators
 
-# methods documented as part of the AbstractQuantity interface
-# scalar quantity
-Base.:+(simpleQuantity::SimpleQuantity) = simpleQuantity
-Base.:-(simpleQuantity::SimpleQuantity) = unaryMinus(simpleQuantity)
-# array quantity
-Base.:+(sqArray::SimpleQuantityArray) = sqArray
-Base.:-(sqArray::SimpleQuantityArray) = unaryMinus(sqArray)
+# unary plus
+Base.:+(q::AbstractQuantity) = q
+Base.:+(q::AbstractQuantityArray) = q
 
-function unaryMinus(sQuantity::SimpleQuantityType)
-    value = -sQuantity.value
-    unit = sQuantity.unit
-    return value * unit
+# unary minus
+Base.:-(q::AbstractQuantity) = unaryMinus(q)
+Base.:-(q::AbstractQuantityArray) = unaryMinus(q)
+unaryMinus(q::SimpleQuantityType) = (-q.value) * q.unit
+unaryMinus(q::Quantity) = Quantity(-q.value, q.dimension, q.internalUnits)
+unaryMinus(q::QuantityArray) = QuantityArray(-q.value, q.dimension, q.internalUnits)
+
+## Arithmetic binary operators
+
+# addition
+"""
+    Base.:+(q1::SimpleQuantity, q2::SimpleQuantity)
+    Base.:+(q1::SimpleQuantityArray, q2::SimpleQuantityArray)
+
+Add two objects of type `SimpleQuantity` or `SimpleQuantityArray`.
+
+The resulting quantity is expressed in units of `q1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are of different dimensions
+"""
+function Base.:+(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    _addition_assertSameDimension(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    q2 = inUnitsOf(q2, q1.unit)
+    return (q1.value + q2.value) * q1.unit
 end
+
+"""
+    Base.:+(q1::Quantity, q2::Quantity)
+    Base.:+(q1::QuantityArray, q2::QuantityArray)
+
+Add two objects of type `Quantity` or `QuantityArray`.
+
+The resulting quantity is expressed in internal units of `q1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are of different dimensions
+"""
+function Base.:+(q1::Quantity, q2::Quantity)
+    _addition_assertSameDimension(q1, q2)
+    q2 = inInternalUnitsOf(q2, q1.internalUnits)
+    return Quantity(q1.value + q2.value, q1.dimension, q1.internalUnits)
+end
+
+function Base.:+(q1::QuantityArray, q2::QuantityArray)
+    _addition_assertSameDimension(q1, q2)
+    q2 = inInternalUnitsOf(q2, q1.internalUnits)
+    return QuantityArray(q1.value + q2.value, q1.dimension, q1.internalUnits)
+end
+
+function _addition_assertSameDimension(q1::AbstractQuantityType, q2::AbstractQuantityType)
+    if dimensionOf(q1) != dimensionOf(q2)
+        newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
+        throw(newException)
+    end
+end
+
+"""
+    Base.:+(q1::SimpleQuantity, q2::Quantity)
+    Base.:+(q1::Quantity, q2::SimpleQuantity)
+    Base.:+(q1::SimpleQuantityArray, q2::QuantityArray)
+    Base.:+(q1::QuantityArray, q2::SimpleQuantityArray)
+
+Add two objects of type `SimpleQuantity` and `Quantity`, or `SimpleQuantityArray` and `QuantityArray`.
+
+Returns a quantity of type `Quantity` or `QuantityArray`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are of different dimensions
+"""
+Base.:+(q1::SimpleQuantity, q2::Quantity) = Quantity(q1, q2.internalUnits) + q2
+Base.:+(q1::Quantity, q2::SimpleQuantity) = q1 + Quantity(q2, q1.internalUnits)
+Base.:+(q1::SimpleQuantityArray, q2::QuantityArray) = QuantityArray(q1, q2.internalUnits) + q2
+Base.:+(q1::QuantityArray, q2::SimpleQuantityArray) = q1 + QuantityArray(q2, q1.internalUnits)
+
+
+# subtraction
+"""
+    Base.:-(q1::SimpleQuantity, q2::SimpleQuantity)
+    Base.:-(q1::SimpleQuantityArray, q2::SimpleQuantityArray)
+
+Subtract two objects of type `SimpleQuantity` or `SimpleQuantityArray`.
+
+The resulting quantity is expressed in units of `q1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are of different dimensions
+"""
+Base.:-(q1::SimpleQuantityType, q2::SimpleQuantityType) = q1 + (-q2)
+
+"""
+    Base.:-(q1::Quantity, q2::Quantity)
+    Base.:-(q1::QuantityArray, q2::QuantityArray)
+
+Subtract two objects of type `Quantity` or `QuantityArray`.
+
+The resulting quantity is expressed in internal units of `q1`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are of different dimensions
+"""
+Base.:-(q1::QuantityType, q2::QuantityType) = q1 + (-q2)
+
+"""
+    Base.:-(q1::SimpleQuantity, q2::Quantity)
+    Base.:-(q1::Quantity, q2::SimpleQuantity)
+    Base.:-(q1::SimpleQuantityArray, q2::QuantityArray)
+    Base.:-(q1::QuantityArray, q2::SimpleQuantityArray)
+
+Subtract two objects of type `SimpleQuantity` and `Quantity`, or `SimpleQuantityArray` and `QuantityArray`.
+
+Returns a quantity of type `Quantity` or `QuantityArray`.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are of different dimensions
+"""
+Base.:-(q1::SimpleQuantityType, q2::QuantityType) = q1 + (-q2)
+Base.:-(q1::QuantityType, q2::SimpleQuantityType) = q1 + (-q2)
+
+
+# multiplication
+# define individual methods for all combinations to avoid ambiguities with Julia base
+# SimpleQuantity
+Base.:*(a::SimpleQuantity, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantity, b::Number) = multiplication(a, b)
+Base.:*(a::Number, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantity, b::Array{<:Number}) = multiplication(a, b)
+Base.:*(a::Array{<:Number}, b::SimpleQuantity) = multiplication(a, b)
+
+# SimpleQuantityArray
+Base.:*(a::SimpleQuantityArray, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::Array{<:Number}) = multiplication(a, b)
+Base.:*(a::Array{<:Number}, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantity, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::Number) = multiplication(a, b)
+Base.:*(a::Number, b::SimpleQuantityArray) = multiplication(a, b)
+
+function multiplication(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    productValue = q1.value * q2.value
+    productUnit = q1.unit * q2.unit
+    return  productValue * productUnit
+end
+
+function multiplication(q::SimpleQuantityType, dimless::DimensionlessType)
+    productValue = q.value * dimless
+    productUnit = q.unit
+    return productValue * productUnit
+end
+
+function multiplication(dimless::DimensionlessType, q::SimpleQuantityType)
+    productValue = dimless * q.value
+    productUnit = q.unit
+    return productValue * productUnit
+end
+
+# Quantity
+Base.:*(a::Quantity, b::Quantity) = multiplication(a, b)
+Base.:*(a::Quantity, b::Number) = multiplication(a, b)
+Base.:*(a::Number, b::Quantity) = multiplication(a, b)
+Base.:*(a::Quantity, b::Array{<:Number}) = multiplication(a, b)
+Base.:*(a::Array{<:Number}, b::Quantity) = multiplication(a, b)
+
+# QuantityArray
+Base.:*(a::QuantityArray, b::QuantityArray) = multiplication(a, b)
+Base.:*(a::QuantityArray, b::Array) = multiplication(a, b)
+Base.:*(a::Array, b::QuantityArray) = multiplication(a, b)
+Base.:*(a::QuantityArray, b::Quantity) = multiplication(a, b)
+Base.:*(a::Quantity, b::QuantityArray) = multiplication(a, b)
+Base.:*(a::QuantityArray, b::Number) = multiplication(a, b)
+Base.:*(a::Number, b::QuantityArray) = multiplication(a, b)
+
+function multiplication(q1::QuantityType, q2::QuantityType)
+    q2 = inInternalUnitsOf(q2, q1.internalUnits)
+    return _createQuantityType( q1.value * q2.value, q1.dimension + q2.dimension, q1.internalUnits )
+end
+
+function multiplication(quantity::QuantityType, dimless::DimensionlessType)
+    return _createQuantityType( quantity.value * dimless, quantity.dimension, quantity.internalUnits )
+end
+
+function multiplication(dimless::DimensionlessType, quantity::QuantityType)
+    return _createQuantityType( dimless * quantity.value, quantity.dimension, quantity.internalUnits )
+end
+
+function _createQuantityType(value::Union{Number, Array{<:Number}}, dimension::Dimension, intu::InternalUnits)
+    if isa(value, Number)
+        return Quantity(value, dimension, intu)
+    else
+        return QuantityArray(value, dimension, intu)
+    end
+end
+
+# mixed: Quantity, QuantityArray, SimpleQuantity, and SimpleQuantityArray
+Base.:*(a::SimpleQuantity, b::Quantity) = multiplication(a, b)
+Base.:*(a::Quantity, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::QuantityArray) = multiplication(a, b)
+Base.:*(a::QuantityArray, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::SimpleQuantityArray, b::Quantity) = multiplication(a, b)
+Base.:*(a::Quantity, b::SimpleQuantityArray) = multiplication(a, b)
+Base.:*(a::QuantityArray, b::SimpleQuantity) = multiplication(a, b)
+Base.:*(a::SimpleQuantity, b::QuantityArray) = multiplication(a, b)
+
+multiplication(q1::SimpleQuantityType, q2::QuantityType) = _createQuantityType(q1, q2.internalUnits) * q2
+multiplication(q1::QuantityType, q2::SimpleQuantityType) = q1 * _createQuantityType(q2, q1.internalUnits)
+
+function _createQuantityType(q::SimpleQuantityType, intu::InternalUnits)
+    if isa(q.value, Number)
+        return Quantity(q, intu)
+    else
+        return QuantityArray(q, intu)
+    end
+end
+
+## TODO below
 
 ## Equality
 
@@ -49,60 +255,6 @@ function Base.:(==)(qArray1::QuantityArray, qArray2::QuantityArray)
 end
 
 
-## Multiplication
-
-# methods documented as part of the AbstractQuantity interface
-# scalar SimpleQuantity
-Base.:*(a::SimpleQuantity, b::SimpleQuantity) = multiplication(a, b)
-Base.:*(a::SimpleQuantity, b::Number) = multiplication(a, b)
-Base.:*(a::Number, b::SimpleQuantity) = multiplication(a, b)
-Base.:*(a::SimpleQuantity, b::Array{<:Number}) = multiplication(a, b)
-Base.:*(a::Array{<:Number}, b::SimpleQuantity) = multiplication(a, b)
-# scalar Quantity
-Base.:*(a::Quantity, b::Quantity) = multiplication(a, b)
-Base.:*(a::Quantity, b::SimpleQuantity) = multiplication(a, b)
-# array quantity
-Base.:*(a::SimpleQuantityArray, b::SimpleQuantityArray) = multiplication(a, b)
-Base.:*(a::SimpleQuantityArray, b::Array{<:Number}) = multiplication(a, b)
-Base.:*(a::Array{<:Number}, b::SimpleQuantityArray) = multiplication(a, b)
-Base.:*(a::SimpleQuantityArray, b::SimpleQuantity) = multiplication(a, b)
-Base.:*(a::SimpleQuantity, b::SimpleQuantityArray) = multiplication(a, b)
-Base.:*(a::SimpleQuantityArray, b::Number) = multiplication(a, b)
-Base.:*(a::Number, b::SimpleQuantityArray) = multiplication(a, b)
-
-function multiplication(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
-    productValue = sQuantity1.value * sQuantity2.value
-    productUnit = sQuantity1.unit * sQuantity2.unit
-    return  productValue * productUnit
-end
-
-function multiplication(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
-    productValue = sQuantity.value * dimless
-    productUnit = sQuantity.unit
-    return productValue * productUnit
-end
-
-function multiplication(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    productValue = dimless * sQuantity.value
-    productUnit = sQuantity.unit
-    return productValue * productUnit
-end
-
-# TODO: below
-
-function multiplication(quantity1::QuantityType, quantity2::QuantityType)
-    targetInternalUnits = quantity1.internalUnits
-    quantity2InIntU = inInternalUnitsOf(quantity2, targetInternalUnits)
-    productValue = quantity1.value * quantity2InIntU.value
-    productDimension = quantity1.dimension + quantity2InIntU.dimension
-    return Quantity( productValue, productDimension, targetInternalUnits )
-end
-
-function multiplication(quantity::QuantityType, sQuantity::SimpleQuantityType)
-    targetInternalUnits = quantity.internalUnits
-    return quantity * Quantity(sQuantity, targetInternalUnits)
-end
-
 ## Division
 
 # methods documented as part of the AbstractQuantity interface
@@ -121,9 +273,9 @@ Base.:/(a::SimpleQuantity, b::SimpleQuantityArray) = division(a, b)
 Base.:/(a::SimpleQuantityArray, b::Number) = division(a, b)
 Base.:/(a::Number, b::SimpleQuantityArray) = division(a, b)
 
-function division(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
-    quotientValue = sQuantity1.value / sQuantity2.value
-    quotientUnit = sQuantity1.unit / sQuantity2.unit
+function division(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    quotientValue = q1.value / q2.value
+    quotientUnit = q1.unit / q2.unit
     return  quotientValue * quotientUnit
 end
 
@@ -155,9 +307,9 @@ Base.:\(a::Array{<:Number}, b::SimpleQuantityArray) = inverseDivision(a, b)
 Base.:\(a::SimpleQuantity, b::SimpleQuantityArray) = inverseDivision(a, b)
 Base.:\(a::Number, b::SimpleQuantityArray) = inverseDivision(a, b)
 
-function inverseDivision(sQuantity1::SimpleQuantityType, sQuantity2::SimpleQuantityType)
-    quotientValue = sQuantity1.value \ sQuantity2.value
-    quotientUnit = sQuantity2.unit / sQuantity1.unit
+function inverseDivision(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    quotientValue = q1.value \ q2.value
+    quotientUnit = q2.unit / q1.unit
     return  quotientValue * quotientUnit
 end
 
@@ -211,55 +363,6 @@ end
 
 ## 2. Arithmetic unary and binary operators
 
-"""
-    Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-
-Add two SimpleQuantities.
-
-The resulting quantity is expressed in units of `simpleQuantity1`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and `simpleQuantity2` are of different dimensions
-"""
-function Base.:+(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    targetUnit = simpleQuantity1.unit
-    simpleQuantity2 = _addition_ConvertQuantityToTargetUnit(simpleQuantity2, targetUnit)
-    sumValue = simpleQuantity1.value + simpleQuantity2.value
-    sumQuantity = SimpleQuantity( sumValue, targetUnit )
-    return sumQuantity
-end
-
-function _addition_ConvertQuantityToTargetUnit(simpleQuantity::SimpleQuantity, targetUnit::AbstractUnit)
-    try
-        simpleQuantity = inUnitsOf(simpleQuantity, targetUnit)
-    catch exception
-        _handleExceptionInAddition(exception)
-    end
-    return simpleQuantity
-end
-
-function _handleExceptionInAddition(exception::Exception)
-    if isa(exception, Exceptions.DimensionMismatchError)
-        newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
-        throw(newException)
-    else
-        rethrow()
-    end
-end
-
-"""
-    Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-
-Subtract two SimpleQuantities.
-
-The resulting quantity is expressed in units of `simpleQuantity1`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and `simpleQuantity2` are of different dimensions
-"""
-function Base.:-(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    return simpleQuantity1 + (-simpleQuantity2)
-end
 
 ## 3. Numeric comparison
 
@@ -513,6 +616,8 @@ end
 Base.iterate(simpleQuantity::SimpleQuantity) = (simpleQuantity,nothing)
 Base.iterate(simpleQuantity::SimpleQuantity, state) = nothing
 
+
+
 ## ## SimpleQuantityArray
 
 
@@ -520,42 +625,6 @@ Base.iterate(simpleQuantity::SimpleQuantity, state) = nothing
 # TODO below
 
 ## 2. Arithmetic unary and binary operators
-
-"""
-    Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-
-Add two `SimpleQuantityArrays`.
-
-The resulting quantity is expressed in units of `sqArray1`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and `sqArray2` are of different dimensions
-"""
-function Base.:+(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    targetUnit = sqArray1.unit
-    sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
-    sumvalue = sqArray1.value + sqArray2.value
-    sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
-    return sumQuantity
-end
-
-function _addition_ConvertQuantityArrayToTargetUnit(sqArray::Union{SimpleQuantityArray, SimpleQuantity}, targetUnit::AbstractUnit)
-    try
-        sqArray = inUnitsOf(sqArray, targetUnit)
-    catch exception
-        _handleExceptionInArrayAddition(exception)
-    end
-    return sqArray
-end
-
-function _handleExceptionInArrayAddition(exception::Exception)
-    if isa(exception, Exceptions.DimensionMismatchError)
-        newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
-        throw(newException)
-    else
-        rethrow()
-    end
-end
 
 """
     Base.:-(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)

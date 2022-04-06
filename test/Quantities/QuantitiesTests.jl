@@ -41,8 +41,8 @@ function run()
         # quantity_arrayBasicsTests.run()
         #
         # quantity_unit_arithmeticsTests.run()
-        # quantity_mathTests.run()
-        quantity_arrayMathTests.run()
+        quantity_mathTests.run()
+        # quantity_arrayMathTests.run()
         # quantity_broadcastingTests.run()
     end
 end
