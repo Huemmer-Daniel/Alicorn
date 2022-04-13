@@ -23,7 +23,7 @@ function Dimensions.dimensionOf(unit::Unit)
     unitFactors = unit.unitFactors
 
     unitFactor_dimensions = map(dimensionOf, unitFactors)
-    dimension = sum(unitFactor_dimensions)
+    dimension = prod(unitFactor_dimensions)
     return dimension
 end
 

@@ -1,10 +1,10 @@
 ## Arithmetic unary operators
 
-# unary plus
+# Unary plus
 Base.:+(q::AbstractQuantity) = q
 Base.:+(q::AbstractQuantityArray) = q
 
-# unary minus
+# Unary minus
 Base.:-(q::AbstractQuantity) = unaryMinus(q)
 Base.:-(q::AbstractQuantityArray) = unaryMinus(q)
 unaryMinus(q::SimpleQuantityType) = (-q.value) * q.unit
@@ -13,7 +13,7 @@ unaryMinus(q::QuantityArray) = QuantityArray(-q.value, q.dimension, q.internalUn
 
 ## Arithmetic binary operators
 
-# addition
+# Addition
 """
     Base.:+(q1::SimpleQuantity, q2::SimpleQuantity)
     Base.:+(q1::SimpleQuantityArray, q2::SimpleQuantityArray)
@@ -80,7 +80,7 @@ Base.:+(q1::SimpleQuantityArray, q2::QuantityArray) = QuantityArray(q1, q2.inter
 Base.:+(q1::QuantityArray, q2::SimpleQuantityArray) = q1 + QuantityArray(q2, q1.internalUnits)
 
 
-# subtraction
+# Subtraction
 """
     Base.:-(q1::SimpleQuantity, q2::SimpleQuantity)
     Base.:-(q1::SimpleQuantityArray, q2::SimpleQuantityArray)
@@ -124,7 +124,7 @@ Base.:-(q1::SimpleQuantityType, q2::QuantityType) = q1 + (-q2)
 Base.:-(q1::QuantityType, q2::SimpleQuantityType) = q1 + (-q2)
 
 
-# multiplication
+# Multiplication
 # define individual methods for all combinations to avoid ambiguities with Julia base
 # SimpleQuantity
 Base.:*(a::SimpleQuantity, b::SimpleQuantity) = multiplication(a, b)
@@ -142,23 +142,9 @@ Base.:*(a::SimpleQuantity, b::SimpleQuantityArray) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::Number) = multiplication(a, b)
 Base.:*(a::Number, b::SimpleQuantityArray) = multiplication(a, b)
 
-function multiplication(q1::SimpleQuantityType, q2::SimpleQuantityType)
-    productValue = q1.value * q2.value
-    productUnit = q1.unit * q2.unit
-    return  productValue * productUnit
-end
-
-function multiplication(q::SimpleQuantityType, dimless::DimensionlessType)
-    productValue = q.value * dimless
-    productUnit = q.unit
-    return productValue * productUnit
-end
-
-function multiplication(dimless::DimensionlessType, q::SimpleQuantityType)
-    productValue = dimless * q.value
-    productUnit = q.unit
-    return productValue * productUnit
-end
+multiplication(q1::SimpleQuantityType, q2::SimpleQuantityType) =  (q1.value * q2.value) * (q1.unit * q2.unit)
+multiplication(q::SimpleQuantityType, dimless::DimensionlessType) = (q.value * dimless) * q.unit
+multiplication(dimless::DimensionlessType, q::SimpleQuantityType) = (dimless * q.value) * q.unit
 
 # Quantity
 Base.:*(a::Quantity, b::Quantity) = multiplication(a, b)
@@ -178,18 +164,18 @@ Base.:*(a::Number, b::QuantityArray) = multiplication(a, b)
 
 function multiplication(q1::QuantityType, q2::QuantityType)
     q2 = inInternalUnitsOf(q2, q1.internalUnits)
-    return _createQuantityType( q1.value * q2.value, q1.dimension + q2.dimension, q1.internalUnits )
+    return _createQuantityType( q1.value * q2.value, q1.dimension * q2.dimension, q1.internalUnits )
 end
 
-function multiplication(quantity::QuantityType, dimless::DimensionlessType)
-    return _createQuantityType( quantity.value * dimless, quantity.dimension, quantity.internalUnits )
+function multiplication(q::QuantityType, dimless::DimensionlessType)
+    return _createQuantityType( q.value * dimless, q.dimension, q.internalUnits )
 end
 
-function multiplication(dimless::DimensionlessType, quantity::QuantityType)
-    return _createQuantityType( dimless * quantity.value, quantity.dimension, quantity.internalUnits )
+function multiplication(dimless::DimensionlessType, q::QuantityType)
+    return _createQuantityType( dimless * q.value, q.dimension, q.internalUnits )
 end
 
-function _createQuantityType(value::Union{Number, Array{<:Number}}, dimension::Dimension, intu::InternalUnits)
+function _createQuantityType(value::Union{Number, AbstractArray{<:Number}}, dimension::Dimension, intu::InternalUnits)
     if isa(value, Number)
         return Quantity(value, dimension, intu)
     else
@@ -197,7 +183,7 @@ function _createQuantityType(value::Union{Number, Array{<:Number}}, dimension::D
     end
 end
 
-# mixed: Quantity, QuantityArray, SimpleQuantity, and SimpleQuantityArray
+# mixed: SimpleQuantity, SimpleQuantityArray, Quantity, and QuantityArray
 Base.:*(a::SimpleQuantity, b::Quantity) = multiplication(a, b)
 Base.:*(a::Quantity, b::SimpleQuantity) = multiplication(a, b)
 Base.:*(a::SimpleQuantityArray, b::QuantityArray) = multiplication(a, b)
@@ -218,53 +204,17 @@ function _createQuantityType(q::SimpleQuantityType, intu::InternalUnits)
     end
 end
 
-## TODO below
 
-## Equality
-
-"""
-    Base.:(==)(quantity1::Quantity, quantity2::Quantity)
-
-Compare two `Quantity` objects.
-
-The two quantities are equal if their values, their dimensions, and their internal units are equal.
-Note that the units are not converted during the comparison.
-"""
-function Base.:(==)(quantity1::Quantity, quantity2::Quantity)
-    valuesEqual = ( quantity1.value == quantity2.value )
-    dimensionsEqual = ( quantity1.dimension == quantity2.dimension )
-    internalUnitsEqual = ( quantity1.internalUnits == quantity2.internalUnits )
-    isEqual = valuesEqual && dimensionsEqual && internalUnitsEqual
-    return isEqual
-end
-
-"""
-    Base.:(==)(qArray1::QuantityArray, qArray2::QuantityArray)
-
-Compare two `QuantityArray` objects.
-
-The two quantities are equal if their values, their dimensions, and their internal units are equal.
-Note that the units are not converted during the comparison.
-"""
-function Base.:(==)(qArray1::QuantityArray, qArray2::QuantityArray)
-    valuesEqual = ( qArray1.value == qArray2.value )
-    dimensionsEqual = ( qArray1.dimension == qArray2.dimension )
-    internalUnitsEqual = ( qArray1.internalUnits == qArray2.internalUnits )
-    isEqual = valuesEqual && dimensionsEqual && internalUnitsEqual
-    return isEqual
-end
-
-
-## Division
-
-# methods documented as part of the AbstractQuantity interface
-# scalar quantity
+# Division
+# define individual methods for all combinations to avoid ambiguities with Julia base
+# SimpleQuantity
 Base.:/(a::SimpleQuantity, b::SimpleQuantity) = division(a, b)
 Base.:/(a::SimpleQuantity, b::Number) = division(a, b)
 Base.:/(a::Number, b::SimpleQuantity) = division(a, b)
 Base.:/(a::SimpleQuantity, b::Array{<:Number}) = division(a, b)
 Base.:/(a::Array{<:Number}, b::SimpleQuantity) = division(a, b)
-# array quantity
+
+# SimpleQuantityArray
 Base.:/(a::SimpleQuantityArray, b::SimpleQuantityArray) = division(a, b)
 Base.:/(a::SimpleQuantityArray, b::Array{<:Number}) = division(a, b)
 Base.:/(a::Array{<:Number}, b::SimpleQuantityArray) = division(a, b)
@@ -273,111 +223,95 @@ Base.:/(a::SimpleQuantity, b::SimpleQuantityArray) = division(a, b)
 Base.:/(a::SimpleQuantityArray, b::Number) = division(a, b)
 Base.:/(a::Number, b::SimpleQuantityArray) = division(a, b)
 
-function division(q1::SimpleQuantityType, q2::SimpleQuantityType)
-    quotientValue = q1.value / q2.value
-    quotientUnit = q1.unit / q2.unit
-    return  quotientValue * quotientUnit
+division(q1::SimpleQuantityType, q2::SimpleQuantityType) = (q1.value / q2.value) * q1.unit / q2.unit
+division(q::SimpleQuantityType, dimless::DimensionlessType) = (q.value / dimless) * q.unit
+division(dimless::DimensionlessType, q::SimpleQuantityType) = (dimless / q.value) * inv(q.unit)
+
+# Quantity
+Base.:/(a::Quantity, b::Quantity) = division(a, b)
+Base.:/(a::Quantity, b::Number) = division(a, b)
+Base.:/(a::Number, b::Quantity) = division(a, b)
+Base.:/(a::Quantity, b::Array{<:Number}) = division(a, b)
+Base.:/(a::Array{<:Number}, b::Quantity) = division(a, b)
+
+# QuantityArray
+Base.:/(a::QuantityArray, b::QuantityArray) = division(a, b)
+Base.:/(a::QuantityArray, b::Array) = division(a, b)
+Base.:/(a::Array, b::QuantityArray) = division(a, b)
+Base.:/(a::QuantityArray, b::Quantity) = division(a, b)
+Base.:/(a::Quantity, b::QuantityArray) = division(a, b)
+Base.:/(a::QuantityArray, b::Number) = division(a, b)
+Base.:/(a::Number, b::QuantityArray) = division(a, b)
+
+function division(q1::QuantityType, q2::QuantityType)
+    q2 = inInternalUnitsOf(q2, q1.internalUnits)
+    return _createQuantityType( q1.value / q2.value, q1.dimension / q2.dimension, q1.internalUnits )
 end
 
-function division(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
-    quotientValue = sQuantity.value / dimless
-    quotientUnit = sQuantity.unit
-    return quotientValue * quotientUnit
+function division(q::QuantityType, dimless::DimensionlessType)
+    return _createQuantityType( q.value / dimless, q.dimension, q.internalUnits )
 end
 
-function division(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    quotientValue = dimless / sQuantity.value
-    quotientUnit = inv(sQuantity.unit)
-    return quotientValue * quotientUnit
+function division(dimless::DimensionlessType, q::QuantityType)
+    return _createQuantityType( dimless / q.value, inv(q.dimension), q.internalUnits )
 end
 
-## Inverse division
+# mixed: SimpleQuantity, SimpleQuantityArray, Quantity, and QuantityArray
+Base.:/(a::SimpleQuantity, b::Quantity) = division(a, b)
+Base.:/(a::Quantity, b::SimpleQuantity) = division(a, b)
+Base.:/(a::SimpleQuantityArray, b::QuantityArray) = division(a, b)
+Base.:/(a::QuantityArray, b::SimpleQuantityArray) = division(a, b)
+Base.:/(a::SimpleQuantityArray, b::Quantity) = division(a, b)
+Base.:/(a::Quantity, b::SimpleQuantityArray) = division(a, b)
+Base.:/(a::QuantityArray, b::SimpleQuantity) = division(a, b)
+Base.:/(a::SimpleQuantity, b::QuantityArray) = division(a, b)
 
-# methods documented as part of the AbstractQuantity interface
-# scalar quantity
-Base.:\(a::SimpleQuantity, b::SimpleQuantity) = inverseDivision(a, b)
-Base.:\(a::SimpleQuantity, b::Number) = inverseDivision(a, b)
-Base.:\(a::Number, b::SimpleQuantity) = inverseDivision(a, b)
-Base.:\(a::SimpleQuantity, b::Array{<:Number}) = inverseDivision(a, b)
-Base.:\(a::Array{<:Number}, b::SimpleQuantity) = inverseDivision(a, b)
-# array quantity
-Base.:\(a::SimpleQuantityArray, b::SimpleQuantityArray) = inverseDivision(a, b)
-Base.:\(a::SimpleQuantityArray, b::Array{<:Number}) = inverseDivision(a, b)
-Base.:\(a::Array{<:Number}, b::SimpleQuantityArray) = inverseDivision(a, b)
-Base.:\(a::SimpleQuantity, b::SimpleQuantityArray) = inverseDivision(a, b)
-Base.:\(a::Number, b::SimpleQuantityArray) = inverseDivision(a, b)
+division(q1::SimpleQuantityType, q2::QuantityType) = _createQuantityType(q1, q2.internalUnits) / q2
+division(q1::QuantityType, q2::SimpleQuantityType) = q1 / _createQuantityType(q2, q1.internalUnits)
 
-function inverseDivision(q1::SimpleQuantityType, q2::SimpleQuantityType)
-    quotientValue = q1.value \ q2.value
-    quotientUnit = q2.unit / q1.unit
-    return  quotientValue * quotientUnit
-end
 
-function inverseDivision(sQuantity::SimpleQuantityType, dimless::DimensionlessType)
-    quotientValue = sQuantity.value \ dimless
-    quotientUnit = inv(sQuantity.unit)
-    return quotientValue * quotientUnit
-end
+# Power
 
-function inverseDivision(dimless::DimensionlessType, sQuantity::SimpleQuantityType)
-    quotientValue = dimless \ sQuantity.value
-    quotientUnit = sQuantity.unit
-    return quotientValue * quotientUnit
-end
+# SimpleQuantity and SimpleQuantityArray
+Base.:^(a::SimpleQuantityType, b::Real) = power(a, b)
+Base.:^(a::SimpleQuantityType, b::Integer) = power(a, b)
 
-## Power
-
-# methods documented as part of the AbstractQuantity interface
-# scalar quantity
-Base.:^(a::SimpleQuantity, b::Real) = power(a, b)
-Base.:^(a::SimpleQuantity, b::Integer) = power(a, b)
-# array quantity
-Base.:^(a::SimpleQuantityArray, b::Real) = power(a, b)
-Base.:^(a::SimpleQuantityArray, b::Integer) = power(a, b)
-
-function power(sQuantity::SimpleQuantityType, exponent::Real)
-    exponentiatedValue = Base.literal_pow(^, sQuantity.value, Val(exponent))
-    exponentiatedUnit = (sQuantity.unit)^exponent
+function power(q::SimpleQuantityType, exponent::Real)
+    exponentiatedValue = Base.literal_pow(^, q.value, Val(exponent))
+    exponentiatedUnit = (q.unit)^exponent
     return exponentiatedValue * exponentiatedUnit
 end
 
-## Inverse
+# Quantity and QuantityArray
+Base.:^(a::QuantityType, b::Real) = power(a, b)
+Base.:^(a::QuantityType, b::Integer) = power(a, b)
 
-# methods documented as part of the AbstractQuantity interface
-# scalar quantity
-Base.:inv(a::SimpleQuantity) = inverse(a)
-# array quantity
-Base.:inv(a::SimpleQuantityArray) = inverse(a)
-
-function inverse(sQuantity::SimpleQuantityType)
-    inverseValue = inv(sQuantity.value)
-    inverseUnit = inv(sQuantity.unit)
-    return inverseValue * inverseUnit
+function power(q::QuantityType, exponent::Real)
+    exponentiatedValue = Base.literal_pow(^, q.value, Val(exponent))
+    exponentiatedDimension = (q.dimension)^exponent
+    return _createQuantityType(exponentiatedValue, exponentiatedDimension, q.internalUnits)
 end
 
 
-## TODO below
+# Inverse
 
-## ## SimpleQuantity
-
-
-## 2. Arithmetic unary and binary operators
+Base.:inv(q::SimpleQuantityType) = inv(q.value) * inv(q.unit)
+Base.:inv(q::QuantityType) = _createQuantityType( inv(q.value), inv(q.dimension), q.internalUnits )
 
 
-## 3. Numeric comparison
+## Numeric comparison
+
+# Equality
 
 """
-    Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    Base.:(==)(q1::SimpleQuantity, q2::SimpleQuantity)
+    Base.:(==)(q1::SimpleQuantityArray, q2::SimpleQuantityArray)
 
-Returns `true` if `simpleQuantity1` and `simpleQuantity2` are of equal value.
+Returns `true` if `q1` and `q2` are of equal dimension and value.
 
-If necessary, `simpleQuantity2` is expressed in units of `simpleQuantity1.unit`
+If necessary, `q2` is expressed in units of `q1.unit`
 before the comparison. Note that the conversion oftens lead to rounding errors
-that render `simpleQuantity1` not equal `simpleQuantity2`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and
-`simpleQuantity2` are not of the same dimension
+that render `q1` not equal `q2`.
 
 # Examples
 ```jldoctest
@@ -396,317 +330,205 @@ julia> q1 == q2
 true
 ```
 """
-function Base.:(==)(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
-    return simpleQuantity1.value == simpleQuantity2.value
+function Base.:(==)(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    if dimensionOf(q1) != dimensionOf(q2)
+        return false
+    else
+        q2 = inUnitsOf(q2, q1.unit)
+        return q1.value == q2.value
+    end
 end
 
 """
-    Base.isless(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
+    Base.:(==)(q1::Quantity, q2::Quantity)
+    Base.:(==)(q1::QuantityArray, q2::QuantityArray)
 
-Returns `true` if `simpleQuantity1` is of lesser value than `simpleQuantity2`.
+Compare two `Quantity` or `QuantityArray` objects.
 
-If necessary, `simpleQuantity2` is expressed in units of `simpleQuantity1.unit`
+The two quantities are equal if their values, their dimensions, and their internal units are equal.
+Note that the internal units are not converted during the comparison.
+"""
+function Base.:(==)(q1::QuantityType, q2::QuantityType)
+    valuesEqual = ( q1.value == q2.value )
+    dimensionsEqual = ( q1.dimension == q2.dimension )
+    internalUnitsEqual = ( q1.internalUnits == q2.internalUnits )
+    isEqual = valuesEqual && dimensionsEqual && internalUnitsEqual
+    return isEqual
+end
+
+
+# isless
+
+"""
+    Base.isless(q1::SimpleQuantity, q2::SimpleQuantity)
+
+Returns `true` if `q1` is of lesser value than `q2`.
+
+If necessary, `q2` is expressed in units of `q1.unit`
 before the comparison. Note that the conversion often leads to rounding errors.
 
 # Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and
-`simpleQuantity2` are not of the same dimension
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
+`q2` are not of the same dimension
 """
-function Base.isless(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
-    return isless( simpleQuantity1.value, simpleQuantity2.value )
+function Base.isless(q1::SimpleQuantity, q2::SimpleQuantity)
+    _assertComparedWithSameDimension(q1, q2)
+    q2 = inUnitsOf(q2, q1.unit)
+    return isless( q1.value, q2.value )
 end
 
-function _ensureComparedWithSameUnit(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    try
-        simpleQuantity2 = inUnitsOf(simpleQuantity2, simpleQuantity1.unit)
-    catch exception
-        _handleExceptionIn_ensureComparedWithSameUnit(exception)
-    end
-    return simpleQuantity2
+"""
+    Base.isless(q1::Quantity, q2::Quantity)
+
+Returns `true` if `q1` is of lesser value than `q2`.
+
+If necessary, `q2` is expressed in internal units of `q1.internalUnits`
+before the comparison. Note that the conversion often leads to rounding errors.
+
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
+`q2` are not of the same dimension
+"""
+function Base.isless(q1::Quantity, q2::Quantity)
+    _assertComparedWithSameDimension(q1, q2)
+    q2 = inInternalUnitsOf(q2, q1.internalUnits)
+    return isless( q1.value, q2.value )
 end
 
-function _handleExceptionIn_ensureComparedWithSameUnit(exception)
-    if isa(exception, Exceptions.DimensionMismatchError)
+function _assertComparedWithSameDimension(q1::AbstractQuantity, q2::AbstractQuantity)
+    if dimensionOf(q1) != dimensionOf(q2)
         newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
         throw(newException)
-    else
-        rethrow()
     end
 end
 
-# method documented as part of the AbstractQuantity interface
-function Base.isfinite(simpleQuantity::SimpleQuantity)
-    return isfinite(simpleQuantity.value)
-end
 
-# method documented as part of the AbstractQuantity interface
-function Base.isinf(simpleQuantity::SimpleQuantity)
-    return isinf(simpleQuantity.value)
-end
+# isfinite
+Base.isfinite(q::AbstractQuantity) = isfinite(q.value)
 
-# method documented as part of the AbstractQuantity interface
-function Base.isnan(simpleQuantity::SimpleQuantity)
-    return isnan(simpleQuantity.value)
-end
+# isinf
+Base.isinf(q::AbstractQuantity) = isinf(q.value)
+
+# isnan
+Base.isnan(q::AbstractQuantity) = isnan(q.value)
+
+
+# isapprox
 
 """
-    Base.isapprox(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity; rtol::Real = sqrt(eps()) )
+    Base.isapprox(q1::SimpleQuantity, q2::SimpleQuantity; rtol::Real = sqrt(eps()) )
+    Base.isapprox(q1::SimpleQuantityArray, q2::SimpleQuantityArray; rtol::Real = sqrt(eps()) )
 
-Returns `isapprox(simpleQuantity1.value, simpleQuantity2.value, rtol=rtol)`.
+Returns `isapprox(q1.value, q2.value, rtol=rtol)`.
 
-If necessary, `simpleQuantity2` is expressed in units of `simpleQuantity1.unit`
+If necessary, `q2` is expressed in units of `q1.unit`
 before the comparison. Note that the conversion often leads to rounding errors.
 
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `simpleQuantity1` and
-`simpleQuantity2` are not of the same dimension
+Returns `false` if the two quantities are not of equal physical dimension.
 """
-function Base.isapprox(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity; rtol::Real = sqrt(eps()))
-    simpleQuantity2 = _ensureComparedWithSameUnit(simpleQuantity1, simpleQuantity2)
-    return isapprox(simpleQuantity1.value, simpleQuantity2.value, rtol=rtol)
+function Base.isapprox(q1::SimpleQuantityType, q2::SimpleQuantityType; rtol::Real = sqrt(eps()))
+    if dimensionOf(q1) != dimensionOf(q2)
+        return false
+    else
+        q2 = inUnitsOf(q2, q1.unit)
+        return isapprox(q1.value, q2.value, rtol=rtol)
+    end
 end
 
-## 4. Rounding
+"""
+    Base.isapprox(q1::Quantity, q2::Quantity; rtol::Real = sqrt(eps()) )
+    Base.isapprox(q1::QuantityArray, q2::QuantityArray; rtol::Real = sqrt(eps()) )
 
-# method documented as part of the AbstractQuantity interface
-function Base.mod2pi(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = mod2pi(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
+Returns `isapprox(q1.value, q2.value, rtol=rtol)`.
 
-## 5. Sign and absolute value
+If necessary, `q2` is expressed in internal units of `q1.internalUnits`
+before the comparison. Note that the conversion often leads to rounding errors.
 
-# method documented as part of the AbstractQuantity interface
-function Base.abs(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = abs(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.abs2(simpleQuantity::SimpleQuantity)
-    unit = (simpleQuantity.unit)^2
-    value = abs2(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.sign(simpleQuantity::SimpleQuantity)
-    value = sign(simpleQuantity.value)
-    return value
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.signbit(simpleQuantity::SimpleQuantity)
-    value = signbit(simpleQuantity.value)
-    return value
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.copysign(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    unit = simpleQuantity1.unit
-    value = copysign(simpleQuantity1.value, simpleQuantity2.value)
-    return SimpleQuantity(value, unit)
-end
-
-function Base.copysign(simpleQuantity::SimpleQuantity, number::Number)
-    unit = simpleQuantity.unit
-    value = copysign(simpleQuantity.value, number)
-    return SimpleQuantity(value, unit)
-end
-
-function Base.copysign(number::Number, simpleQuantity::SimpleQuantity)
-    value = copysign(number, simpleQuantity.value)
-    return value
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.flipsign(simpleQuantity1::SimpleQuantity, simpleQuantity2::SimpleQuantity)
-    unit = simpleQuantity1.unit
-    value = flipsign(simpleQuantity1.value, simpleQuantity2.value)
-    return SimpleQuantity(value, unit)
-end
-
-function Base.flipsign(simpleQuantity::SimpleQuantity, number::Number)
-    unit = simpleQuantity.unit
-    value = flipsign(simpleQuantity.value, number)
-    return SimpleQuantity(value, unit)
-end
-
-function Base.flipsign(number::Number, simpleQuantity::SimpleQuantity)
-    value = flipsign(number, simpleQuantity.value)
-    return value
-end
-
-## 6. Roots
-
-# method documented as part of the AbstractQuantity interface
-function Base.sqrt(simpleQuantity::SimpleQuantity)
-    rootOfValue = sqrt(simpleQuantity.value)
-    rootOfUnit = sqrt(simpleQuantity.unit)
-    rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
-    return rootOfQuantity
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.cbrt(simpleQuantity::SimpleQuantity)
-    rootOfValue = cbrt(simpleQuantity.value)
-    rootOfUnit = cbrt(simpleQuantity.unit)
-    rootOfQuantity = SimpleQuantity(rootOfValue, rootOfUnit)
-    return rootOfQuantity
+Returns `false` if the two quantities are not of equal physical dimension.
+"""
+function Base.isapprox(q1::QuantityType, q2::QuantityType; rtol::Real = sqrt(eps()))
+    if dimensionOf(q1) != dimensionOf(q2)
+        return false
+    else
+        q2 = inInternalUnitsOf(q2, q1.internalUnits)
+        return isapprox(q1.value, q2.value, rtol=rtol)
+    end
 end
 
 
-## 8. Complex numbers
+## Sign and absolute value
 
-# method documented as part of the AbstractQuantity interface
-function Base.real(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = real(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
+# abs
+Base.abs(q::SimpleQuantity) = SimpleQuantity(abs(q.value), q.unit)
+Base.abs(q::Quantity) = Quantity(abs(q.value), q.dimension, q.internalUnits)
 
-# method documented as part of the AbstractQuantity interface
-function Base.imag(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = imag(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
+# abs2
+Base.abs2(q::SimpleQuantity) = SimpleQuantity( abs2(q.value), (q.unit)^2 )
+Base.abs2(q::Quantity) = Quantity( abs2(q.value), q.dimension^2, q.internalUnits)
 
-# method documented as part of the AbstractQuantity interface
-function Base.conj(simpleQuantity::SimpleQuantity)
-    unit = simpleQuantity.unit
-    value = conj(simpleQuantity.value)
-    return SimpleQuantity(value, unit)
-end
+# sign
+Base.sign(q::Union{SimpleQuantity, Quantity}) = sign(q.value)
 
-# method documented as part of the AbstractQuantity interface
-function Base.angle(simpleQuantity::SimpleQuantity)
-    value = angle(simpleQuantity.value)
-    return value
-end
+# signbit
+Base.signbit(q::Union{SimpleQuantity, Quantity}) = signbit(q.value)
 
-## 9. Compatibility with array functions
+# copysign
+# to SimpleQuantity
+Base.copysign(q1::SimpleQuantity, q2::Union{SimpleQuantity, Quantity}) =
+    SimpleQuantity(copysign(q1.value, q2.value), q1.unit)
+Base.copysign(q::SimpleQuantity, number::Number) = SimpleQuantity(copysign(q.value, number), q.unit)
+# to Quantity
+Base.copysign(q1::Quantity, q2::Union{SimpleQuantity, Quantity}) =
+    Quantity(copysign(q1.value, q2.value), q1.dimension, q1.internalUnits)
+Base.copysign(q::Quantity, number::Number) = Quantity(copysign(q.value, number), q.dimension, q.internalUnits)
+# to Number
+Base.copysign(number::Number, q::Union{SimpleQuantity, Quantity}) = copysign(number, q.value)
 
-# method documented as part of the AbstractQuantity interface
-function Base.length(simpleQuantity::SimpleQuantity)
-    return length(simpleQuantity.value)
-end
+# flipsign
+# of SimpleQuantity
+Base.flipsign(q1::SimpleQuantity, q2::Union{SimpleQuantity, Quantity}) =
+    SimpleQuantity(flipsign(q1.value, q2.value), q1.unit)
+Base.flipsign(q1::SimpleQuantity, number::Number) =
+    SimpleQuantity(flipsign(q1.value, number), q1.unit)
+# of Quantity
+Base.flipsign(q1::Quantity, q2::Union{SimpleQuantity, Quantity}) =
+    Quantity(flipsign(q1.value, q2.value), q1.dimension, q1.internalUnits)
+Base.flipsign(q1::Quantity, number::Number) =
+    Quantity(flipsign(q1.value, number), q1.dimension, q1.internalUnits)
+# of Number
+Base.flipsign(number::Number, q::Union{SimpleQuantity, Quantity}) = flipsign(number, q.value)
 
-# method documented as part of the AbstractQuantity interface
-function Base.size(simpleQuantity::SimpleQuantity)
-    return size(simpleQuantity.value)
-end
 
-# method documented as part of the AbstractQuantity interface
-function Base.ndims(simpleQuantity::SimpleQuantity)
-    return ndims(simpleQuantity.value)
-end
+## Roots
 
-# method documented as part of the AbstractQuantity interface
-function Base.getindex(simpleQuantity::SimpleQuantity, index...)
-    unit = simpleQuantity.unit
-    value = getindex(simpleQuantity.value, index...)
-    return SimpleQuantity(value, unit)
-end
+# sqrt
+Base.sqrt(q::SimpleQuantity) = SimpleQuantity( sqrt(q.value), sqrt(q.unit) )
+Base.sqrt(q::Quantity) = Quantity( sqrt(q.value), q.dimension^(1/2), q.internalUnits )
+
+# cbrt
+Base.cbrt(q::SimpleQuantity) = SimpleQuantity( cbrt(q.value), cbrt(q.unit) )
+Base.cbrt(q::Quantity) = Quantity( cbrt(q.value), q.dimension^(1/3), q.internalUnits )
+
+
+## Complex numbers
+
+# real
+Base.real(q::SimpleQuantityType) = real(q.value) * q.unit
+Base.real(q::QuantityType) = _createQuantityType( real(q.value), q.dimension, q.internalUnits )
+
+# imag
+Base.imag(q::SimpleQuantityType) = imag(q.value) * q.unit
+Base.imag(q::QuantityType) = _createQuantityType( imag(q.value), q.dimension, q.internalUnits )
+
+# angle
+Base.angle(q::Union{SimpleQuantity, Quantity}) = angle(q.value)
+
+# conj
+Base.conj(q::SimpleQuantity) = SimpleQuantity(conj(q.value), q.unit)
+Base.conj(q::Quantity) = Quantity(conj(q.value), q.dimension, q.internalUnits)
+
+
+## TODO
 
 Base.iterate(simpleQuantity::SimpleQuantity) = (simpleQuantity,nothing)
 Base.iterate(simpleQuantity::SimpleQuantity, state) = nothing
-
-
-
-## ## SimpleQuantityArray
-
-
-
-# TODO below
-
-## 2. Arithmetic unary and binary operators
-
-"""
-    Base.:-(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-
-Subtract two `SimpleQuantityArrays`.
-
-The resulting quantity is expressed in units of `sqArray1`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and `sqArray2` are of different dimensions
-"""
-function Base.:-(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    return sqArray1 + (-sqArray2)
-end
-
-## 3. Numeric comparison
-
-"""
-    Base.:(==)(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-
-Returns `true` if `sqArray1` and `sqArray2` are of equal value and dimension.
-
-If necessary, `sqArray2` is expressed in units of `sqArray1.unit`
-before the comparison. Note that the conversion oftens lead to rounding errors
-that render `sqArray1` not equal `sqArray2`.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and
-`sqArray2` are not of the same dimension
-```
-"""
-function Base.:(==)(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    sqArray2 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
-    return ( sqArray1.value == sqArray2.value )
-end
-
-function _ensureComparedWithSameUnit(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
-    try
-        targetUnit = sqArray1.unit
-        sqArray2 = inUnitsOf(sqArray2, targetUnit)
-    catch exception
-        _handleExceptionIn_ensureComparedWithSameUnit(exception)
-    end
-    return sqArray2
-end
-
-"""
-    Base.isapprox(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray; rtol::Real = sqrt(eps()) )
-
-Returns `isapprox(sqArray1.value, sqArray2.value, rtol=rtol)`.
-
-If necessary, `sqArray2` is expressed in units of `sqArray1.unit`
-before the comparison. Note that the conversion often leads to rounding errors.
-
-# Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `sqArray1` and
-`sqArray2` are not of the same dimension
-"""
-function Base.isapprox(sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray; rtol::Real = sqrt(eps()))
-    sqArray2 = _ensureComparedWithSameUnit(sqArray1, sqArray2)
-    return isapprox(sqArray1.value, sqArray2.value, rtol=rtol)
-end
-
-## 4. Complex numbers
-
-# method documented as part of the AbstractQuantity interface
-function Base.real(sqArray::SimpleQuantityArray)
-    value = real(sqArray.value)
-    unit = sqArray.unit
-    return value * unit
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.imag(sqArray::SimpleQuantityArray)
-    value = imag(sqArray.value)
-    unit = sqArray.unit
-    return value * unit
-end
-
-# method documented as part of the AbstractQuantity interface
-function Base.conj(sqArray::SimpleQuantityArray)
-    value = conj(sqArray.value)
-    unit = sqArray.unit
-    return value * unit
-end

@@ -99,14 +99,15 @@ inferTargetUnit(::typeof(imag), arg::Tuple{<:AbstractUnit, <:Any}) = arg[1]
 inferTargetUnit(::typeof(isless), arg1::Tuple{<:AbstractUnit, <:Any}, arg2::Tuple{<:AbstractUnit, <:Any}) = unitlessUnit
 
 
-# broadcastable operations on SimpleQuantityArrays that require eager evaluation
 
 ## SimpleQuantityArray eager evaluation
+# broadcastable operations on SimpleQuantityArrays that require eager evaluation
 
 # addition of two SimpleQuantityArray
 function Broadcast.broadcasted(::typeof(+), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
-    sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
+    _addition_assertSameDimension(sqArray1, sqArray2)
+    sqArray2 = inUnitsOf(sqArray2, targetUnit)
     sumvalue = sqArray1.value .+ sqArray2.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
@@ -130,7 +131,8 @@ end
 # subtraction of two SimpleQuantityArray
 function Broadcast.broadcasted(::typeof(-), sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray)
     targetUnit = sqArray1.unit
-    sqArray2 = _addition_ConvertQuantityArrayToTargetUnit(sqArray2, targetUnit)
+    _addition_assertSameDimension(sqArray1, sqArray2)
+    sqArray2 = inUnitsOf(sqArray2, targetUnit)
     sumvalue = sqArray1.value .- sqArray2.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
@@ -154,14 +156,16 @@ end
 # addition of a SimpleQuantityArray and a SimpleQuantity
 function Broadcast.broadcasted(::typeof(+), sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
     targetUnit = sqArray.unit
-    simpleQuantity = _addition_ConvertQuantityArrayToTargetUnit(simpleQuantity, targetUnit)
+    _addition_assertSameDimension(sqArray, simpleQuantity)
+    simpleQuantity = inUnitsOf(simpleQuantity, targetUnit)
     sumvalue = sqArray.value .+ simpleQuantity.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
 
 function Broadcast.broadcasted(::typeof(+), simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
     targetUnit = simpleQuantity.unit
-    sqArray = _addition_ConvertQuantityArrayToTargetUnit(sqArray, targetUnit)
+    _addition_assertSameDimension(sqArray, simpleQuantity)
+    sqArray = inUnitsOf(sqArray, targetUnit)
     sumvalue = simpleQuantity.value .+ sqArray.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
@@ -180,14 +184,16 @@ end
 
 function Broadcast.broadcasted(::typeof(-), sqArray::SimpleQuantityArray, simpleQuantity::SimpleQuantity)
     targetUnit = sqArray.unit
-    simpleQuantity = _addition_ConvertQuantityArrayToTargetUnit(simpleQuantity, targetUnit)
+    _addition_assertSameDimension(sqArray, simpleQuantity)
+    simpleQuantity = inUnitsOf(simpleQuantity, targetUnit)
     sumvalue = sqArray.value .- simpleQuantity.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end
 
 function Broadcast.broadcasted(::typeof(-), simpleQuantity::SimpleQuantity, sqArray::SimpleQuantityArray)
     targetUnit = simpleQuantity.unit
-    sqArray = _addition_ConvertQuantityArrayToTargetUnit(sqArray, targetUnit)
+    _addition_assertSameDimension(sqArray, simpleQuantity)
+    sqArray = inUnitsOf(sqArray, targetUnit)
     sumvalue = simpleQuantity.value .- sqArray.value
     sumQuantity = SimpleQuantityArray( sumvalue, targetUnit )
 end

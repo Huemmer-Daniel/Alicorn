@@ -15,7 +15,10 @@ function run()
         @test Dimension_actsAsScalarInBroadcast()
 
         @test Number_Dimension_multiplication_implemented()
-        @test addition_implemented()
+        @test inv_implemented()
+        @test multiplication_implemented()
+        @test division_implemented()
+        @test exponentiation_implemented()
     end
 end
 
@@ -146,12 +149,29 @@ function _getExamplesFor_Number_Dimension_multiplication()
     return examples
 end
 
-function addition_implemented()
-    examples = _getExamplesFor_addition()
-    return TestingTools.testDyadicFunction(Base.:+, examples)
+function inv_implemented()
+    examples = _getExamplesFor_inv()
+    return TestingTools.testMonadicFunction(Base.inv, examples)
 end
 
-function _getExamplesFor_addition()
+function _getExamplesFor_inv()
+    examples = [
+        ( Dimension(M=1), Dimension(M=-1) ),
+        ( Dimension(L=2), Dimension(L=-2) ),
+        ( Dimension(T=-2), Dimension(T=2) ),
+        ( Dimension(I=7), Dimension(I=-7) ),
+        ( Dimension(N=-2), Dimension(N=2) ),
+        ( Dimension(J=3, N=-2), Dimension(J=-3, N=2) )
+    ]
+    return examples
+end
+
+function multiplication_implemented()
+    examples = _getExamplesFor_multiplication()
+    return TestingTools.testDyadicFunction(Base.:*, examples)
+end
+
+function _getExamplesFor_multiplication()
     examples = [
         ( Dimension(M=1), Dimension(M=1, L=2), Dimension(M=2, L=2) ),
         ( Dimension(L=2), Dimension(L=-2), Dimension(L=0) ),
@@ -159,6 +179,41 @@ function _getExamplesFor_addition()
         ( Dimension(I=-2), Dimension(I=7), Dimension(I=5) ),
         ( Dimension(N=-2), Dimension(N=7), Dimension(N=5) ),
         ( Dimension(J=3, N=-2), Dimension(N=7, J=-1), Dimension(N=5, J=2) )
+    ]
+    return examples
+end
+
+function division_implemented()
+    examples = _getExamplesFor_division()
+    return TestingTools.testDyadicFunction(Base.:/, examples)
+end
+
+function _getExamplesFor_division()
+    examples = [
+        ( Dimension(M=1), Dimension(M=1, L=2), Dimension(L=-2) ),
+        ( Dimension(L=2), Dimension(L=2), Dimension(L=0) ),
+        ( Dimension(T=-2), Dimension(T=-1), Dimension(T=-1) ),
+        ( Dimension(I=-2), Dimension(I=-7), Dimension(I=5) ),
+        ( Dimension(N=-2), Dimension(N=-7), Dimension(N=5) ),
+        ( Dimension(J=3, N=-2), Dimension(N=7, J=-1), Dimension(N=-9, J=4) )
+    ]
+    return examples
+end
+
+function exponentiation_implemented()
+    examples = _getExamplesFor_exponentiation()
+    return TestingTools.testDyadicFunction(Base.:^, examples)
+end
+
+function _getExamplesFor_exponentiation()
+    examples = [
+        ( Dimension(M=1), 1, Dimension(M=1) ),
+        ( Dimension(M=1), 2, Dimension(M=2) ),
+        ( Dimension(L=2), 1/2, Dimension(L=1) ),
+        ( Dimension(T=-2), 3.5, Dimension(T=-7) ),
+        ( Dimension(I=-2), -2, Dimension(I=4) ),
+        ( Dimension(N=-2), -1, Dimension(N=2) ),
+        ( Dimension(J=3, N=-2), 2.5, Dimension(J=7.5, N=-5) )
     ]
     return examples
 end
