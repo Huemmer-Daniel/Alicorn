@@ -30,9 +30,10 @@ include("quantity_typeConversion.jl")
 include("quantity_unitConversion.jl")
 export inUnitsOf, valueInUnitsOf, inInternalUnitsOf, inBasicSIUnits, valueOfDimensionless
 
-include("quantity_basics.jl")
+include("quantity_objectBasics.jl")
 include("quantity_abstractArray.jl")
 include("quantity_arrayBasics.jl")
+include("quantity_collectionBasics.jl")
 
 include("quantity_unit_arithmetics.jl")
 include("quantity_math.jl")

@@ -81,10 +81,14 @@ function Quantity(::AbstractQuantity, ::InternalUnits) end
 function Quantity(::AbstractQuantity) end
 
 function Quantity(quantity::Quantity{T}, internalUnits::InternalUnits) where T
-    convFactor = conversionFactor(quantity.dimension, quantity.internalUnits, internalUnits)
-    value = quantity.value * convFactor
-    value = _attemptConversionToType(T, value)
-    return Quantity(value, quantity.dimension, internalUnits)
+    if quantity.internalUnits == internalUnits
+        return quantity
+    else
+        convFactor = conversionFactor(quantity.dimension, quantity.internalUnits, internalUnits)
+        value = quantity.value * convFactor
+        value = _attemptConversionToType(T, value)
+        return Quantity(value, quantity.dimension, internalUnits)
+    end
 end
 
 Quantity(quantity::Quantity) = quantity
@@ -257,10 +261,14 @@ function QuantityArray(::AbstractQuantityArray, ::InternalUnits) end
 function QuantityArray(::AbstractQuantityArray) end
 
 function QuantityArray(qArray::QuantityArray{T}, internalUnits::InternalUnits) where T
-    convFactor = conversionFactor(qArray.dimension, qArray.internalUnits, internalUnits)
-    value = qArray.value * convFactor
-    value = _attemptConversionToType(typeof(qArray.value), value)
-    return QuantityArray(value, qArray.dimension, internalUnits)
+    if qArray.internalUnits == internalUnits
+        return qArray
+    else
+        convFactor = conversionFactor(qArray.dimension, qArray.internalUnits, internalUnits)
+        value = qArray.value * convFactor
+        value = _attemptConversionToType(typeof(qArray.value), value)
+        return QuantityArray(value, qArray.dimension, internalUnits)
+    end
 end
 QuantityArray(qArray::QuantityArray) = qArray
 

@@ -526,9 +526,3 @@ Base.angle(q::Union{SimpleQuantity, Quantity}) = angle(q.value)
 # conj
 Base.conj(q::SimpleQuantity) = SimpleQuantity(conj(q.value), q.unit)
 Base.conj(q::Quantity) = Quantity(conj(q.value), q.dimension, q.internalUnits)
-
-
-## TODO
-
-Base.iterate(simpleQuantity::SimpleQuantity) = (simpleQuantity,nothing)
-Base.iterate(simpleQuantity::SimpleQuantity, state) = nothing
