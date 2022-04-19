@@ -395,7 +395,7 @@ function Base.isless(q1::Quantity, q2::Quantity)
     return isless( q1.value, q2.value )
 end
 
-function _assertComparedWithSameDimension(q1::AbstractQuantity, q2::AbstractQuantity)
+function _assertComparedWithSameDimension(q1::AbstractQuantityType, q2::AbstractQuantityType)
     if dimensionOf(q1) != dimensionOf(q2)
         newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
         throw(newException)

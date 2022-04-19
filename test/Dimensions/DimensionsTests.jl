@@ -19,6 +19,8 @@ function run()
         @test multiplication_implemented()
         @test division_implemented()
         @test exponentiation_implemented()
+        @test sqrt_implemented()
+        @test cbrt_implemented()
     end
 end
 
@@ -214,6 +216,38 @@ function _getExamplesFor_exponentiation()
         ( Dimension(I=-2), -2, Dimension(I=4) ),
         ( Dimension(N=-2), -1, Dimension(N=2) ),
         ( Dimension(J=3, N=-2), 2.5, Dimension(J=7.5, N=-5) )
+    ]
+    return examples
+end
+
+function sqrt_implemented()
+    examples = _getExamplesFor_sqrt()
+    return TestingTools.testMonadicFunction(Base.:sqrt, examples)
+end
+
+function _getExamplesFor_sqrt()
+    examples = [
+        ( Dimension(M=1), Dimension(M=1/2) ),
+        ( Dimension(L=2), Dimension(L=1) ),
+        ( Dimension(T=-2), Dimension(T=-1) ),
+        ( Dimension(N=-2), Dimension(N=-1) ),
+        ( Dimension(J=3, N=-2), Dimension(J=3/2, N=-1) )
+    ]
+    return examples
+end
+
+function cbrt_implemented()
+    examples = _getExamplesFor_cbrt()
+    return TestingTools.testMonadicFunction(Base.:cbrt, examples)
+end
+
+function _getExamplesFor_cbrt()
+    examples = [
+        ( Dimension(M=1), Dimension(M=1/3) ),
+        ( Dimension(L=2), Dimension(L=2/3) ),
+        ( Dimension(T=-2), Dimension(T=-2/3 ) ),
+        ( Dimension(N=-2), Dimension(N=-2/3) ),
+        ( Dimension(J=3, N=-2), Dimension(J=1, N=-2/3) )
     ]
     return examples
 end

@@ -160,3 +160,43 @@ function Base.:^(dimension::Dimension, exponent::Number)
     )
     return resultingExponents
 end
+
+"""
+    Base.:sqrt(dimension::Dimension)
+
+Square root a physical dimension.
+
+If a quantity `Q` is of dimension `D`, then `sqrt(Q)` is of dimension `sqrt(D)`.
+"""
+function Base.:sqrt(dimension::Dimension)
+    resultingExponents = Dimension(
+        M = dimension.massExponent/2,
+        L = dimension.lengthExponent/2,
+        T = dimension.timeExponent/2,
+        I = dimension.currentExponent/2,
+        θ = dimension.temperatureExponent/2,
+        N = dimension.amountExponent/2,
+        J = dimension.luminousIntensityExponent/2
+    )
+    return resultingExponents
+end
+
+"""
+    Base.:cbrt(dimension::Dimension)
+
+Cubic root a physical dimension.
+
+If a quantity `Q` is of dimension `D`, then `cbrt(Q)` is of dimension `cbrt(D)`.
+"""
+function Base.:cbrt(dimension::Dimension)
+    resultingExponents = Dimension(
+        M = dimension.massExponent/3,
+        L = dimension.lengthExponent/3,
+        T = dimension.timeExponent/3,
+        I = dimension.currentExponent/3,
+        θ = dimension.temperatureExponent/3,
+        N = dimension.amountExponent/3,
+        J = dimension.luminousIntensityExponent/3
+    )
+    return resultingExponents
+end
