@@ -14,7 +14,6 @@ include("quantity_dimensionsTests.jl")
 include("quantity_typeConversionTests.jl")
 include("quantity_unitConversionTests.jl")
 
-include("quantity_basicsTests.jl")
 include("quantity_abstractArrayTests.jl")
 include("quantity_arrayBasicsTests.jl")
 
@@ -25,25 +24,24 @@ include("quantity_broadcastingTests.jl")
 
 function run()
     @testset "Quantities" begin
-        # SimpleQuantityTests.run()
-        # SimpleQuantityArrayTests.run()
+        SimpleQuantityTests.run()
+        SimpleQuantityArrayTests.run()
 
-        # InternalUnitsTests.run()
-        # QuantityTests.run()
-        # QuantityArrayTests.run()
+        InternalUnitsTests.run()
+        QuantityTests.run()
+        QuantityArrayTests.run()
 
-        # quantity_dimensionsTests.run()
-        # quantity_typeConversionTests.run()
-        # quantity_unitConversionTests.run()
+        quantity_dimensionsTests.run()
+        quantity_typeConversionTests.run()
+        quantity_unitConversionTests.run()
 
-        # quantity_basicsTests.run()
-        # quantity_abstractArrayTests.run()
-        # quantity_arrayBasicsTests.run()
-
-        # quantity_unit_arithmeticsTests.run()
+        quantity_abstractArrayTests.run()
+        quantity_arrayBasicsTests.run()
+        
+        quantity_unit_arithmeticsTests.run()
         quantity_mathTests.run()
-        # quantity_arrayMathTests.run()
-        # quantity_broadcastingTests.run()
+        quantity_arrayMathTests.run()
+        quantity_broadcastingTests.run()
     end
 end
 

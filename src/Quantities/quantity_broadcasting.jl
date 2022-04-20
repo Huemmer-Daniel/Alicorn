@@ -1,3 +1,7 @@
+# make Quantity and SimpleQuantity broadcastable
+# QuantityArray and SimpleQuantityArray are <: AbstractArray and therefore already broadcastable
+Base.broadcastable(q::AbstractQuantity) = q
+
 # define broadcast styles for SimpleQuantity types and Quantity types
 Base.BroadcastStyle(::Type{<:SimpleQuantityArray}) = Broadcast.ArrayStyle{SimpleQuantityArray}()
 Base.BroadcastStyle(::Type{<:QuantityArray}) = Broadcast.ArrayStyle{QuantityArray}()
@@ -7,38 +11,6 @@ Base.BroadcastStyle(::Type{<:Quantity}) = Broadcast.DefaultArrayStyle{0}()
 # this means any broadcast involving a Quantity or QuantityArray will return a QuantityArray
 Base.BroadcastStyle(s1::Broadcast.ArrayStyle{SimpleQuantityArray}, s2::Broadcast.ArrayStyle{QuantityArray}) = s2
 Base.BroadcastStyle(s1::Broadcast.ArrayStyle{QuantityArray}, s2::Broadcast.ArrayStyle{SimpleQuantityArray}) = s1
-
-## TODO check this implementation
-# Quantity and SimpleQuantity should be broadcastable
-# -> need to support [`axes`](@ref), indexing, and its type supports [`ndims`](@ref)
-Base.broadcastable(q::AbstractQuantity) = q
-
-Base.IndexStyle(::Type{<:SimpleQuantity}) = IndexLinear()
-Base.IndexStyle(::Type{<:Quantity}) = IndexLinear()
-
-# define getindex twice -- once with a single argument, once as varargs --
-# to avoid unintended splatting if inds is itself an iterable collection
-Base.getindex(sqArray::SimpleQuantity, inds) = getindex(sqArray.value, inds) * sqArray.unit
-Base.getindex(sqArray::SimpleQuantity, inds...) = getindex(sqArray.value, inds...) * sqArray.unit
-
-function Base.getindex(q::Quantity, inds)
-    subarray = getindex(q.value, inds)
-    if length(subarray) == 1
-        return Quantity(subarray, q.dimension, q.internalUnits)
-    else
-        return QuantityArray(subarray, q.dimension, q.internalUnits)
-    end
-end
-
-function Base.getindex(q::Quantity, inds...)
-    subarray = getindex(q.value, inds...)
-    if length(subarray) == 1
-        return Quantity(subarray, q.dimension, q.internalUnits)
-    else
-        return QuantityArray(subarray, q.dimension, q.internalUnits)
-    end
-end
-## end hack
 
 ## SimpleQuantityArray: eager evaluation
 

@@ -16,11 +16,15 @@ function run()
         @test size_implementedForQuantityArray()
 
         # IndexStyle
+        @test SimpleQuantity_reportsLinearIndexing()
         @test SimpleQuantityArray_reportsLinearIndexing()
+        @test Quantity_reportsLinearIndexing()
         @test QuantityArray_reportsLinearIndexing()
 
         # getindex
+        @test getindex_implementedForSimpleQuantity()
         @test getindex_implementedForSimpleQuantityArray()
+        @test getindex_implementedForQuantity()
         @test getindex_implementedForQuantityArray()
 
         # setindex
@@ -28,6 +32,10 @@ function run()
         test_setindex!_forSimpleQuantityArray_errorsForMismatchedUnits()
         @test setindex!_implementedForQuantityArray()
         test_setindex!_forQuantityArray_errorsForMismatchedUnits()
+
+        # length
+        @test size_implementedForSimpleQuantityArray()
+        @test size_implementedForQuantityArray()
 
     end
 end
@@ -66,10 +74,17 @@ end
 
 ## IndexStyle
 
+function SimpleQuantity_reportsLinearIndexing()
+    return ( Base.IndexStyle(SimpleQuantity) == IndexLinear() )
+end
+
 function SimpleQuantityArray_reportsLinearIndexing()
     return ( Base.IndexStyle(SimpleQuantityArray) == IndexLinear() )
 end
 
+function Quantity_reportsLinearIndexing()
+    return ( Base.IndexStyle(Quantity) == IndexLinear() )
+end
 function QuantityArray_reportsLinearIndexing()
     return ( Base.IndexStyle(QuantityArray) == IndexLinear() )
 end
@@ -82,6 +97,24 @@ function test_getindex(examples)
         correct &= ( returnedArray == expectedArray )
     end
     return correct
+end
+
+function getindex_implementedForSimpleQuantity()
+    examples = _getExamplesFor_getindex_implementedForSimpleQuantity()
+    return test_getindex(examples)
+end
+
+function _getExamplesFor_getindex_implementedForSimpleQuantity()
+
+    a = SimpleQuantity{Int32}(-3, (ucat.meter)^2 )
+
+    # single index
+    returned1 = getindex(a, 1)
+    correct1 = SimpleQuantity{Int32}( -3, (ucat.meter)^2 )
+
+    examples = [
+        ( returned1, correct1 )
+    ]
 end
 
 function getindex_implementedForSimpleQuantityArray()
@@ -134,6 +167,25 @@ function _getExamplesFor_getindex_implementedForSimpleQuantityArray()
         ( returned6, correct6 ),
         ( returned7, correct7 ),
         ( returned8, correct8 )
+    ]
+end
+
+function getindex_implementedForQuantity()
+    examples = _getExamplesFor_getindex_implementedForQuantity()
+    return test_getindex(examples)
+end
+
+function _getExamplesFor_getindex_implementedForQuantity()
+
+    a = Quantity{Int32}( 3, Dimension(L=2), intu2 )
+
+    # cartesian single index
+    returned1 = getindex(a, 1)
+    correct1 = Quantity{Int32}( 3, Dimension(L=2), intu2 )
+
+
+    examples = [
+        ( returned1, correct1 )
     ]
 end
 

@@ -2,15 +2,17 @@
 
 Base.size(qArray::AbstractQuantityType) = size(qArray.value)
 
+Base.IndexStyle(::Type{<:SimpleQuantity}) = IndexLinear()
 Base.IndexStyle(::Type{<:SimpleQuantityArray}) = IndexLinear()
+Base.IndexStyle(::Type{<:Quantity}) = IndexLinear()
 Base.IndexStyle(::Type{<:QuantityArray}) = IndexLinear()
 
 # define getindex twice -- once with a single argument, once as varargs --
 # to avoid unintended splatting if inds is itself an iterable collection
-Base.getindex(sqArray::SimpleQuantityArray, inds) = getindex(sqArray.value, inds) * sqArray.unit
-Base.getindex(sqArray::SimpleQuantityArray, inds...) = getindex(sqArray.value, inds...) * sqArray.unit
+Base.getindex(q::SimpleQuantityType, inds) = getindex(q.value, inds) * q.unit
+Base.getindex(q::SimpleQuantityType, inds...) = getindex(q.value, inds...) * q.unit
 
-function Base.getindex(qArray::QuantityArray, inds)
+function Base.getindex(qArray::QuantityType, inds)
     subarray = getindex(qArray.value, inds)
     if length(subarray) == 1
         return Quantity(subarray, qArray.dimension, qArray.internalUnits)
@@ -19,7 +21,7 @@ function Base.getindex(qArray::QuantityArray, inds)
     end
 end
 
-function Base.getindex(qArray::QuantityArray, inds...)
+function Base.getindex(qArray::QuantityType, inds...)
     subarray = getindex(qArray.value, inds...)
     if length(subarray) == 1
         return Quantity(subarray, qArray.dimension, qArray.internalUnits)
