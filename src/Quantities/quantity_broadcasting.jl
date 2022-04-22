@@ -26,7 +26,7 @@ Base.BroadcastStyle(s1::Broadcast.ArrayStyle{QuantityArray}, s2::Broadcast.Array
 function Broadcast.broadcasted(::typeof(+), q1::SimpleQuantityType, q2::SimpleQuantityType)
     _addition_assertSameDimension(q1, q2)
     q2 = inUnitsOf(q2, q1.unit)
-    return SimpleQuantityArray( q1.value .+ q2.value, q1.unit )
+    return (q1.value .+ q2.value) * q1.unit
 end
 # SimpleQuantityArray or SimpleQuantity with Broadcasted
 Broadcast.broadcasted(::typeof(+), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, q2::SimpleQuantityType) =
@@ -42,7 +42,7 @@ Broadcast.broadcasted(::typeof(+), bc1::Broadcast.Broadcasted{Broadcast.ArraySty
 function Broadcast.broadcasted(::typeof(-), q1::SimpleQuantityType, q2::SimpleQuantityType)
     _addition_assertSameDimension(q1, q2)
     q2 = inUnitsOf(q2, q1.unit)
-    return SimpleQuantityArray( q1.value .- q2.value, q1.unit )
+    return (q1.value .- q2.value) * q1.unit
 end
 # SimpleQuantityArray or SimpleQuantity with Broadcasted
 Broadcast.broadcasted(::typeof(-), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, q2::SimpleQuantityArray) =
@@ -118,6 +118,14 @@ _squeezeOutUnits(x::Any) = (x, Nothing)
 # fallback for functions without implementation for broadcasting
 inferTargetUnit(t::Any, args...) =
     throw(error("Broadcasting function $t to SimpleQuantityArray not implemented by Alicorn. Defining appropriate method inferTargetUnit(::typeof($t), args...) may solve this issue."))
+
+# unary plus and minus
+function inferTargetUnit(t::Union{typeof(+), typeof(-)}, valueAndUnit::Tuple)
+    u = valueAndUnit[2]
+    return inferTargetUnit(t, u)
+end
+inferTargetUnit(::typeof(+), u::Unit) = u
+inferTargetUnit(::typeof(-), u::Unit) = u
 
 # Multiplication
 function inferTargetUnit(::typeof(*), valueAndUnit1::Tuple, valueAndUnit2::Tuple)
@@ -250,9 +258,17 @@ _squeezeOutDims(x::Any, ::InternalUnits) = (x, Nothing)
 inferTargetDimension(t::Any, args...) =
     throw(error("Broadcasting function $t to QuantityArray not implemented by Alicorn. Defining appropriate method inferTargetDimension(::typeof($t), args...) may solve this issue."))
 
+# Unary plus and minus
+function inferTargetDimension(t::Union{typeof(+), typeof(-)}, valueAndDim::Tuple)
+    d = valueAndDim[2]
+    return inferTargetDimension(t, d)
+end
+inferTargetDimension(::typeof(+), d::Dimension) = d
+inferTargetDimension(::typeof(-), d::Dimension) = d
+
 # Addition
 function inferTargetDimension(::typeof(+), valueAndDim1::Tuple{Any, Dimension}, valueAndDim2::Tuple{Any, Dimension})
-    if valueAndDim1[2] == valueAndDim1[2]
+    if valueAndDim1[2] == valueAndDim2[2]
         return valueAndDim1[2]
     else
         newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")
@@ -262,7 +278,7 @@ end
 
 # Subtraction
 function inferTargetDimension(::typeof(-), valueAndDim1::Tuple{Any, Dimension}, valueAndDim2::Tuple{Any, Dimension})
-    if valueAndDim1[2] == valueAndDim1[2]
+    if valueAndDim1[2] == valueAndDim2[2]
         return valueAndDim1[2]
     else
         newException = Exceptions.DimensionMismatchError("summands are not of the same physical dimension")

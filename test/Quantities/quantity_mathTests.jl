@@ -943,11 +943,11 @@ function _getExamplesFor_QuantityArray_Array_multiplication()
 end
 
 function Array_QuantityArray_multiplication_implemented()
-    examples = _getExamplesFor_Array_Quantity_multiplication()
+    examples = _getExamplesFor_Array_QuantityArray_multiplication()
     return TestingTools.testDyadicFunction(Base.:*, examples)
 end
 
-function _getExamplesFor_Array_Quantity_multiplication()
+function _getExamplesFor_Array_QuantityArray_multiplication()
     # format: factor1, factor2, correct product factor1 * factor2
     examples = [
         ( ones(2,2), QuantityArray(ones(2,2), dimless, intu), QuantityArray(2*ones(2,2), dimless, intu) ),
