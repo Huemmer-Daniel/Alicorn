@@ -5,12 +5,74 @@ Base.broadcastable(q::AbstractQuantity) = q
 # define broadcast styles for SimpleQuantity types and Quantity types
 Base.BroadcastStyle(::Type{<:SimpleQuantityArray}) = Broadcast.ArrayStyle{SimpleQuantityArray}()
 Base.BroadcastStyle(::Type{<:QuantityArray}) = Broadcast.ArrayStyle{QuantityArray}()
-Base.BroadcastStyle(::Type{<:SimpleQuantity}) = Broadcast.DefaultArrayStyle{0}()
-Base.BroadcastStyle(::Type{<:Quantity}) = Broadcast.DefaultArrayStyle{0}()
+Base.BroadcastStyle(::Type{<:SimpleQuantity}) = Broadcast.Style{SimpleQuantity}()
+Base.BroadcastStyle(::Type{<:Quantity}) = Broadcast.Style{Quantity}()
+
+
 # give precedence to broadcast style of Quantity types over SimpleQuantity types
 # this means any broadcast involving a Quantity or QuantityArray will return a QuantityArray
+
+# 1. combining array styles
+# SimpleQuantityArray first
 Base.BroadcastStyle(s1::Broadcast.ArrayStyle{SimpleQuantityArray}, s2::Broadcast.ArrayStyle{QuantityArray}) = s2
+# SimpleQuantityArray with Number array implemented in Base: ArrayStyle{T} with DefaultArrayStyle{N} yields ArrayStyle{T}
+
+# QuantityArray first
 Base.BroadcastStyle(s1::Broadcast.ArrayStyle{QuantityArray}, s2::Broadcast.ArrayStyle{SimpleQuantityArray}) = s1
+# QuantityArray with Number array implemented in Base: ArrayStyle{T} with DefaultArrayStyle{N} yields ArrayStyle{T}
+
+
+# 2. combining scalar styles
+# SimpleQuantity first
+Base.BroadcastStyle(s1::Broadcast.Style{SimpleQuantity}, s2::Broadcast.Style{Quantity}) = s2
+Base.BroadcastStyle(s1::Broadcast.Style{SimpleQuantity}, s2::Broadcast.DefaultArrayStyle{0}) = s1
+
+# Quantity first
+Base.BroadcastStyle(s1::Broadcast.Style{Quantity}, s2::Broadcast.Style{SimpleQuantity}) = s1
+Base.BroadcastStyle(s1::Broadcast.Style{Quantity}, s2::Broadcast.DefaultArrayStyle{0}) = s1
+
+# Number first
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.Style{SimpleQuantity}) = s2
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.Style{Quantity}) = s2
+
+# 3. combining array with scalar styles
+# SimpleQuantityArray first
+Base.BroadcastStyle(s1::Broadcast.ArrayStyle{SimpleQuantityArray}, s2::Broadcast.Style{SimpleQuantity}) = s1
+Base.BroadcastStyle(s1::Broadcast.ArrayStyle{SimpleQuantityArray}, s2::Broadcast.Style{Quantity}) =
+    Broadcast.ArrayStyle{QuantityArray}()
+# SimpleQuantityArray with Number implemented in Base: ArrayStyle{T} with DefaultArrayStyle{0} yields ArrayStyle{T}
+
+# QuantityArray first
+Base.BroadcastStyle(s1::Broadcast.ArrayStyle{QuantityArray}, s2::Broadcast.Style{SimpleQuantity}) = s1
+Base.BroadcastStyle(s1::Broadcast.ArrayStyle{QuantityArray}, s2::Broadcast.Style{Quantity}) = s1
+# QuantityArray with Number implemented in Base: ArrayStyle{T} with DefaultArrayStyle{0} yields ArrayStyle{T}
+
+# Number array first
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{N}, s2::Broadcast.Style{SimpleQuantity}) where N =
+    Broadcast.ArrayStyle{SimpleQuantityArray}()
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{N}, s2::Broadcast.Style{Quantity}) where N =
+    Broadcast.ArrayStyle{QuantityArray}()
+# Number array with Number implemented in Base: DefaultArrayStyle{N} with DefaultArrayStyle{0} yields DefaultArrayStyle{N}
+
+# SimpleQuantity first
+Base.BroadcastStyle(s1::Broadcast.Style{SimpleQuantity}, s2::Broadcast.ArrayStyle{SimpleQuantityArray}) = s2
+Base.BroadcastStyle(s1::Broadcast.Style{SimpleQuantity}, s2::Broadcast.ArrayStyle{QuantityArray}) = s2
+Base.BroadcastStyle(s1::Broadcast.Style{SimpleQuantity}, s2::Broadcast.DefaultArrayStyle{N}) where N =
+    Broadcast.ArrayStyle{SimpleQuantityArray}()
+
+# Quantity first
+Base.BroadcastStyle(s1::Broadcast.Style{Quantity}, s2::Broadcast.ArrayStyle{SimpleQuantityArray}) =
+    Broadcast.ArrayStyle{QuantityArray}()
+Base.BroadcastStyle(s1::Broadcast.Style{Quantity}, s2::Broadcast.ArrayStyle{QuantityArray}) = s2
+Base.BroadcastStyle(s1::Broadcast.Style{Quantity}, s2::Broadcast.DefaultArrayStyle{N}) where N =
+    Broadcast.ArrayStyle{QuantityArray}()
+
+# Number first
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.Style{SimpleQuantity}) = s2
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.Style{Quantity}) = s2
+# Number with Number implemented by Base: DefaultArrayStyle{0} with DefaultArrayStyle{0} yields DefaultArrayStyle{0}
+
+
 
 ## SimpleQuantityArray: eager evaluation
 
@@ -21,6 +83,9 @@ Base.BroadcastStyle(s1::Broadcast.ArrayStyle{QuantityArray}, s2::Broadcast.Array
 # 1. if an argument is a Broadcasted already, materialize is to obtain a SimpleQuantityArray
 # 2. then check and match units and evaluate the final array immediately
 
+const SimpleQuantityBroadcasted =
+    Union{ Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}},Broadcast.Broadcasted{Broadcast.Style{SimpleQuantity}} }
+
 # Addition
 # twice SimpleQuantityArray or SimpleQuantity
 function Broadcast.broadcasted(::typeof(+), q1::SimpleQuantityType, q2::SimpleQuantityType)
@@ -29,12 +94,12 @@ function Broadcast.broadcasted(::typeof(+), q1::SimpleQuantityType, q2::SimpleQu
     return (q1.value .+ q2.value) * q1.unit
 end
 # SimpleQuantityArray or SimpleQuantity with Broadcasted
-Broadcast.broadcasted(::typeof(+), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, q2::SimpleQuantityType) =
+Broadcast.broadcasted(::typeof(+), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
     Broadcast.broadcasted(+, Broadcast.materialize(bc), q2)
-Broadcast.broadcasted(::typeof(+), q1::SimpleQuantityArray, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}) =
+Broadcast.broadcasted(::typeof(+), q1::SimpleQuantityArray, bc::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(+, q1, Broadcast.materialize(bc))
 # twice Broadcasted
-Broadcast.broadcasted(::typeof(+), bc1::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, bc2::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}) =
+Broadcast.broadcasted(::typeof(+), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(+, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
 
 # Subtraction
@@ -45,12 +110,12 @@ function Broadcast.broadcasted(::typeof(-), q1::SimpleQuantityType, q2::SimpleQu
     return (q1.value .- q2.value) * q1.unit
 end
 # SimpleQuantityArray or SimpleQuantity with Broadcasted
-Broadcast.broadcasted(::typeof(-), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, q2::SimpleQuantityArray) =
+Broadcast.broadcasted(::typeof(-), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityArray) =
     Broadcast.broadcasted(-, Broadcast.materialize(bc), q2)
-Broadcast.broadcasted(::typeof(-), q1::SimpleQuantityArray, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}) =
+Broadcast.broadcasted(::typeof(-), q1::SimpleQuantityArray, bc::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(-, q1, Broadcast.materialize(bc))
 # twice Broadcasted
-Broadcast.broadcasted(::typeof(-), bc1::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, bc2::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}) =
+Broadcast.broadcasted(::typeof(-), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(-, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
 
 # Numerical comparison
@@ -62,18 +127,18 @@ function Broadcast.broadcasted(::typeof(<), q1::SimpleQuantityType, q2::SimpleQu
     return isless.( q1.value, q2.value )
 end
 # SimpleQuantityArray or SimpleQuantity with Broadcasted
-Broadcast.broadcasted(::typeof(<), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, q2::SimpleQuantityType) =
+Broadcast.broadcasted(::typeof(<), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
     Broadcast.broadcasted(<, Broadcast.materialize(bc), q2)
-Broadcast.broadcasted(::typeof(<), q1::SimpleQuantityType, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}) =
+Broadcast.broadcasted(::typeof(<), q1::SimpleQuantityType, bc::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(<, q1, Broadcast.materialize(bc))
 # twice Broadcasted
-Broadcast.broadcasted(::typeof(<), bc1::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}, bc2::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}}) =
+Broadcast.broadcasted(::typeof(<), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(<, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
 # TODO: add more comparisons
 
 ## SimpleQuantityArray: no eager evaluation
 
-# if final array type is SimpleQuantityArray:
+# if final array type is SimpleQuantityArray or SimpleQuantity
 # we can assume that the units of all involved quantities are compatible and no unit conversions are requried, since
 # unit conversions would have been handled by eager evaluation via specialization of Broadcast.broadcasted while
 # constructing the Broadcasted in the first place
@@ -88,10 +153,21 @@ function Broadcast.materialize(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{Si
     return SimpleQuantityArray(bareValue, targetUnit)
 end
 
+function Broadcast.materialize(bc::Broadcast.Broadcasted{Broadcast.Style{SimpleQuantity}})
+    # infer which physical unit bc will evaluate to, and in the process construct a new Broadcasted that only
+    # contains the bare values of all quantitites (converted to Quantity or QuantityArray using the targetInternalUnits
+    # wherever appropriate)
+    (bareValue_bc, targetUnit) = _squeezeOutUnits(bc)
+    # evaluate the bare value Broadcasted using Julia default machinery
+    bareValue = Broadcast.materialize(bareValue_bc)
+    # construct the corresponding SimpleQuantityArray using the targetUnit we inferred earlier
+    return SimpleQuantity(bareValue, targetUnit)
+end
+
 # recursively separate unit from bare values in the Broadcasted object
 # returns the appropriate physical unit the Broadcasted object will evaluate to, and a new Broadcasted object
 # analogous to bc, but containing only the bare values instead of quantities
-function _squeezeOutUnits(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{SimpleQuantityArray}})
+function _squeezeOutUnits(bc::Broadcast.Broadcasted)
     bareValues = Array{Any}(undef, length(bc.args))
     valuesAndUnits = Array{Tuple}(undef, length(bc.args))
     # infer bare value and dimension of each argument in bc
@@ -167,6 +243,10 @@ inferTargetUnit(::typeof(cbrt), valueAndUnit::Tuple{Any, Unit}) = cbrt(valueAndU
 # 1. if an argument is a Broadcasted already, materialize is to obtain a QuantityArray
 # 2. then check dimensions and evaluate the final array immediately
 
+const QuantityBroadcasted =
+    Union{ Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}},Broadcast.Broadcasted{Broadcast.Style{Quantity}} }
+
+
 # Numerical comparison
 # <
 # twice QuantityArray or Quantity
@@ -176,17 +256,17 @@ function Broadcast.broadcasted(::typeof(<), q1::QuantityType, q2::QuantityType)
     return isless.( q1.value, q2.value )
 end
 # QuantityArray or Quantity with Broadcasted
-Broadcast.broadcasted(::typeof(<), bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}}, q2::QuantityType) =
+Broadcast.broadcasted(::typeof(<), bc::QuantityBroadcasted, q2::QuantityType) =
     Broadcast.broadcasted(<, Broadcast.materialize(bc), q2)
-Broadcast.broadcasted(::typeof(<), q1::QuantityType, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}}) =
+Broadcast.broadcasted(::typeof(<), q1::QuantityType, bc::QuantityBroadcasted) =
     Broadcast.broadcasted(<, q1, Broadcast.materialize(bc))
 # twice Broadcasted
-Broadcast.broadcasted(::typeof(<), bc1::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}}, bc2::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}}) =
+Broadcast.broadcasted(::typeof(<), bc1::QuantityBroadcasted, bc2::QuantityBroadcasted) =
     Broadcast.broadcasted(<, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
 
 ## QuantityArray: no eager evaluation
 
-# if final array type is QuantityArray:
+# if final array type is QuantityArray or Quantity
 # convert all quantities to Quantity or QuantityArray of uniform InternalUnits before evaluating the Broadcasted object
 function Broadcast.materialize(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}})
     # determine which InternalUnits to use
@@ -201,9 +281,22 @@ function Broadcast.materialize(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{Qu
     return QuantityArray(bareValue, targetDimension, targetInternalUnits)
 end
 
+function Broadcast.materialize(bc::Broadcast.Broadcasted{Broadcast.Style{Quantity}})
+    # determine which InternalUnits to use
+    targetInternalUnits = _findFirstInternalUnits(bc)
+    # infer which physical dimension bc will evaluate to, and in the process construct a new Broadcasted that only
+    # contains the bare values of all quantitites (converted to Quantity or QuantityArray using the targetInternalUnits
+    # wherever appropriate)
+    (bareValue_bc, targetDimension) = _squeezeOutDims(bc, targetInternalUnits)
+    # evaluate the bare value Broadcasted using Julia default machinery
+    bareValue = Broadcast.materialize(bareValue_bc)
+    # construct the corresponding QuantityArray using the targetDimension and targetInternalUnits we inferred earlier
+    return Quantity(bareValue, targetDimension, targetInternalUnits)
+end
+
 # recursively iterate through arguments of bc and return the InternalUnit of the first Quantity or QuantityArray
 # encountered; the Broadcasted is of type ArrayStyle{QuantityArray}, so there has to be at least one
-function _findFirstInternalUnits(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}})
+function _findFirstInternalUnits(bc::QuantityBroadcasted)
     intU = Nothing
     for arg in bc.args
         intU = _findFirstInternalUnits(arg)
@@ -222,7 +315,7 @@ _findFirstInternalUnits(::Any) = Nothing
 # returns the appropriate physical dimension the Broadcasted object will evaluate to, and a new Broadcasted object
 # analogous to bc, but containing only the bare values instead of quantities
 # in the process, all quantitites are converted to Quantity or QuantityArray using the targetInternalUnits
-function _squeezeOutDims(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}}, targetInternalUnits::InternalUnits)
+function _squeezeOutDims(bc::Broadcast.Broadcasted, targetInternalUnits::InternalUnits)
     bareValues = Array{Any}(undef, length(bc.args))
     valuesAndDims = Array{Tuple}(undef, length(bc.args))
     # infer bare value and dimension of each argument in bc
@@ -256,7 +349,7 @@ _squeezeOutDims(x::Any, ::InternalUnits) = (x, Nothing)
 # infer target dimension and check compatibility of dimensions if required
 # fallback for functions without implementation for broadcasting
 inferTargetDimension(t::Any, args...) =
-    throw(error("Broadcasting function $t to QuantityArray not implemented by Alicorn. Defining appropriate method inferTargetDimension(::typeof($t), args...) may solve this issue."))
+    throw(error("Broadcasting function $t to Quantity or QuantityArray not implemented by Alicorn. Defining appropriate method inferTargetDimension(::typeof($t), args...) may solve this issue."))
 
 # Unary plus and minus
 function inferTargetDimension(t::Union{typeof(+), typeof(-)}, valueAndDim::Tuple)

@@ -36,7 +36,7 @@ include("quantity_arrayBasics.jl")
 include("quantity_unit_arithmetics.jl")
 include("quantity_math.jl")
 include("quantity_arrayMath.jl")
-include("quantity_broadcasting.jl") # TODO needs testing and completion
+include("quantity_broadcasting.jl")
 
 const defaultInternalUnits = InternalUnits()
 const dimensionless = Dimension()

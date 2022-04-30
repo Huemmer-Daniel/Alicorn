@@ -307,11 +307,9 @@ Base.:inv(q::QuantityType) = _createQuantityType( inv(q.value), inv(q.dimension)
     Base.:(==)(q1::SimpleQuantity, q2::SimpleQuantity)
     Base.:(==)(q1::SimpleQuantityArray, q2::SimpleQuantityArray)
 
-Returns `true` if `q1` and `q2` are of equal dimension and value.
+Returns `true` if `q1` and `q2` are of equal value and unit.
 
-If necessary, `q2` is expressed in units of `q1.unit`
-before the comparison. Note that the conversion oftens lead to rounding errors
-that render `q1` not equal `q2`.
+Note that the units are not converted during the comparison.
 
 # Examples
 ```jldoctest
@@ -327,16 +325,13 @@ julia> q1 == q1
 true
 
 julia> q1 == q2
-true
+false
 ```
 """
 function Base.:(==)(q1::SimpleQuantityType, q2::SimpleQuantityType)
-    if dimensionOf(q1) != dimensionOf(q2)
-        return false
-    else
-        q2 = inUnitsOf(q2, q1.unit)
-        return q1.value == q2.value
-    end
+    equalValue = q1.value == q2.value
+    equalUnit =  q1.unit == q2.unit
+    return equalValue && equalUnit
 end
 
 """

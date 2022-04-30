@@ -780,9 +780,9 @@ function _getExamplesFor_SimpleQuantity_SimpleQuantityArray_multiplication()
         ( 1 * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit, ones(2,2) * Alicorn.unitlessUnit ),
         ( 2 * ucat.second, [1 1] * Alicorn.unitlessUnit, [2 2] * ucat.second ),
         ( 1 * Alicorn.unitlessUnit, [2, 2] * ucat.second, [2, 2] * ucat.second ),
-        ( 2 * ucat.second, [2.5 3.5] * ucat.meter, [5 7] * ucat.meter * ucat.second ),
-        ( 2.5 * ucat.meter, [2] * ucat.second, [5.0] * ucat.second * ucat.meter ),
-        ( 2.5 * (ucat.pico * ucat.second), [-7; 1] * ucat.lumen * (ucat.nano * ucat.second), [-17.5 ; 2.5 ] * ucat.lumen * (ucat.nano * ucat.second) * (ucat.pico * ucat.second) ),
+        ( 2 * ucat.second, [2.5 3.5] * ucat.meter, [5 7] * ucat.second * ucat.meter ),
+        ( 2.5 * ucat.meter, [2] * ucat.second, [5.0] * ucat.meter * ucat.second ),
+        ( 2.5 * (ucat.pico * ucat.second), [-7; 1] * ucat.lumen * (ucat.nano * ucat.second), [-17.5 ; 2.5 ] * (ucat.pico * ucat.second) * ucat.lumen * (ucat.nano * ucat.second) ),
         ( 4 * (ucat.milli * ucat.candela)^2, [2 2] * (ucat.milli * ucat.candela)^-4, [8 8] * (ucat.milli * ucat.candela)^-2 )
     ]
     return examples
@@ -1873,7 +1873,7 @@ function _getExamplesFor_SimpleQuantity_equality()
     # format: quantity1, quantity2, correct result for quantity1 == quantity2
     examples = [
         ( q1, q1Copy, true ),
-        ( q1, q2, true ),
+        ( q1, q2, false ),
         ( q1, q3, false ),
         ( q1, q4, false ),
         ( q1, q5, false )
@@ -1901,7 +1901,7 @@ function _getExamplesFor_SimpleQuantityArray_equality()
     # format: sqArray1::SimpleQuantityArray, sqArray2::SimpleQuantityArray, correct result for sqArray1 == sqArray2
     examples = [
         ( sqArray1, sqArray1Copy, true ),
-        ( sqArray1, sqArray2, true ),
+        ( sqArray1, sqArray2, false ),
         ( sqArray5, sqArray3, false ),
         ( sqArray5, sqArray4, false ),
         ( sqArray1, sqArray6, false )
