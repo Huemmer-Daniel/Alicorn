@@ -359,15 +359,14 @@ end
 
 Returns `true` if `q1` is of lesser value than `q2`.
 
-If necessary, `q2` is expressed in units of `q1.unit`
-before the comparison. Note that the conversion often leads to rounding errors.
+Note that units are not converted during the comparison.
 
 # Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
-`q2` are not of the same dimension
+- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and
+`q2` are not of the same unit
 """
 function Base.isless(q1::SimpleQuantity, q2::SimpleQuantity)
-    _assertComparedWithSameDimension(q1, q2)
+    _assertComparedWithSameUnit(q1, q2)
     q2 = inUnitsOf(q2, q1.unit)
     return isless( q1.value, q2.value )
 end
@@ -377,26 +376,36 @@ end
 
 Returns `true` if `q1` is of lesser value than `q2`.
 
-If necessary, `q2` is expressed in internal units of `q1.internalUnits`
-before the comparison. Note that the conversion often leads to rounding errors.
+Note that internal units are not converted during the comparison.
 
 # Raises Exceptions
 - `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
 `q2` are not of the same dimension
+- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and
+`q2` are not using the same internal units
 """
 function Base.isless(q1::Quantity, q2::Quantity)
-    _assertComparedWithSameDimension(q1, q2)
+    _assertComparedWithSameIntUandDimension(q1, q2)
     q2 = inInternalUnitsOf(q2, q1.internalUnits)
     return isless( q1.value, q2.value )
 end
 
-function _assertComparedWithSameDimension(q1::AbstractQuantityType, q2::AbstractQuantityType)
-    if dimensionOf(q1) != dimensionOf(q2)
-        newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+function _assertComparedWithSameUnit(q1::SimpleQuantityType, q2::SimpleQuantityType)
+    if q1.unit != q2.unit
+        newException = Exceptions.UnitMismatchError("compared quantities are not of the same physical unit")
         throw(newException)
     end
 end
-
+function _assertComparedWithSameIntUandDimension(q1::QuantityType, q2::QuantityType)
+    if (q1.dimension != q2.dimension)
+        newException = Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+        throw(newException)
+    end
+    if (q1.internalUnits != q2.internalUnits)
+        newException = Exceptions.UnitMismatchError("compared quantities are not using the same internal units")
+        throw(newException)
+    end
+end
 
 # isfinite
 Base.isfinite(q::AbstractQuantity) = isfinite(q.value)
@@ -416,18 +425,11 @@ Base.isnan(q::AbstractQuantity) = isnan(q.value)
 
 Returns `isapprox(q1.value, q2.value, rtol=rtol)`.
 
-If necessary, `q2` is expressed in units of `q1.unit`
-before the comparison. Note that the conversion often leads to rounding errors.
-
-Returns `false` if the two quantities are not of equal physical dimension.
+Note that units are not converted during the comparison. Returns `false` if the two quantities are not of equal physical dimension.
 """
 function Base.isapprox(q1::SimpleQuantityType, q2::SimpleQuantityType; rtol::Real = sqrt(eps()))
-    if dimensionOf(q1) != dimensionOf(q2)
-        return false
-    else
-        q2 = inUnitsOf(q2, q1.unit)
-        return isapprox(q1.value, q2.value, rtol=rtol)
-    end
+    _assertComparedWithSameUnit(q1, q2)
+    return isapprox(q1.value, q2.value, rtol=rtol)
 end
 
 """
@@ -436,18 +438,17 @@ end
 
 Returns `isapprox(q1.value, q2.value, rtol=rtol)`.
 
-If necessary, `q2` is expressed in internal units of `q1.internalUnits`
-before the comparison. Note that the conversion often leads to rounding errors.
+Note that internal units are not converted during the comparison.
 
-Returns `false` if the two quantities are not of equal physical dimension.
+# Raises Exceptions
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
+`q2` are not of the same dimension
+- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and
+`q2` are not using the same internal units
 """
 function Base.isapprox(q1::QuantityType, q2::QuantityType; rtol::Real = sqrt(eps()))
-    if dimensionOf(q1) != dimensionOf(q2)
-        return false
-    else
-        q2 = inInternalUnitsOf(q2, q1.internalUnits)
-        return isapprox(q1.value, q2.value, rtol=rtol)
-    end
+    _assertComparedWithSameIntUandDimension(q1, q2)
+    return isapprox(q1.value, q2.value, rtol=rtol)
 end
 
 

@@ -68,8 +68,8 @@ Base.BroadcastStyle(s1::Broadcast.Style{Quantity}, s2::Broadcast.DefaultArraySty
     Broadcast.ArrayStyle{QuantityArray}()
 
 # Number first
-Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.Style{SimpleQuantity}) = s2
-Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.Style{Quantity}) = s2
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.ArrayStyle{SimpleQuantityArray}) = s2
+Base.BroadcastStyle(s1::Broadcast.DefaultArrayStyle{0}, s2::Broadcast.ArrayStyle{QuantityArray}) = s2
 # Number with Number implemented by Base: DefaultArrayStyle{0} with DefaultArrayStyle{0} yields DefaultArrayStyle{0}
 
 
@@ -118,13 +118,26 @@ Broadcast.broadcasted(::typeof(-), q1::SimpleQuantityArray, bc::SimpleQuantityBr
 Broadcast.broadcasted(::typeof(-), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(-, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
 
-# Numerical comparison
+# ==
+# twice SimpleQuantityArray or SimpleQuantity
+function Broadcast.broadcasted(::typeof(==), q1::SimpleQuantityType, q2::SimpleQuantityType)
+    unitEqual = q1.unit == q2.unit
+    return unitEqual .&& (q1.value .== q2.value)
+end
+# SimpleQuantityArray or SimpleQuantity with Broadcasted
+Broadcast.broadcasted(::typeof(==), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
+    Broadcast.broadcasted(==, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(==), q1::SimpleQuantityType, bc::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(==, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(==), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(==, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
 # <
 # twice SimpleQuantityArray or SimpleQuantity
 function Broadcast.broadcasted(::typeof(<), q1::SimpleQuantityType, q2::SimpleQuantityType)
-    _assertComparedWithSameDimension(q1, q2)
-    q2 = inUnitsOf(q2, q1.unit)
-    return isless.( q1.value, q2.value )
+    _assertComparedWithSameUnit(q1, q2)
+    return q1.value .< q2.value
 end
 # SimpleQuantityArray or SimpleQuantity with Broadcasted
 Broadcast.broadcasted(::typeof(<), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
@@ -134,7 +147,69 @@ Broadcast.broadcasted(::typeof(<), q1::SimpleQuantityType, bc::SimpleQuantityBro
 # twice Broadcasted
 Broadcast.broadcasted(::typeof(<), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
     Broadcast.broadcasted(<, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
-# TODO: add more comparisons
+
+# <=
+# twice SimpleQuantityArray or SimpleQuantity
+function Broadcast.broadcasted(::typeof(<=), q1::SimpleQuantityType, q2::SimpleQuantityType)
+    _assertComparedWithSameUnit(q1, q2)
+    return q1.value .<= q2.value
+end
+# SimpleQuantityArray or SimpleQuantity with Broadcasted
+Broadcast.broadcasted(::typeof(<=), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
+    Broadcast.broadcasted(<=, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(<=), q1::SimpleQuantityType, bc::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(<=, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(<=), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(<=, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# >
+# twice SimpleQuantityArray or SimpleQuantity
+function Broadcast.broadcasted(::typeof(>), q1::SimpleQuantityType, q2::SimpleQuantityType)
+    _assertComparedWithSameUnit(q1, q2)
+    return q1.value .> q2.value
+end
+# SimpleQuantityArray or SimpleQuantity with Broadcasted
+Broadcast.broadcasted(::typeof(>), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
+    Broadcast.broadcasted(>, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(>), q1::SimpleQuantityType, bc::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(>, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(>), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(>, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# >=
+# twice SimpleQuantityArray or SimpleQuantity
+function Broadcast.broadcasted(::typeof(>=), q1::SimpleQuantityType, q2::SimpleQuantityType)
+    _assertComparedWithSameUnit(q1, q2)
+    return q1.value .>= q2.value
+end
+# SimpleQuantityArray or SimpleQuantity with Broadcasted
+Broadcast.broadcasted(::typeof(>=), bc::SimpleQuantityBroadcasted, q2::SimpleQuantityType) =
+    Broadcast.broadcasted(>=, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(>=), q1::SimpleQuantityType, bc::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(>=, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(>=), bc1::SimpleQuantityBroadcasted, bc2::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(>=, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# sign
+# SimpleQuantityArray or SimpleQuantity
+function Broadcast.broadcasted(::typeof(sign), q::SimpleQuantityType)
+    return sign.( q.value )
+end
+# Broadcasted
+Broadcast.broadcasted(::typeof(sign), bc::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(sign, Broadcast.materialize(bc))
+
+# angle
+# SimpleQuantityArray or SimpleQuantity
+function Broadcast.broadcasted(::typeof(angle), q::SimpleQuantityType)
+    return angle.( q.value )
+end
+# Broadcasted
+Broadcast.broadcasted(::typeof(angle), bc::SimpleQuantityBroadcasted) =
+    Broadcast.broadcasted(angle, Broadcast.materialize(bc))
 
 ## SimpleQuantityArray: no eager evaluation
 
@@ -193,7 +268,7 @@ _squeezeOutUnits(x::Any) = (x, Nothing)
 # by specializing Broadcasted.broadcasted in order to be able to convert and match units
 # fallback for functions without implementation for broadcasting
 inferTargetUnit(t::Any, args...) =
-    throw(error("Broadcasting function $t to SimpleQuantityArray not implemented by Alicorn. Defining appropriate method inferTargetUnit(::typeof($t), args...) may solve this issue."))
+    throw(error("Broadcasting function $t to SimpleQuantity or SimpleQuantityArray not implemented by Alicorn. Defining appropriate method inferTargetUnit(::typeof($t), args...) may solve this issue."))
 
 # unary plus and minus
 function inferTargetUnit(t::Union{typeof(+), typeof(-)}, valueAndUnit::Tuple)
@@ -226,13 +301,14 @@ inferTargetUnit(::typeof(^), valueAndUnit::Tuple{Any, Unit}, exponent::Tuple{Any
 # for integer exponents
 inferTargetUnit(::typeof(Base.literal_pow), f::Tuple{Base.RefValue{typeof(^)}, DataType}, valueAndUnit::Tuple{<:Any, Unit}, exp::Tuple{Base.RefValue{Val{exponent}}, DataType}) where exponent = (valueAndUnit[2])^exponent
 
-# TODO random collection below
+inferTargetUnit(::typeof(inv), valueAndUnit::Tuple{Any, Unit}) = inv(valueAndUnit[2])
 inferTargetUnit(::typeof(abs), valueAndUnit::Tuple{Any, Unit}) = valueAndUnit[2]
-inferTargetUnit(::typeof(angle), valueAndUnit::Tuple{Any, Unit}) = unitlessUnit
-inferTargetUnit(::typeof(real), valueAndUnit::Tuple{Any, Unit}) = valueAndUnit[2]
-inferTargetUnit(::typeof(imag), valueAndUnit::Tuple{Any, Unit}) = valueAndUnit[2]
+inferTargetUnit(::typeof(abs2), valueAndUnit::Tuple{Any, Unit}) = (valueAndUnit[2])^2
 inferTargetUnit(::typeof(sqrt), valueAndUnit::Tuple{Any, Unit}) = sqrt(valueAndUnit[2])
 inferTargetUnit(::typeof(cbrt), valueAndUnit::Tuple{Any, Unit}) = cbrt(valueAndUnit[2])
+inferTargetUnit(::typeof(real), valueAndUnit::Tuple{Any, Unit}) = valueAndUnit[2]
+inferTargetUnit(::typeof(imag), valueAndUnit::Tuple{Any, Unit}) = valueAndUnit[2]
+inferTargetUnit(::typeof(conj), valueAndUnit::Tuple{Any, Unit}) = valueAndUnit[2]
 
 
 ## QuantityArray: eager evaluation
@@ -246,14 +322,26 @@ inferTargetUnit(::typeof(cbrt), valueAndUnit::Tuple{Any, Unit}) = cbrt(valueAndU
 const QuantityBroadcasted =
     Union{ Broadcast.Broadcasted{Broadcast.ArrayStyle{QuantityArray}},Broadcast.Broadcasted{Broadcast.Style{Quantity}} }
 
+# ==
+# twice QuantityArray or Quantity
+function Broadcast.broadcasted(::typeof(==), q1::QuantityType, q2::QuantityType)
+    unitAndDimEqual = (q1.dimension == q2.dimension) && (q1.internalUnits == q2.internalUnits)
+    return unitAndDimEqual .&& (q1.value .== q2.value)
+end
+# QuantityArray or Quantity with Broadcasted
+Broadcast.broadcasted(::typeof(==), bc::QuantityBroadcasted, q2::QuantityType) =
+    Broadcast.broadcasted(==, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(==), q1::QuantityType, bc::QuantityBroadcasted) =
+    Broadcast.broadcasted(==, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(==), bc1::QuantityBroadcasted, bc2::QuantityBroadcasted) =
+    Broadcast.broadcasted(==, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
 
-# Numerical comparison
 # <
 # twice QuantityArray or Quantity
 function Broadcast.broadcasted(::typeof(<), q1::QuantityType, q2::QuantityType)
-    _assertComparedWithSameDimension(q1, q2)
-    q2 = inInternalUnitsOf(q2, q1.internalUnits)
-    return isless.( q1.value, q2.value )
+    _assertComparedWithSameIntUandDimension(q1, q2)
+    return q1.value .< q2.value
 end
 # QuantityArray or Quantity with Broadcasted
 Broadcast.broadcasted(::typeof(<), bc::QuantityBroadcasted, q2::QuantityType) =
@@ -263,6 +351,69 @@ Broadcast.broadcasted(::typeof(<), q1::QuantityType, bc::QuantityBroadcasted) =
 # twice Broadcasted
 Broadcast.broadcasted(::typeof(<), bc1::QuantityBroadcasted, bc2::QuantityBroadcasted) =
     Broadcast.broadcasted(<, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# <=
+# twice QuantityArray or Quantity
+function Broadcast.broadcasted(::typeof(<=), q1::QuantityType, q2::QuantityType)
+    _assertComparedWithSameIntUandDimension(q1, q2)
+    return q1.value .<= q2.value
+end
+# QuantityArray or Quantity with Broadcasted
+Broadcast.broadcasted(::typeof(<=), bc::QuantityBroadcasted, q2::QuantityType) =
+    Broadcast.broadcasted(<=, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(<=), q1::QuantityType, bc::QuantityBroadcasted) =
+    Broadcast.broadcasted(<=, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(<=), bc1::QuantityBroadcasted, bc2::QuantityBroadcasted) =
+    Broadcast.broadcasted(<=, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# >
+# twice QuantityArray or Quantity
+function Broadcast.broadcasted(::typeof(>), q1::QuantityType, q2::QuantityType)
+    _assertComparedWithSameIntUandDimension(q1, q2)
+    return q1.value .> q2.value
+end
+# QuantityArray or Quantity with Broadcasted
+Broadcast.broadcasted(::typeof(>), bc::QuantityBroadcasted, q2::QuantityType) =
+    Broadcast.broadcasted(>, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(>), q1::QuantityType, bc::QuantityBroadcasted) =
+    Broadcast.broadcasted(>, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(>), bc1::QuantityBroadcasted, bc2::QuantityBroadcasted) =
+    Broadcast.broadcasted(>, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# >=
+# twice QuantityArray or Quantity
+function Broadcast.broadcasted(::typeof(>=), q1::QuantityType, q2::QuantityType)
+    _assertComparedWithSameIntUandDimension(q1, q2)
+    return q1.value .>= q2.value
+end
+# QuantityArray or Quantity with Broadcasted
+Broadcast.broadcasted(::typeof(>=), bc::QuantityBroadcasted, q2::QuantityType) =
+    Broadcast.broadcasted(>=, Broadcast.materialize(bc), q2)
+Broadcast.broadcasted(::typeof(>=), q1::QuantityType, bc::QuantityBroadcasted) =
+    Broadcast.broadcasted(>=, q1, Broadcast.materialize(bc))
+# twice Broadcasted
+Broadcast.broadcasted(::typeof(>=), bc1::QuantityBroadcasted, bc2::QuantityBroadcasted) =
+    Broadcast.broadcasted(>=, Broadcast.materialize(bc1), Broadcast.materialize(bc2))
+
+# sign
+# QuantityArray or Quantity
+function Broadcast.broadcasted(::typeof(sign), q::QuantityType)
+    return sign.( q.value )
+end
+# Broadcasted
+Broadcast.broadcasted(::typeof(sign), bc::QuantityBroadcasted) =
+    Broadcast.broadcasted(sign, Broadcast.materialize(bc))
+
+# angle
+# QuantityArray or Quantity
+function Broadcast.broadcasted(::typeof(angle), q::QuantityType)
+    return angle.( q.value )
+end
+# Broadcasted
+Broadcast.broadcasted(::typeof(angle), bc::QuantityBroadcasted) =
+    Broadcast.broadcasted(angle, Broadcast.materialize(bc))
 
 ## QuantityArray: no eager evaluation
 
@@ -404,9 +555,11 @@ inferTargetDimension(::typeof(^), valueAndDim::Tuple{Any, Dimension}, exponent::
 # for integer exponents
 inferTargetDimension(::typeof(Base.literal_pow), f::Tuple{Base.RefValue{typeof(^)}, DataType}, valueAndDim::Tuple{<:Any, Dimension}, exp::Tuple{Base.RefValue{Val{exponent}}, DataType}) where exponent = (valueAndDim[2])^exponent
 
-# TODO random collection below
+inferTargetDimension(::typeof(inv), valueAndDim::Tuple{Any, Dimension}) = inv(valueAndDim[2])
 inferTargetDimension(::typeof(abs), valueAndDim::Tuple{Any, Dimension}) = valueAndDim[2]
-inferTargetDimension(::typeof(real), valueAndDim::Tuple{Any, Dimension}) = valueAndDim[2]
-inferTargetDimension(::typeof(imag), valueAndDim::Tuple{Any, Dimension}) = valueAndDim[2]
+inferTargetDimension(::typeof(abs2), valueAndDim::Tuple{Any, Dimension}) = (valueAndDim[2])^2
 inferTargetDimension(::typeof(sqrt), valueAndDim::Tuple{Any, Dimension}) = sqrt(valueAndDim[2])
 inferTargetDimension(::typeof(cbrt), valueAndDim::Tuple{Any, Dimension}) = cbrt(valueAndDim[2])
+inferTargetDimension(::typeof(real), valueAndDim::Tuple{Any, Dimension}) = valueAndDim[2]
+inferTargetDimension(::typeof(imag), valueAndDim::Tuple{Any, Dimension}) = valueAndDim[2]
+inferTargetDimension(::typeof(conj), valueAndDim::Tuple{Any, Dimension}) = valueAndDim[2]

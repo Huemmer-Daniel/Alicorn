@@ -155,7 +155,7 @@ function run()
 
         # Less
         @test SimpleQuantity_isless_implemented()
-        test_SimpleQuantity_isless_ErrorsForMismatchedDimensions()
+        test_SimpleQuantity_isless_ErrorsForMismatchedUnits()
         @test Quantity_isless_implemented()
         test_Quantity_isless_ErrorsForMismatchedDimensions()
 
@@ -1719,6 +1719,7 @@ function _getExamplesFor_SimpleQuantity_QuantityArray_division()
     return examples
 end
 
+
 ## exponentiation
 
 function SimpleQuantity_exponentiation_implemented()
@@ -1972,21 +1973,19 @@ function _getExamplesFor_SimpleQuantity_isless()
     q1 = SimpleQuantity(value, baseUnit)
     q2 = SimpleQuantity(-value, baseUnit)
     q3 = SimpleQuantity(2*value, baseUnit)
-    q4 = SimpleQuantity(value, ucat.deci * baseUnit)
 
     # format: quantity1, quantity2, correct result for isless(quantity1, quantity2)
     examples = [
         ( q1, q2, false ),
         ( q2, q1, true ),
-        ( q1, q3, true ),
-        ( q1, q4, false )
+        ( q1, q3, true )
     ]
     return examples
 end
 
-function test_SimpleQuantity_isless_ErrorsForMismatchedDimensions()
+function test_SimpleQuantity_isless_ErrorsForMismatchedUnits()
     (mismatchedSQ1, mismatchedSQ2) = _generateDimensionMismatchedQuantities_forSimpleQuantity()
-    expectedError = Alicorn.Exceptions.DimensionMismatchError("compared quantities are not of the same physical dimension")
+    expectedError = Alicorn.Exceptions.UnitMismatchError("compared quantities are not of the same physical unit")
     @test_throws expectedError isless(mismatchedSQ1, mismatchedSQ2)
 end
 
@@ -2001,14 +2000,12 @@ function _getExamplesFor_Quantity_isless()
     q1 = Quantity(value, lengthDim, intu)
     q2 = Quantity(-value, lengthDim, intu)
     q3 = Quantity(2*value, lengthDim, intu)
-    q4 = Quantity(value, lengthDim, intu2)
 
     # format: quantity1, quantity2, correct result for isless(quantity1, quantity2)
     examples = [
         ( q1, q2, false ),
         ( q2, q1, true ),
-        ( q1, q3, true ),
-        ( q1, q4, true )
+        ( q1, q3, true )
     ]
     return examples
 end
@@ -2173,8 +2170,8 @@ end
 
 function _getExamplesFor_SimpleQuantity_isapprox()
     examples = [
-        ( 7 * ucat.meter, 71 * (ucat.deci * ucat.meter), 0.01, false ),
-        ( 7 * ucat.meter, 71 * (ucat.deci * ucat.meter), 0.015, true )
+        ( 7 * ucat.meter, 7.1 * ucat.meter, 0.01, false ),
+        ( 7 * ucat.meter, 7.1 * ucat.meter, 0.015, true )
     ]
     return examples
 end
@@ -2194,8 +2191,8 @@ end
 
 function _getExamplesFor_SimpleQuantityArray_isapprox()
     examples = [
-        ( [7, 2] * ucat.meter, [71, 21] * (ucat.deci * ucat.meter), 0.01, false ),
-        ( [7, 2] * ucat.meter, [71, 21] * (ucat.deci * ucat.meter), 0.02, true )
+        ( [7, 2] * ucat.meter, [7.1, 2.1] * ucat.meter, 0.01, false ),
+        ( [7, 2] * ucat.meter, [7.1, 2.1] * ucat.meter, 0.02, true )
     ]
     return examples
 end
@@ -2208,7 +2205,7 @@ end
 function _getExamplesFor_Quantity_isapprox()
     examples = [
         ( Quantity(7, lengthDim, intu), Quantity(7.1, lengthDim, intu), 0.01, false ),
-        ( Quantity(7, lengthDim, intu), Quantity(3.55, lengthDim, intu2), 0.015, true )
+        ( Quantity(7, lengthDim, intu), Quantity(7.1, lengthDim, intu), 0.02, true )
     ]
     return examples
 end
@@ -2221,7 +2218,7 @@ end
 function _getExamplesFor_QuantityArray_isapprox()
     examples = [
         ( QuantityArray([7, 2], lengthDim, intu), QuantityArray([7.1, 2.1], lengthDim, intu), 0.01, false ),
-        ( QuantityArray([7, 2], lengthDim, intu), QuantityArray([3.55, 1], lengthDim, intu2), 0.015, true )
+        ( QuantityArray([7, 2], lengthDim, intu), QuantityArray([7.1, 2.1], lengthDim, intu), 0.02, true )
     ]
     return examples
 end
