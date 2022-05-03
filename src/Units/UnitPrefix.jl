@@ -1,6 +1,5 @@
 using ..Utils
 
-export UnitPrefix
 """
     UnitPrefix  <: AbstractUnitElement
 
@@ -41,8 +40,6 @@ struct UnitPrefix <: AbstractUnitElement
 end
 
 ## Constants of type UnitPrefix
-
-export emptyUnitPrefix
 """
 Constant of type `UnitPrefix` that indicates the absence of a unit prefix.
 
@@ -50,7 +47,6 @@ The prefix `emptyUnitPrefix` is used to construct [`UnitFactor`](@ref) objects w
 """
 const emptyUnitPrefix = UnitPrefix(name="empty", symbol="<empty>", value=1)
 
-export kilo
 """
 Constant of type `UnitPrefix` that represents the SI prefix "kilo".
 

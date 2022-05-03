@@ -56,3 +56,7 @@ julia> force = mass * acceleration
 julia> inUnitsOf(force, ucat.kilo * ucat.newton)
 0.02 kN
 ```
+
+## Alternative
+
+If you are interested in Alicorn, also have a look at the mature [`Unitful.jl`](https://github.com/PainterQubits/Unitful.jl) package. `Unitful.jl` offers functionalities similar to `Alicorn.jl`, and more.

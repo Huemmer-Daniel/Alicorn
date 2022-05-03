@@ -49,10 +49,31 @@ end
 
 function generateRandomNonzeroReal(; dim = 1)
     randomReal = 0
-    while randomReal == 0
-        randomReal = generateRandomReal()
+    while prod(randomReal) == 0
+        randomReal = generateRandomReal(dim=dim)
     end
     return randomReal
+end
+
+function generateRandomPositive()
+    randomPositive = 0
+    while randomPositive <= 0
+        randomPositive = generateRandomReal()
+    end
+    return randomPositive
+end
+function generateRandomComplex(; dim = 1)
+    realPart = generateRandomReal(dim = dim)
+    imagPart = generateRandomReal(dim = dim)
+    return realPart + im .* imagPart
+end
+
+function generateRandomNonzeroComplex(; dim = 1)
+    randomComplex = 0
+    while prod(randomComplex) == 0
+        randomComplex = generateRandomComplex(dim=dim)
+    end
+    return randomComplex
 end
 
 function generateRandomExponent(; dim = 1)
@@ -142,7 +163,15 @@ function testMonadicFunction(func, examples::Array)
     correct = true
     for (input, correctOutput) in examples
         returnedOutput = func(input)
-        correct &= (returnedOutput == correctOutput)
+        exampleCorrect = (returnedOutput == correctOutput)
+        if ~exampleCorrect
+            println("Test of monadic function failed:")
+            @show func
+            @show input
+            @show correctOutput
+            @show returnedOutput
+        end
+        correct &= exampleCorrect
     end
     return correct
 end
@@ -151,6 +180,33 @@ function testDyadicFunction(func, examples::Array)
     correct = true
     for (input1, input2, correctOutput) in examples
         returnedOutput = func(input1, input2)
+        exampleCorrect = (returnedOutput == correctOutput)
+        if ~exampleCorrect
+            println("Test of dyadic function failed:")
+            @show func
+            @show input1
+            @show input2
+            @show correctOutput
+            @show returnedOutput
+        end
+        correct &= exampleCorrect
+    end
+    return correct
+end
+
+function testDyadicFunction_Splat2ndArgs(func, examples::Array)
+    correct = true
+    for (input1, input2, correctOutput) in examples
+        returnedOutput = func(input1, input2...)
+        correct &= (returnedOutput == correctOutput)
+    end
+    return correct
+end
+
+function testTriadicFunction(func, examples::Array)
+    correct = true
+    for (input1, input2, input3, correctOutput) in examples
+        returnedOutput = func(input1, input2, input3)
         correct &= (returnedOutput == correctOutput)
     end
     return correct
@@ -273,7 +329,6 @@ end
 function generateRandomSimpleQuantityWithFields()
     randomValue = generateRandomReal()
     randomUnit = generateRandomUnit()
-
     randomFields = Dict{String,Any}()
     randomFields["value"] = randomValue
     randomFields["unit"] = randomUnit
@@ -281,6 +336,136 @@ function generateRandomSimpleQuantityWithFields()
     randomSimpleQuantity = SimpleQuantity(randomValue, randomUnit)
 
     return (randomSimpleQuantity, randomFields)
+end
+
+function generateRandomSimpleQuantityArray()
+    (randomSimpleQuantityArray,) = generateRandomSimpleQuantityArrayWithFields()
+    return randomSimpleQuantityArray
+end
+
+function generateRandomSimpleQuantityArrayWithFields()
+    randomValue = generateRandomReal(dim=(3,3))
+    randomUnit = generateRandomUnit()
+
+    randomFields = Dict{String,Any}()
+    randomFields["value"] = randomValue
+    randomFields["unit"] = randomUnit
+
+    randomSimpleQuantityArray = SimpleQuantityArray(randomValue, randomUnit)
+    return (randomSimpleQuantityArray, randomFields)
+end
+
+function generateRandomInternalUnits()
+    (randomInternalUnits,) = generateRandomInternalUnitsWithFields()
+    return randomInternalUnits
+end
+
+function generateRandomInternalUnitsWithFields()
+    ucat = UnitCatalogue()
+    randomMassUnit = generateRandomPositive() * (ucat.nano * ucat.gram)
+    randomLengthUnit = generateRandomPositive() * (ucat.deci * ucat.meter)
+    randomTimeUnit = generateRandomPositive() * (ucat.milli * ucat.second)
+    randomCurrentUnit = generateRandomPositive() * (ucat.tera * ucat.ampere)
+    randomTemperatureUnit = generateRandomPositive() * (ucat.deca * ucat.kelvin)
+    randomAmountUnit = generateRandomPositive() * (ucat.kilo * ucat.mol)
+    randomLuminousIntensityUnit = generateRandomPositive() * (ucat.micro * ucat.candela)
+
+    randomFields = Dict([
+        ("massUnit", randomMassUnit),
+        ("lengthUnit", randomLengthUnit),
+        ("timeUnit", randomTimeUnit),
+        ("currentUnit", randomCurrentUnit),
+        ("temperatureUnit", randomTemperatureUnit),
+        ("amountUnit", randomAmountUnit),
+        ("luminousIntensityUnit", randomLuminousIntensityUnit)
+    ])
+
+    randomInternalUnits = InternalUnits(randomMassUnit, randomLengthUnit, randomTimeUnit, randomCurrentUnit, randomTemperatureUnit, randomAmountUnit, randomLuminousIntensityUnit)
+
+    return (randomInternalUnits, randomFields)
+end
+
+function generateRandomDimension()
+    (randomDimension,) = generateRandomDimenionWithFields()
+    return randomDimension
+end
+
+function generateRandomDimenionWithFields()
+    randomFields = generateRandomDimensionFields()
+    randomDimension = Dimension(
+        L = randomFields["length"],
+        M = randomFields["mass"],
+        T = randomFields["time"],
+        I = randomFields["current"],
+        θ = randomFields["temperature"],
+        N = randomFields["amount"],
+        J = randomFields["luminousIntensity"]
+    )
+    return (randomDimension, randomFields)
+end
+
+function generateRandomDimensionFields()
+    coreDimensions = _getCoreDimensions()
+    randExponents = generateRandomExponent(dim = 7)
+    return Dict( zip(coreDimensions, randExponents) )
+end
+
+function _getCoreDimensions()
+    return ["mass", "length", "time", "current", "temperature", "amount", "luminousIntensity"]
+end
+
+function generateRandomQuantity()
+     return generateRandomQuantityWithFields()[1]
+end
+
+function generateRandomQuantityWithFields()
+    randomFields = generateRandomQuantityFields()
+    randomQuantity = Quantity(
+        randomFields["value"],
+        randomFields["dimension"],
+        randomFields["internalUnits"]
+    )
+    return (randomQuantity, randomFields)
+end
+
+function generateRandomQuantityFields()
+    randomValue = generateRandomReal()
+    randomDimension = generateRandomDimension()
+    randomInternalUnits = generateRandomInternalUnits()
+
+    randomFields = Dict([
+        ("value", randomValue),
+        ("dimension", randomDimension),
+        ("internalUnits", randomInternalUnits)
+    ])
+    return randomFields
+end
+
+function generateRandomQuantityArray()
+     return generateRandomQuantityArrayWithFields()[1]
+end
+
+function generateRandomQuantityArrayWithFields()
+    randomFields = generateRandomQuantityArrayFields()
+    randomQuantityArray = QuantityArray(
+        randomFields["value"],
+        randomFields["dimension"],
+        randomFields["internalUnits"]
+    )
+    return (randomQuantityArray, randomFields)
+end
+
+function generateRandomQuantityArrayFields()
+    randomValue = generateRandomReal(dim=(2,3))
+    randomDimension = generateRandomDimension()
+    randomInternalUnits = generateRandomInternalUnits()
+
+    randomFields = Dict([
+        ("value", randomValue),
+        ("dimension", randomDimension),
+        ("internalUnits", randomInternalUnits)
+    ])
+    return randomFields
 end
 
 end # module

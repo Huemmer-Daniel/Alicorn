@@ -1,4 +1,3 @@
-export Unit
 @doc raw"""
     Unit <: AbstractUnit
 
@@ -311,6 +310,15 @@ function Base.sqrt(unit::Unit)
     return unit^(0.5)
 end
 
+"""
+    Base.cbrt(unit::Unit)
+
+Take the cubic root of `unit` and return it as unit of type `Unit`.
+"""
+function Base.cbrt(unit::Unit)
+    return unit^(1/3)
+end
+
 ## Methods
 
 function Base.:(==)(unit1::Unit, unit2::Unit)
@@ -319,7 +327,6 @@ end
 
 ## Constants of type UnitFactor
 
-export unitlessUnit
 """
 Constant of type `Unit` indicating the absence of a unit.
 

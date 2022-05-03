@@ -4,11 +4,11 @@ function Base.show(io::IO, prefix::UnitPrefix)
 end
 
 function _generatePrettyPrintingOutput(prefix::UnitPrefix)
-    stringRepresentation = _generateStringRepresentation(prefix)
+    stringRepresentation = generateStringRepresentation(prefix)
     return "UnitPrefix " * stringRepresentation
 end
 
-function _generateStringRepresentation(prefix::UnitPrefix)
+function generateStringRepresentation(prefix::UnitPrefix)
     name = prefix.name
     symbol = prefix.symbol
     value = prefix.value

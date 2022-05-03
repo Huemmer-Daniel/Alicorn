@@ -2,7 +2,7 @@ using Documenter
 using Alicorn
 
 const MANUAL = ["manual/basic_usage.md", "manual/advanced_usage.md", "manual/caveats.md"]
-const REFERENCE = ["reference/units.md", "reference/quantities.md", "reference/index.md"]
+const REFERENCE = ["reference/units.md", "reference/dimensions.md", "reference/quantities.md", "reference/index.md"]
 const PAGES = [
     "Home" => "index.md",
     "Manual" => MANUAL,
@@ -24,7 +24,8 @@ makedocs(
     pages    = PAGES
 )
 
-deploydocs(
-    repo = "github.com/Huemmer-Daniel/Alicorn.jl.git",
-    devbranch = "development",
-)
+# deploydocs(
+#     repo = "github.com/Huemmer-Daniel/Alicorn.jl.git",
+#     devbranch = "development",
+#     devurl = "dev"
+# )

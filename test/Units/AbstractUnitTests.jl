@@ -24,6 +24,7 @@ function run()
         test_inv_required()
         test_exponentiation_required()
         test_sqrt_required()
+        test_cbrt_required()
         test_convertToBasicSI_required()
         test_convertToBasicSIAsExponents_required()
     end
@@ -75,6 +76,14 @@ function test_sqrt_required()
     @test_throws expectedError sqrt(mockUnit)
 end
 
+function test_cbrt_required()
+    mockUnit = MockUnitStub()
+    exponent = TestingTools.generateRandomExponent()
+
+    expectedError = Core.ErrorException("subtype Main.UnitsTests.AbstractUnitTests.MockUnitStub of AbstractUnit misses an implementation of the Base.cbrt function")
+
+    @test_throws expectedError cbrt(mockUnit)
+end
 
 function test_convertToBasicSI_required()
     mockUnit = MockUnitStub()

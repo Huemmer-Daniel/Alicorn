@@ -4,11 +4,11 @@ function Base.show(io::IO, baseUnit::BaseUnit)
 end
 
 function generatePrettyPrintingOutput(baseUnit::BaseUnit)
-    stringRepresentation = _generateStringRepresentation(baseUnit)
+    stringRepresentation = generateStringRepresentation(baseUnit)
     return "BaseUnit " * stringRepresentation
 end
 
-function _generateStringRepresentation(baseUnit::BaseUnit)
+function generateStringRepresentation(baseUnit::BaseUnit)
     name = baseUnit.name
     symbol = baseUnit.symbol
     prefactor = baseUnit.prefactor

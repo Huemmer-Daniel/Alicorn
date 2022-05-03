@@ -26,6 +26,7 @@ function run()
         @test inv_implemented()
         @test exponentiation_implemented()
         @test sqrt_implemented()
+        @test cbrt_implemented()
 
         @test multiplication_implemented()
         @test division_implemented()
@@ -241,6 +242,26 @@ function _getExamplesFor_sqrt()
     examples = [
         ( unitlessBaseUnit, unitlessUnitFactor ),
         ( baseUnit, UnitFactor(baseUnit, 0.5) )
+    ]
+    return examples
+end
+
+function cbrt_implemented()
+    examples = _getExamplesFor_cbrt()
+    return TestingTools.testMonadicFunction(Base.cbrt, examples)
+end
+
+function _getExamplesFor_cbrt()
+    unitlessBaseUnit = Alicorn.unitlessBaseUnit
+    unitlessUnitFactor = Alicorn.unitlessUnitFactor
+
+    baseUnit = TestingTools.generateRandomBaseUnit()
+    exponent = TestingTools.generateRandomExponent()
+
+    # format: baseUnit, correct result for cbrt(baseUnit)
+    examples = [
+        ( unitlessBaseUnit, unitlessUnitFactor ),
+        ( baseUnit, UnitFactor(baseUnit, 1/3) )
     ]
     return examples
 end

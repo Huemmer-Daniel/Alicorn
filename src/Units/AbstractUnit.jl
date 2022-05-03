@@ -1,4 +1,3 @@
-export AbstractUnit
 """
     AbstractUnit <: AbstractUnitElement
 
@@ -58,8 +57,6 @@ Base.broadcastable(abstractUnit::AbstractUnit) = Ref(abstractUnit)
 ## 2. Interface
 # the following functions need to be extended for concrete implementations of
 # AbstractUnit
-
-export convertToUnit
 """
     convertToUnit(abstractUnit::AbstractUnit)::Unit
 
@@ -70,7 +67,6 @@ function convertToUnit(abstractUnit::AbstractUnit)::Unit
     error("subtype $subtype of AbstractUnit misses an implementation of the convertToUnit function")
 end
 
-export convertToBasicSI
 """
     convertToBasicSI(abstractUnit::AbstractUnit)
 
@@ -87,7 +83,6 @@ function convertToBasicSI(abstractUnit::AbstractUnit)
    error("subtype $subtype of AbstractUnit misses an implementation of the convertToBasicSI function")
 end
 
-export convertToBasicSIAsExponents
 """
      convertToBasicSIAsExponents(abstractUnit::AbstractUnit)
 
@@ -115,7 +110,7 @@ function Base.:*(unitPrefix::UnitPrefix, abstractUnit::AbstractUnit)
 end
 
 """
-    Base.:inv(abstractUnit::AbstractUnit)
+    Base.inv(abstractUnit::AbstractUnit)
 
 Return the (multiplicative) inverse of a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
 """
@@ -142,4 +137,14 @@ Take the square root of a unit. The behavior of this function depends on the con
 function Base.:sqrt(abstractUnit::AbstractUnit)
    subtype = typeof(abstractUnit)
    error("subtype $subtype of AbstractUnit misses an implementation of the Base.sqrt function")
+end
+
+"""
+    Base.:cbrt(abstractUnit::AbstractUnit)
+
+Take the cubic root of a unit. The behavior of this function depends on the concrete subtype of `abstractUnit`.
+"""
+function Base.:cbrt(abstractUnit::AbstractUnit)
+   subtype = typeof(abstractUnit)
+   error("subtype $subtype of AbstractUnit misses an implementation of the Base.cbrt function")
 end

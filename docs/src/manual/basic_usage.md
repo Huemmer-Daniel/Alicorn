@@ -49,7 +49,7 @@ julia> energy = force * height
 4600 kg m s^-2 cm
 
 julia> inUnitsOf(energy, ucat.joule)
-46.0 J
+46 J
 ```
 Now, while we are holding the rock up there, we wonder what would happen if we were to accidentally drop it on our nose. Assuming that our nose is ``h_n = 1.7\,\mathrm{m}`` above the ground, we can calculate the energy transferred after a drop of height ``h - h_n`` as follows:
 ```jldoctest
