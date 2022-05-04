@@ -67,7 +67,7 @@ Base.:*(dimension::Dimension, number::Number) = number * dimension
 
 Add each exponent in `dimension1` to its counterpart in `dimension2`.
 
-If a quantity `Q1` (`Q2`) is of dimension `D1` (`D2`), then `Q1 * Q2` is of dimension `D1 + D2`.
+If a quantity `Q1` (`Q2`) is of dimension `D1` (`D2`), then `Q1 * Q2` is of dimension `D1 * D2`.
 
 # Example
 ```jldoctest
