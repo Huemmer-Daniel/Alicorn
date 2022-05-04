@@ -6,7 +6,7 @@ end
 
 # Units
 
-This section describes the `Units` submodule of Alicorn. The module is concerned with defining and storing physical units, and defines the arithmetic operations available for constructing and combining units.
+The `Units` submodule is concerned with defining and storing physical units, and defines the arithmetic operations available for constructing and combining units.
 
 Unless stated otherwise, all types, functions, and constants defined in the submodule are exported by Alicorn.
 
@@ -14,6 +14,7 @@ Unless stated otherwise, all types, functions, and constants defined in the subm
 
 ```@contents
 Pages = ["units.md"]
+Depth = 3
 ```
 
 ## Overview
@@ -40,10 +41,9 @@ while for the third
 * `BaseUnit`: ``\mathrm{s}`` (second)
 * `exponent::Real`: ``-2``
 
-Each [`BaseUnit`](@ref) represents a named combination of the seven basic units
+Each [`BaseUnit`](@ref) represents one of the seven basic units
 (kilogram, meter, second, ampere, kelvin, mol, and candela) of the International
-System of Units, such as the basic units themselves or derived units such as the
-joule. A [`BaseUnit`](@ref) is characterized through a prefactor and the
+System of Units, or a derived unit bearing a special name, such as the joule. A [`BaseUnit`](@ref) is characterized through a prefactor and the
 corresponding powers of the basic units, represented as a
 [`BaseUnitExponents`](@ref) object.
 
@@ -94,11 +94,23 @@ Unit kg nm^2 ps^-2
 ```
 
 
-## Abstract Supertypes
+## AbstractUnitElement
 
 ```@docs
 AbstractUnitElement
+```
+
+
+## UnitFactorElement
+
+```@docs
 UnitFactorElement
+```
+
+
+## AbstractUnit
+
+```@docs
 AbstractUnit
 ```
 
@@ -122,6 +134,7 @@ Base.:sqrt(::AbstractUnit)
 Base.:cbrt(::AbstractUnit)
 convertToBasicSI(::AbstractUnit)
 Alicorn.convertToBasicSIAsExponents(::AbstractUnit)
+dimensionOf(::AbstractUnit)
 ```
 
 ## UnitPrefix

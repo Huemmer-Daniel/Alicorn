@@ -24,6 +24,7 @@ const SimpleQuantityType = Union{SimpleQuantity, SimpleQuantityArray}
 const QuantityType = Union{Quantity, QuantityArray}
 const AbstractQuantityType = Union{AbstractQuantity, AbstractQuantityArray}
 const DimensionlessType = Union{Number, AbstractArray{<:Number}}
+export SimpleQuantityType, QuantityType, AbstractQuantityType, DimensionlessType
 
 include("quantity_dimensions.jl")
 include("quantity_typeConversion.jl")

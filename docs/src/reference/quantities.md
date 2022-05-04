@@ -6,7 +6,7 @@ end
 
 # Quantities
 
-This section describes the Quantities submodule of Alicorn. The module is concerned with defining and manipulating physical quantities.
+The `Quantities` submodule is concerned with defining and manipulating physical quantities.
 
 Unless stated otherwise, all types, functions, and constants defined in the submodule are exported to the global scope.
 
@@ -103,13 +103,14 @@ Base.:/(::Number, ::AbstractUnit)
 SimpleQuantity(::AbstractQuantity)
 SimpleQuantity{T}(::AbstractQuantity) where {T<:Number}
 Base.convert(::Type{T}, ::SimpleQuantity) where {T<:SimpleQuantity}
-Quantity(::AbstractQuantity)
-Quantity{T}(::AbstractQuantity) where {T<:Number}
 Base.convert(::Type{T}, ::Quantity) where {T<:Quantity}
 ```
 
 ### Dimension
 
+```@docs
+dimensionOf(::AbstractQuantity)
+```
 
 ### Unit conversion
 
@@ -122,6 +123,7 @@ valueOfDimensionless(::AbstractQuantity)
 valueOfDimensionless(::SimpleQuantity)
 ```
 
+
 ```@docs
 Base.:*(::AbstractQuantity, ::AbstractUnit)
 Base.:/(::AbstractQuantity, ::AbstractUnit)
@@ -130,17 +132,24 @@ Base.:/(::AbstractQuantity, ::AbstractUnit)
 ### Arithmetics, elementary functions
 
 ```@docs
-Base.:+(::SimpleQuantity, ::SimpleQuantity)
-Base.:-(::SimpleQuantity, ::SimpleQuantity)
-Base.isless(::SimpleQuantity, ::SimpleQuantity)
-Base.isapprox(::SimpleQuantity, ::SimpleQuantity)
+Base.:+(q1::SimpleQuantityType, q2::SimpleQuantityType)
+Base.:+(q1::Quantity, q2::Quantity)
+Base.:+(q1::SimpleQuantity, q2::Quantity)
+Base.:-(q1::SimpleQuantityType, q2::SimpleQuantityType)
+Base.:-(q1::QuantityType, q2::QuantityType)
+Base.:-(q1::SimpleQuantityType, q2::QuantityType)
 ```
+
 
 ### Numeric comparison
 
 ```@docs
-Base.:(==)(::SimpleQuantity, ::SimpleQuantity)
-Base.:(==)(::Quantity, ::Quantity)
+Base.:(==)(::SimpleQuantityType, ::SimpleQuantityType)
+Base.:(==)(::QuantityType, ::QuantityType)
+Base.isless(::SimpleQuantity, ::SimpleQuantity)
+Base.isless(::Quantity, ::Quantity)
+Base.isapprox(::SimpleQuantityType, ::SimpleQuantityType)
+Base.isapprox(::QuantityType, ::QuantityType)
 ```
 
 ### Rounding
@@ -163,6 +172,7 @@ AbstractQuantityVector
 AbstractQuantityMatrix
 ```
 
+
 #### Array-valued simple quantities
 
 ```@docs
@@ -171,6 +181,7 @@ SimpleQuantityVector
 SimpleQuantityMatrix
 ```
 
+
 #### Array-valued quantities
 
 ```@docs
@@ -178,6 +189,7 @@ QuantityArray
 QuantityVector
 QuantityMatrix
 ```
+
 
 #### Aliases for arrays with or without units
 
@@ -196,35 +208,32 @@ Base.convert(::Type{T}, ::SimpleQuantityArray) where {T<:SimpleQuantityArray}
 Base.convert(::Type{T}, ::QuantityArray) where {T<:QuantityArray}
 ```
 
-
 ### Dimension
+
+```@docs
+dimensionOf(::AbstractQuantityArray)
+```
 
 ### Unit conversion
 
 ```@docs
 inUnitsOf(::AbstractQuantityArray, ::AbstractUnit)
 inBasicSIUnits(::AbstractQuantityArray)
+valueInUnitsOf(::AbstractQuantity{T}, ::SimpleQuantity) where T
 valueInUnitsOf(::AbstractQuantityArray, ::AbstractUnit)
-valueInUnitsOf(::AbstractQuantityArray, ::SimpleQuantity)
+valueInUnitsOf(::AbstractQuantityArray{T}, ::SimpleQuantity) where T
 valueOfDimensionless(::AbstractQuantityArray)
 Base.:*(::AbstractQuantityArray, ::AbstractUnit)
 Base.:/(::AbstractQuantityArray, ::AbstractUnit)
+conversionFactor(::Dimension, ::InternalUnits, ::InternalUnits)
+inInternalUnitsOf(::Quantity, ::InternalUnits)
+inInternalUnitsOf(::QuantityArray, ::InternalUnits)
 ```
 
 ### Arithmetics, elementary functions
 
-```@docs
-Base.:+(::SimpleQuantityArray, ::SimpleQuantityArray)
-Base.:-(::SimpleQuantityArray, ::SimpleQuantityArray)
-```
-
 ### Numeric comparison
 
-```@docs
-Base.:(==)(::SimpleQuantityArray, ::SimpleQuantityArray)
-Base.:(==)(::QuantityArray, ::QuantityArray)
-Base.isapprox(::SimpleQuantityArray, ::SimpleQuantityArray)
-```
 
 
 ## InternalUnits
@@ -233,7 +242,6 @@ Base.isapprox(::SimpleQuantityArray, ::SimpleQuantityArray)
 InternalUnits
 Base.:(==)(::InternalUnits, ::InternalUnits)
 internalUnitFor(::Dimension, ::InternalUnits)
-conversionFactor(::InternalUnits, ::InternalUnits)
 ```
 
 ```@meta

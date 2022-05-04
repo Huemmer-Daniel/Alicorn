@@ -28,11 +28,10 @@ export Unit
 include("Quantities/Quantities.jl")
 using .Quantities
 
-export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector,
-    AbstractQuantityMatrix
+export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector, AbstractQuantityMatrix
 export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
-export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector,
-    SimpleQuantityMatrix
+export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix
+export SimpleQuantityType, QuantityType, AbstractQuantityType, DimensionlessType
 export InternalUnits, internalUnitFor, conversionFactor
 export Quantity, QuantityArray, QuantityVector, QuantityMatrix
 export inUnitsOf, valueInUnitsOf, inInternalUnitsOf, inBasicSIUnits,
