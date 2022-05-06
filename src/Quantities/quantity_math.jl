@@ -379,10 +379,8 @@ Returns `true` if `q1` is of lesser value than `q2`.
 Note that internal units are not converted during the comparison.
 
 # Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
-`q2` are not of the same dimension
-- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and
-`q2` are not using the same internal units
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are not of the same dimension
+- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and `q2` are not using the same internal units
 """
 function Base.isless(q1::Quantity, q2::Quantity)
     _assertComparedWithSameIntUandDimension(q1, q2)
@@ -441,10 +439,8 @@ Returns `isapprox(q1.value, q2.value, rtol=rtol)`.
 Note that internal units are not converted during the comparison.
 
 # Raises Exceptions
-- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and
-`q2` are not of the same dimension
-- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and
-`q2` are not using the same internal units
+- `Alicorn.Exceptions.DimensionMismatchError`: if `q1` and `q2` are not of the same dimension
+- `Alicorn.Exceptions.UnitMismatchError`: if `q1` and `q2` are not using the same internal units
 """
 function Base.isapprox(q1::QuantityType, q2::QuantityType; rtol::Real = sqrt(eps()))
     _assertComparedWithSameIntUandDimension(q1, q2)

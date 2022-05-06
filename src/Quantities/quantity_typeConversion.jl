@@ -116,7 +116,7 @@ See `Quantity(::AbstractQuantity, ::InternalUnits)` for details.
 - `InexactError`: if the internal value of `AbstractQuantity` cannot be
 represented as type `T`.
 """
-function Quantity{T}(::AbstractQuantity, ::InternalUnits) where {T<:Number} end
+function Quantity{T}(::AbstractQuantity, ::InternalUnits) where T<:Number end
 function Quantity{T}(::AbstractQuantity) where {T<:Number} end
 
 function Quantity{T}(quantity::Quantity, internalUnits::InternalUnits) where {T<:Number}
@@ -202,7 +202,7 @@ See `SimpleQuantityArray(::AbstractQuantityArray)` for details.
 - `InexactError`: if the value of `AbstractQuantityArray` cannot be
 represented as type `Array{T}`.
 """
-function SimpleQuantityArray{T}(quantityArray::AbstractQuantityArray) where {T<:Number} end
+function SimpleQuantityArray{T}(quantityArray::AbstractQuantityArray) where T<:Number end
 
 SimpleQuantityArray{T}(sqArray::SimpleQuantityArray) where {T<:Number} = SimpleQuantityArray(convert(Array{T}, sqArray.value), sqArray.unit)
 
@@ -224,7 +224,7 @@ See `SimpleQuantityArray(::AbstractQuantity)` for details.
 - `InexactError`: if the value of `AbstractQuantity` cannot be
 represented as type `Array{T}`.
 """
-function SimpleQuantityArray{T}(quantity::AbstractQuantity) where {T<:Number} end
+function SimpleQuantityArray{T}(quantity::AbstractQuantity) where T<:Number end
 
 SimpleQuantityArray{T}(simpleQuantity::SimpleQuantity) where {T<:Number} = SimpleQuantityArray{T}(Array{T}([simpleQuantity.value]), simpleQuantity.unit)
 
@@ -325,7 +325,7 @@ See `QuantityArray(::AbstractQuantityArray, ::InternalUnits)` for details.
 - `InexactError`: if the internal value of `AbstractQuantityArray` cannot be
 represented as type `Array{T}`.
 """
-function QuantityArray{T}(::AbstractQuantityArray, ::InternalUnits) where {T<:Number} end
+function QuantityArray{T}(::AbstractQuantityArray, ::InternalUnits) where T<:Number end
 function QuantityArray{T}(::AbstractQuantityArray) where {T<:Number} end
 
 function QuantityArray{T}(qArray::QuantityArray, internalUnits::InternalUnits) where {T<:Number}
@@ -364,7 +364,7 @@ See `QuantityArray(::AbstractQuantity, ::InternalUnits)` for details.
 - `InexactError`: if the internal value of `AbstractQuantityArray` cannot be
 represented as type `Array{T}`.
 """
-function QuantityArray{T}(::AbstractQuantity, ::InternalUnits) where {T<:Number} end
+function QuantityArray{T}(::AbstractQuantity, ::InternalUnits) where T<:Number end
 function QuantityArray{T}(::AbstractQuantity) where {T<:Number} end
 
 function QuantityArray{T}(quantity::Quantity, internalUnits::InternalUnits) where {T<:Number}

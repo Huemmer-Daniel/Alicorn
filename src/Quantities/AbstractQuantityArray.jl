@@ -55,3 +55,19 @@ or without a physical unit.
 Alias for `Union{Array{T,N}, AbstractQuantityArray{T,N}} where {T<:Number, N}`.
 """
 const ArrayQuantity{T,N} = Union{Array{T,N}, AbstractQuantityArray{T,N}} where {T<:Number, N}
+
+"""
+    AbstractQuantityType{T}
+
+Alias for `Union{AbstractQuantity{T}, AbstractQuantityArray{T}} where T<:Number`.
+"""
+const AbstractQuantityType{T} = Union{AbstractQuantity{T}, AbstractQuantityArray{T}} where T<:Number
+
+"""
+    DimensionlessType{T}
+
+Type union representing numbers and number arrays.
+
+Alias for `Union{Number, AbstractArray{<:Number}}`.
+"""
+const DimensionlessType{T} = Union{Number, AbstractArray{<:Number}} where T<:Number

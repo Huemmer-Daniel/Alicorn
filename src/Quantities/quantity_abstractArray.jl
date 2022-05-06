@@ -1,6 +1,6 @@
 ## ## Methods implementing the interface of AbstractArray
 
-Base.size(qArray::AbstractQuantityType) = size(qArray.value)
+Base.size(q::AbstractQuantityType) = size(q.value)
 
 Base.IndexStyle(::Type{<:SimpleQuantity}) = IndexLinear()
 Base.IndexStyle(::Type{<:SimpleQuantityArray}) = IndexLinear()

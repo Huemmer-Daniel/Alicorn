@@ -50,6 +50,13 @@ Alias for `SimpleQuantityArray{T,2}`.
 """
 const SimpleQuantityMatrix{T} = SimpleQuantityArray{T,2}
 
+"""
+    SimpleQuantityType{T}
+
+Alias for `Union{SimpleQuantity{T}, SimpleQuantityArray{T}} where T<:Number`.
+"""
+const SimpleQuantityType{T} = Union{SimpleQuantity{T}, SimpleQuantityArray{T}} where T<:Number 
+
 
 ## ## External constructors
 

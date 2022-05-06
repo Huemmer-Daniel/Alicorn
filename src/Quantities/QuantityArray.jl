@@ -61,6 +61,13 @@ Alias for `QuantityArray{T,2}`.
 """
 const QuantityMatrix{T} = QuantityArray{T,2}
 
+"""
+    QuantityType{T}
+
+Alias for `Union{Quantity{T}, QuantityArray{T}} where T<:Number`.
+"""
+const QuantityType{T} = Union{Quantity{T}, QuantityArray{T}} where T<:Number 
+
 
 ## ## External constructors
 

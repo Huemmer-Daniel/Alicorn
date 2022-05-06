@@ -6,25 +6,20 @@ using ..Units
 
 include("AbstractQuantity.jl")
 include("AbstractQuantityArray.jl")
-export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector, AbstractQuantityMatrix
+export AbstractQuantity, AbstractQuantityArray, AbstractQuantityVector, AbstractQuantityMatrix, AbstractQuantityType,
+    DimensionlessType
 export ScalarQuantity, VectorQuantity, MatrixQuantity, ArrayQuantity
 
 include("SimpleQuantity.jl")
 include("SimpleQuantityArray.jl")
-export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix
+export SimpleQuantity, SimpleQuantityArray, SimpleQuantityVector, SimpleQuantityMatrix, SimpleQuantityType
 
 include("InternalUnits.jl")
 export InternalUnits, internalUnitFor, conversionFactor
 
 include("Quantity.jl")
 include("QuantityArray.jl")
-export Quantity, QuantityArray, QuantityVector, QuantityMatrix
-
-const SimpleQuantityType = Union{SimpleQuantity, SimpleQuantityArray}
-const QuantityType = Union{Quantity, QuantityArray}
-const AbstractQuantityType = Union{AbstractQuantity, AbstractQuantityArray}
-const DimensionlessType = Union{Number, AbstractArray{<:Number}}
-export SimpleQuantityType, QuantityType, AbstractQuantityType, DimensionlessType
+export Quantity, QuantityArray, QuantityVector, QuantityMatrix, QuantityType
 
 include("quantity_dimensions.jl")
 include("quantity_typeConversion.jl")
