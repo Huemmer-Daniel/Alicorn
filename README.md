@@ -9,6 +9,7 @@
 
 **Documentation:**
 [![Documentation stable][docs-stable-badge]][docs-stable-url]
+[![Documentation development][docs-dev-badge]][docs-dev-url]
 
 The `Alicorn.jl` package serves a dual purpose:
 1. Dynamically define and combine physical units based on the
@@ -102,3 +103,6 @@ If you are interested in Alicorn, also have a look at the mature [`Unitful.jl`](
 
 [docs-stable-badge]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://huemmer-daniel.github.io/Alicorn/stable/
+
+[docs-dev-badge]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-dev-url]: https://huemmer-daniel.github.io/Alicorn/dev/
