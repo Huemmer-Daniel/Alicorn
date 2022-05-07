@@ -28,5 +28,5 @@ deploydocs(
     repo = "github.com/Huemmer-Daniel/Alicorn.jl.git",
     devbranch = "master",
     devurl = "dev",
-    versions = ["stable" => "v^", "v#", devurl => devurl]
+    versions = ["stable" => "v^", "v#", "devurl" => devurl]
 )
