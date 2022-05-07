@@ -25,6 +25,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/Huemmer-Daniel/Alicorn.jl.git"
+    repo = "github.com/Huemmer-Daniel/Alicorn.jl.git",
     versions = nothing
 )
