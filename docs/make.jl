@@ -26,5 +26,7 @@ makedocs(
 
 deploydocs(
     repo = "github.com/Huemmer-Daniel/Alicorn.jl.git",
-    versions = nothing
+    devbranch = "master",
+    devurl = dev,
+    versions = ["stable" => "v^"]
 )
