@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Advanced Usage · Alicorn.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.svg" alt="Alicorn.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.svg" alt="Alicorn.jl logo"/></a><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Manual</span><ul><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li class="is-active"><a class="tocitem" href>Advanced Usage</a><ul class="internal"><li><a class="tocitem" href="#Using-Quantity-Types"><span>Using Quantity Types</span></a></li><li><a class="tocitem" href="#Broadcasting"><span>Broadcasting</span></a></li><li><a class="tocitem" href="#Custom-UnitCatalogue"><span>Custom UnitCatalogue</span></a></li></ul></li></ul></li><li><span class="tocitem">Reference</span><ul><li><a class="tocitem" href="../../reference/units/">Units</a></li><li><a class="tocitem" href="../../reference/dimensions/">Dimensions</a></li><li><a class="tocitem" href="../../reference/quantities/">Quantities</a></li><li><a class="tocitem" href="../../reference/">Index</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Manual</a></li><li class="is-active"><a href>Advanced Usage</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Advanced Usage</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Huemmer-Daniel/Alicorn/blob/master/docs/src/manual/advanced_usage.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Advanced-Usage"><a class="docs-heading-anchor" href="#Advanced-Usage">Advanced Usage</a><a id="Advanced-Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Advanced-Usage" title="Permalink"></a></h1><p>This section demonstrates how to accomplish some typical tasks.</p><h4 id="Contents"><a class="docs-heading-anchor" href="#Contents">Contents</a><a id="Contents-1"></a><a class="docs-heading-anchor-permalink" href="#Contents" title="Permalink"></a></h4><ul><li><a href="#Advanced-Usage">Advanced Usage</a></li><ul><li><a href="#Using-Quantity-Types">Using Quantity Types</a></li><li><a href="#Broadcasting">Broadcasting</a></li><li><a href="#Custom-UnitCatalogue">Custom UnitCatalogue</a></li></ul></ul><h2 id="Using-Quantity-Types"><a class="docs-heading-anchor" href="#Using-Quantity-Types">Using Quantity Types</a><a id="Using-Quantity-Types-1"></a><a class="docs-heading-anchor-permalink" href="#Using-Quantity-Types" title="Permalink"></a></h2><p>We can repeat a calculation similar to the basic usage example using <a href="../../reference/quantities/#Alicorn.Quantities.Quantity"><code>Quantity</code></a> and <a href="../../reference/quantities/#Alicorn.Quantities.QuantityArray"><code>QuantityArray</code></a>. We start by choosing a set of <a href="../../reference/quantities/#Alicorn.Quantities.InternalUnits"><code>InternalUnits</code></a></p><pre><code class="language-julia-repl">julia&gt; using Alicorn
+
+julia&gt; ucat = UnitCatalogue() ;
+
+julia&gt; intu = InternalUnits( length=1*ucat.milli*ucat.meter )
+InternalUnits
+ mass unit:               1 kg
+ length unit:             1 mm
+ time unit:               1 s
+ current unit:            1 A
+ temperature unit:        1 K
+ amount unit:             1 mol
+ luminous intensity unit: 1 cd</code></pre><p>We can then define the quantities given in the problem</p><pre><code class="language-julia-repl">julia&gt; mass = Quantity(2 * (ucat.kilo * ucat.gram), intu)
+Quantity{Int64} of dimension M^1 in units of (1 kg):
+ 2
+
+julia&gt; acceleration = QuantityArray([10 15 20] * ucat.meter * ucat.second^-2, intu)
+1×3 QuantityMatrix{Int64} of dimension L^1 T^-2 in units of (1 mm, 1 s):
+ 10000  15000  20000</code></pre><p>and have Julia calculate the required force:</p><pre><code class="language-julia-repl">julia&gt; force = mass * acceleration
+1×3 QuantityMatrix{Int64} of dimension M^1 L^1 T^-2 in units of (1 kg, 1 mm, 1 s):
+ 20000  30000  40000</code></pre><p>Note that the force has been expressed using the same set of <a href="../../reference/quantities/#Alicorn.Quantities.InternalUnits"><code>InternalUnits</code></a>. We decide we would like to express the force in units of kilonewton</p><pre><code class="language-julia-repl">julia&gt; force2 = inUnitsOf(force, ucat.kilo * ucat.newton)
+1×3 SimpleQuantityMatrix{Float64} of unit kN:
+ 0.02  0.03  0.04</code></pre><h2 id="Broadcasting"><a class="docs-heading-anchor" href="#Broadcasting">Broadcasting</a><a id="Broadcasting-1"></a><a class="docs-heading-anchor-permalink" href="#Broadcasting" title="Permalink"></a></h2><p>Alicorn offers broadcasting for most mathematical functions available for quantities. For example,</p><pre><code class="language-julia-repl">julia&gt; force ./ force2
+1×3 QuantityMatrix{Float64} of dimension 1 in units of (1):
+ 1.0  1.0  1.0</code></pre><h2 id="Custom-UnitCatalogue"><a class="docs-heading-anchor" href="#Custom-UnitCatalogue">Custom UnitCatalogue</a><a id="Custom-UnitCatalogue-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-UnitCatalogue" title="Permalink"></a></h2><h3 id="Empty-UnitCatalogue"><a class="docs-heading-anchor" href="#Empty-UnitCatalogue">Empty UnitCatalogue</a><a id="Empty-UnitCatalogue-1"></a><a class="docs-heading-anchor-permalink" href="#Empty-UnitCatalogue" title="Permalink"></a></h3><p>An empty <a href="../../reference/units/#Alicorn.Units.UnitCatalogue"><code>UnitCatalogue</code></a> can be initialized by explicitly passing empty lists of prefixes and units to the constructor:</p><pre><code class="language-julia-repl">julia&gt; emptyUcat = UnitCatalogue([],[])
+UnitCatalogue providing
+ 0 unit prefixes
+ 0 base units</code></pre><p>Users can then fill the catalogue with custom definitions.</p><h3 id="Custom-Prefixes"><a class="docs-heading-anchor" href="#Custom-Prefixes">Custom Prefixes</a><a id="Custom-Prefixes-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-Prefixes" title="Permalink"></a></h3><p>As an example, we define the <em>dozen</em> as a unit prefix. The dozen is not contained in a default <a href="../../reference/units/#Alicorn.Units.UnitCatalogue"><code>UnitCatalogue</code></a>:</p><pre><code class="language-julia-repl">julia&gt; ucat = UnitCatalogue()
+UnitCatalogue providing
+ 21 unit prefixes
+ 43 base units
+
+julia&gt; providesUnitPrefix(ucat, &quot;dozen&quot;)
+false</code></pre><p>We define it and add it to the unit catalogue:</p><pre><code class="language-julia-repl">julia&gt; dozen = UnitPrefix( name=&quot;dozen&quot;, symbol=&quot;dz&quot;, value=12 )
+UnitPrefix dozen (dz) of value 1.2e+1
+
+julia&gt; add!(ucat, dozen)
+UnitCatalogue providing
+ 22 unit prefixes
+ 43 base units
+
+julia&gt; providesUnitPrefix(ucat, &quot;dozen&quot;)
+true</code></pre><div class="admonition is-info"><header class="admonition-header">Custom unit prefix</header><div class="admonition-body"><p>It is not required to add a new custom prefix to an existing <code>UnitCatalogue</code>. However, doing so is good practice since a <code>UnitCatalogue</code> can easily be passed to methods (brought into specific scopes) as a whole.</p></div></div><h3 id="Custom-Units"><a class="docs-heading-anchor" href="#Custom-Units">Custom Units</a><a id="Custom-Units-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-Units" title="Permalink"></a></h3><p>As an example, we define the international <em>mile</em>. The mile is not contained in the default <a href="../../reference/units/#Alicorn.Units.UnitCatalogue"><code>UnitCatalogue</code></a>:</p><pre><code class="language-julia-repl">julia&gt; ucat = UnitCatalogue()
+UnitCatalogue providing
+ 21 unit prefixes
+ 43 base units
+
+julia&gt; providesUnitPrefix(ucat, &quot;mile&quot;)
+false</code></pre><p>We define it and add it to the unit catalogue:</p><pre><code class="language-julia-repl">julia&gt; mile = BaseUnit( name=&quot;mile&quot;, symbol=&quot;mi&quot;, prefactor=1609.344, exponents=BaseUnitExponents(m=1) )
+BaseUnit mile (1 mi = 1.61e+3 m)
+
+julia&gt; add!(ucat, mile)
+UnitCatalogue providing
+ 21 unit prefixes
+ 44 base units
+
+julia&gt; providesBaseUnit(ucat, &quot;mile&quot;)
+true</code></pre><div class="admonition is-info"><header class="admonition-header">Custom base unit</header><div class="admonition-body"><p>It is not required to add a new custom base unit to an existing <code>UnitCatalogue</code>. However, doing so is good practice since a <code>UnitCatalogue</code> can easily be passed to methods (brought into specific scopes) as a whole.</p></div></div><h3 id="Removing-a-Prefix-or-Unit"><a class="docs-heading-anchor" href="#Removing-a-Prefix-or-Unit">Removing a Prefix or Unit</a><a id="Removing-a-Prefix-or-Unit-1"></a><a class="docs-heading-anchor-permalink" href="#Removing-a-Prefix-or-Unit" title="Permalink"></a></h3><p>Unit prefixes and named units can be removed one by one from an existing <code>UnitCatalogue</code>:</p><pre><code class="language-julia-repl">julia&gt; ucat = UnitCatalogue()
+UnitCatalogue providing
+ 21 unit prefixes
+ 43 base units
+
+julia&gt; providesUnitPrefix(ucat, &quot;milli&quot;)
+true
+
+julia&gt; remove!(ucat, &quot;milli&quot;)
+UnitCatalogue providing
+ 20 unit prefixes
+ 43 base units
+
+julia&gt; providesUnitPrefix(ucat, &quot;milli&quot;)
+false</code></pre><p>and likewise for a unit</p><pre><code class="language-julia-repl">julia&gt; ucat = UnitCatalogue()
+UnitCatalogue providing
+ 21 unit prefixes
+ 43 base units
+
+julia&gt; providesBaseUnit(ucat, &quot;angstrom&quot;)
+true
+
+julia&gt; remove!(ucat, &quot;angstrom&quot;)
+UnitCatalogue providing
+ 21 unit prefixes
+ 42 base units
+
+julia&gt; providesBaseUnit(ucat, &quot;angstrom&quot;)
+false</code></pre><h3 id="Redefining-a-Prefix-or-Unit"><a class="docs-heading-anchor" href="#Redefining-a-Prefix-or-Unit">Redefining a Prefix or Unit</a><a id="Redefining-a-Prefix-or-Unit-1"></a><a class="docs-heading-anchor-permalink" href="#Redefining-a-Prefix-or-Unit" title="Permalink"></a></h3><p>The names of prefixes and base units stored in a <code>UnitCatalogue</code> have to be unique. In consequence, to redefine a prefix or unit, it first has to be removed from the catalogue and, subsequently, the newly defined element added.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../basic_usage/">« Basic Usage</a><a class="docs-footer-nextpage" href="../../reference/units/">Units »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 7 May 2022 12:32">Saturday 7 May 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
