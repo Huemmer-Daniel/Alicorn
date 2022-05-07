@@ -26,7 +26,9 @@ The `Alicorn.jl` package serves a dual purpose:
    no parsing of strings representing units is required
  * New units can be **dynamically defined during runtime**, no manipulation of
    source files or configuration files is required
- * Alicorn provides two concrete implementations of [`AbstractQuantity`](@ref) and [`AbstractQuantityArray`](@ref): First, [`SimpleQuantity`](@ref) and [`SimpleQuantityArray`](@ref), which explicitly contain a physical unit and is therefore easy to read and interpret. Second, [`Quantity`](@ref) and [`QuantityArray`](@ref), which store only the physical dimension and reference a common set of [`InternalUnits`](@ref). This structure reduces the need for unit conversions and is therefore particularly useful in larger numerical operations.
+ * Alicorn provides two concrete implementations of [`AbstractQuantity`](@ref) and [`AbstractQuantityArray`](@ref):
+   - [`SimpleQuantity`](@ref) and [`SimpleQuantityArray`](@ref), which explicitly contain a physical unit and is therefore easy to read and interpret.
+   - [`Quantity`](@ref) and [`QuantityArray`](@ref), which store only the physical dimension and reference a common set of [`InternalUnits`](@ref). This structure reduces the need for unit conversions and is therefore particularly useful in larger numerical operations.
  * Both kinds of quantities can be freely combined to allow intuitive manipulation of quantities.
 
 ## Installation
