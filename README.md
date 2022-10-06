@@ -20,16 +20,16 @@ The `Alicorn.jl` package serves a dual purpose:
 
  ## Features
 
- * Alicorn represents units as objects of type [`AbstractUnit`](@ref) with
+ * Alicorn represents units as objects of type `AbstractUnit` with
    suitable methods to create and manipulate them
- * Alicorn represents quantities as objects of type [`AbstractQuantity`](@ref) for scalars and [`AbstractQuantityArray`](@ref) for vectors and matrices, with suitable methods to create and manipulate them
+ * Alicorn represents quantities as objects of type `AbstractQuantity` for scalars and `AbstractQuantityArray` for vectors and matrices, with suitable methods to create and manipulate them
  * Units can be combined and quantities formed using **intuitive arithmetic syntax**,
    no parsing of strings representing units is required
  * New units can be **dynamically defined during runtime**, no manipulation of
    source files or configuration files is required
- * Alicorn provides two concrete implementations of [`AbstractQuantity`](@ref) and [`AbstractQuantityArray`](@ref):
-   - [`SimpleQuantity`](@ref) and [`SimpleQuantityArray`](@ref), which explicitly contain a physical unit and is therefore easy to read and interpret.
-   - [`Quantity`](@ref) and [`QuantityArray`](@ref), which store only the physical dimension and reference a common set of [`InternalUnits`](@ref). This structure reduces the need for unit conversions and is therefore particularly useful in larger numerical operations.
+ * Alicorn provides two concrete implementations of `AbstractQuantity` and `AbstractQuantityArray`:
+   - `SimpleQuantity` and `SimpleQuantityArray`, which explicitly contain a physical unit and is therefore easy to read and interpret.
+   - `Quantity` and `QuantityArray`, which store only the physical dimension and reference a common set of `InternalUnits`. This structure reduces the need for unit conversions and is therefore particularly useful in larger numerical operations.
  * Both kinds of quantities can be freely combined to allow intuitive manipulation of quantities.
 
 ## Installation
@@ -44,9 +44,9 @@ pkg> add Alicorn
 
 ## Quick Start
 
-The listing below shows a minimal example of how to use Alicorn. Refer to the [Basic Usage](@ref) section for more details.
+The listing below shows a minimal example of how to use Alicorn. Refer to the [Basic Usage](https://huemmer-daniel.github.io/Alicorn/stable/manual/basic_usage/) section for more details.
 
-First, let us calculate a force as a [`SimpleQuantity`](@ref):
+First, let us calculate a force as a `SimpleQuantity`:
 ```jldoctest
 julia> using Alicorn
 
@@ -64,7 +64,7 @@ julia> force = mass * acceleration
 julia> inUnitsOf(force, ucat.kilo * ucat.newton)
 0.02 kN
 ```
-We can perform the same caluclation using [`Quantity`](@ref), choosing a set of [`InternalUnits`](@ref) first:
+We can perform the same caluclation using `Quantity`, choosing a set of `InternalUnits` first:
 ```jldoctest
 julia> using Alicorn
 
